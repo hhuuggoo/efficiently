@@ -1,0 +1,17 @@
+#+STARTUP: hidestars
+#+STARTUP: showall
+#+TODO: todo inprogress | done
+
+* Functionality
+** emails to create items, place in inbox
+** inbox/trashbox
+** multiple pages per account
+** local storage
+** syncing with server
+** todo state
+** hash tags, searching
+** create delete todostate hide
+** keyboard nav to move items
+** drag drop for movement
+** clean dirty models
+
