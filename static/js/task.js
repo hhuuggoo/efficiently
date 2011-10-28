@@ -1,17 +1,19 @@
-function Task(){
+var task = {}
+task.Task = function(){
     this.name = ""
     this.dirty = {};
 }
-Task.prototype = new Model()
-Task.prototype._name_setter = function(value){
+task.Task.prototype = new model.Model()
+task.Task.prototype._name_setter = function(value){
     console.log('name');
     console.log(value);
     this.name = value;
 }
 
-a = new Task();
-b = new Task();
-a.set('name', 'hello');
 
+
+a = new task.Task();
+b = new task.Task();
+a.set('name', 'sdf');
 console.log(a.dirty);
 console.log(b.dirty);
