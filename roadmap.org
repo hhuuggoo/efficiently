@@ -4,8 +4,11 @@
 
 * Functionality
 ** done clean dirty models
-** local storage
+** done local storage
+** create outline object
+** render outline object
 ** create delete todostate hide
+** visualization
 ** todo state
 ** keyboard nav to move items
 ** drag drop for movement
