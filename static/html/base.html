@@ -2,12 +2,22 @@
 <!-- saved from url=(0050)http://www.blueprintcss.org/tests/parts/forms.html -->
 <html lang="en">
   <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="../js/underscore-1.1.4.js"></script>
+    <script type="text/template" id="outline-template">
+      <div>
+	<b>&middot;</b>
+	<div id="<%= id %>-todostate"><%= todostate %></div>
+	<div id="<%= id %>-text"><%=text %></div>
+	<div id="<%= id %>-children"></div>
+      </div>
+    </script>
+    <script src="../js/underscore.js"></script>
     <script src="../js/jquery-1.4.4.min.js"></script>
     <script src="../js/underscore.string.js"></script>
+    <script src="../js/localstorage.js"></script>
     <script src="../js/model.js"></script>
     <script src="../js/outline.js"></script>
-    <script src="../js/localstorage.js"></script>
+
     <body>
+      <div id="main-outline"/>
     </body>
 </html>

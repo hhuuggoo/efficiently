@@ -24,3 +24,32 @@ model.Model.prototype.get = function(field){
     }
 };
 
+model.Model.prototype.to_dict = function(){
+    var data = {}
+    var obj = this;
+    _.each(this.fields, 
+	   function(f){
+	       data[f] = obj.get(f);
+	   });
+    return data;
+
+}
+
+model.Model.prototype.update = function(data){
+    var obj = this;
+    _.each(this.fields,
+	   function(f){
+	       if (f in data){
+		   obj.set(f, data[f]);
+	       }
+	   });
+}
+
+model.Model.prototype.serialize = function(){
+    return JSON.stringify(this.to_dict());
+}
+
+model.Model.prototype.deserialize = function(str){
+    var data = JSON.parse(str);
+    this.update(data);
+}

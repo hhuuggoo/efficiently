@@ -13,10 +13,13 @@ storage.guid = function(store_id) {
     }
 };
 
-storage.Collections = function(store_id){
+storage.Collections = function(store_id, types){
     this.store_id = store_id;
     this.collections  = {};
-    this.types = {};
+    if (!types){
+	types = {}
+    }
+    this.types = types;
 }
 
 storage.Collections.prototype.storage_key = function(key, collection){
@@ -45,7 +48,7 @@ storage.Collections.prototype.save = function(key, value, collection){
     //saves from local storage and adds to in memory data structure
     var serialized;
     if (collection in this.types){
-	serialized = this.types[collection].serialize(value);
+	serialized = value.serialize();
     }else{
 	serialized = JSON.stringify(value)
     }
@@ -70,7 +73,10 @@ storage.Collections.prototype.load_all = function(){
 	collection = data[1];
         val = localStorage[storage_key];
 	if (collection in this.types){
-	    val = this.types[collection].deserialize(val);
+	    var tmp = new this.types[collection]()
+	    tmp.deserialize(val);
+	    val = tmp;
+	
 	}else{
 	    val = JSON.parse(val);
 	}
@@ -78,8 +84,4 @@ storage.Collections.prototype.load_all = function(){
     }
 }
 
-mystore = new storage.Collections('id5');
-mystore.load_all();
-mystore.save('1', [1,2,3,4,5], 'array')
-mystore.save('1', {'a':1}, 'dict')
 
