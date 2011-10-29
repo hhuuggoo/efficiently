@@ -7,9 +7,9 @@ storage.timestamp = function(){
 };
 storage.guid = function(store_id) {
     if (store_id){
-	return store_id + "-" + S4() + "-" + timestamp();
+	return store_id + "-" + storage.S4() + "-" + storage.timestamp();
     }else{
-	return S4() + "-" + timestamp();
+	return storage.S4() + "-" + storage.timestamp();
     }
 };
 
@@ -21,7 +21,9 @@ storage.Collections = function(store_id, types){
     }
     this.types = types;
 }
-
+storage.Collections.prototype.new_id = function(){
+    return storage.guid(this.store_id);
+}
 storage.Collections.prototype.storage_key = function(key, collection){
     return JSON.stringify([this.store_id, key, collection]);
 }
@@ -43,6 +45,12 @@ storage.Collections.prototype.set_mem = function(key, value, collection){
     }
     this.collections[collection][key] = value;
 }
+storage.Collections.prototype.remove_mem = function(key, collection){
+    if (!(collection in this.collections)){
+	this.collections[collection] = {};
+    }
+    delete this.collections[collection][key];
+}
 
 storage.Collections.prototype.save = function(key, value, collection){
     //saves from local storage and adds to in memory data structure
@@ -55,7 +63,14 @@ storage.Collections.prototype.save = function(key, value, collection){
     localStorage.setItem(this.storage_key(key, collection), serialized);
     this.set_mem(key, value, collection);
 }
+storage.Collections.prototype.remove = function(key, collection){
+    delete localStorage[this.storage_key(key, collection)];
+    this.remove_mem(key, collection);
+}
 storage.Collections.prototype.get = function(key, collection){
+    if (!(collection in this.collections)){
+	return null;
+    }
     return this.collections[collection][key];
 }
 storage.Collections.prototype.load_all = function(){
