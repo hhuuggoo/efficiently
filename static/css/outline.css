@@ -78,3 +78,7 @@ button{
     color: #444;
     	  cursor: pointer;
 }
+
+.hide{
+    display : None;
+}

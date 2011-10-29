@@ -67,11 +67,16 @@ outline.Outline.prototype.render_children = function(){
     var ids = this.get('children');
     var obj = this;
     this.field_el('children').children().detach();
-    _.each(ids, function(id){
-	var child = collections.get(id, 'outline');
-	child.render();
-	this.field_el('children').append(child.el);
-    });
+    if (ids.length == 0){
+	obj.field_el('children').hide();
+    }else{
+	obj.field_el('children').show();
+	_.each(ids, function(id){
+	    var child = collections.get(id, 'outline');
+	    child.render();
+	    obj.field_el('children').append(child.el);
+	});
+    }
 }
 outline.Outline.prototype.render_function = function(field){
     var obj = this;
@@ -103,6 +108,17 @@ outline.Outline.prototype.hook_events = function(){
 	parent.render();
 	newnode.field_el('text').delay(300).focus();
     }
+    this.field_el('content').mouseout(
+    	function(){
+    	    $(".image", obj.field_el('content')).hide()
+    	}
+    );
+    this.field_el('content').mouseover(
+    	function(){
+    	    $(".image", obj.field_el('content')).show()
+    	}
+    );
+        
     this.field_el('content').droppable(
         {'tolerance':'pointer',
 	 'hoverClass': "ui-state-hover",

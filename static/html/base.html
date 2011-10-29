@@ -19,7 +19,7 @@
 	  <textarea id="<%= id %>-text" 
 		    class="outline-input"><%= text %>
 	  </textarea>
-	  <image class="image"> </image>
+	  <image class="image hide"> </image>
 	</div>
 	<div class="edge"></div>
 	<ul id="<%= id %>-children" class="square"></ul>
@@ -33,7 +33,8 @@
       </div>
     </script>
     <script src="../js/underscore.js"></script>
-    <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+    
+    <script src="../js/jquery-1.6.4.min.js"></script>
     <script src="../js/jquery.autoresize.js"></script>
     <script type="text/javascript" src="../js/jquery-ui-1.8.16.custom.js"></script>
     <script src="../js/tabs.js"></script>
@@ -60,34 +61,6 @@
 	      <!-- Give ID that matches HREF of above anchors -->
 	      <li class="active" id="main">
 		<div id="main-outline"></div>
-		<ul id="test" class="square">
-		  <li><textarea>
-		      test
-		      </textarea>
-
-		  </li>
-		  <ul class="square">
-		    <li><textarea>test
-			</textarea>
-		      <image class="image"> </image>
-		    </li>
-		    <ul class="square">
-		      <li><textarea>test</textarea>
-			<image class="image"> </image>
-		      </li>
-		      <ul class="square">
-			<li><textarea>  </textarea>
-			  <image class="image"> </image>
-			</li>
-			<ul class="square">
-			  <li><textarea>laskdjflasdkfj;asldkfjas;ldfk</textarea>
-			    <image class="image"> </image>
-			  </li>
-			</ul>
-		      </ul>
-		    </ul>
-		  </ul>
-		</ul>
 	      <li id="account">
 		Your Account
 	      </li>
