@@ -19,6 +19,9 @@ outline.Outline.prototype.field_id = function(fld){
 outline.Outline.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
 }
+outline.Outline.prototype.render_text = function(){
+    $("#" + this.field_id('text'), this.el).val(this.get('text'));
+}
 outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
 }
@@ -34,9 +37,9 @@ outline.Outline.prototype.render_children = function(){
 outline.Outline.prototype.render_function = function(field){
     var obj = this;
     if ("render_"  + field in this){
-	return function(f){obj["render_"  + field]()};
+	return function(){obj["render_"  + field]()};
     }else{
-	return function(f) {obj.render_field(f);};
+	return function() {obj.render_field(field);};
     }
 }
 outline.Outline.prototype.render = function(){
@@ -54,7 +57,6 @@ outline.Outline.prototype.render = function(){
 }
 collections = new storage.Collections('id5', {'outline' : outline.Outline});
 $(function(){
-
     collections.load_all();
     var root_id = 'id1'
     var root = collections.get(root_id, 'outline')

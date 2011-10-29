@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/skeleton.css">
     <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/outline.css">
     <script type="text/template" id="outline-template">
       <li>
-	<div id="<%= id %>-todostate"><%= todostate %></div>
-	<div id="<%= id %>-text"><%=text %></div>
-	<div id="<%= id %>-children"></div>
+	<textarea id="<%= id %>-text"></textarea>
+	<ul id="<%= id %>-children" class="square"></div>
       </li>
     </script>
     <script src="../js/underscore.js"></script>
@@ -32,14 +32,29 @@
 	<div class="sixteen columns">
 	  <ul class="tabs">
 	    <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
-	    <li><a class="active" href="#main">Simple</a></li>
-	    <li><a href="#account">Lightweight</a></li>
+	    <li><a class="active" href="#main">Main</a></li>
+	    <li><a href="#account">Your Account</a></li>
 	  </ul>
 	  <!-- Standard <ul> with class of "tabs-content" -->
 	  <ul class="tabs-content">
 	    <!-- Give ID that matches HREF of above anchors -->
 	    <li class="active" id="main">
-	      <ul id="main-outline" class="disc">
+	      <ul id="main-outline" class="square">
+	      </ul>
+	      <ul id="test" class="square">
+		<li>test</li>
+		<ul class="square">
+		  <li>test</li>
+		  <ul class="square">
+		    <li>test</li>
+		    <ul class="square">
+		      <li><textarea></textarea></li>
+		      <ul class="square">
+			<li>test</li>
+		      </ul>
+		    </ul>
+		  </ul>
+		</ul>
 	      </ul>
 	    <li id="account">
 	      Your Account
