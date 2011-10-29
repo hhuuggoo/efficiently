@@ -5,15 +5,24 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Tasks</title>
+    <link rel="stylesheet" href="../themes/base/jquery.ui.all.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/skeleton.css">
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/outline.css">
+
     <script type="text/template" id="outline-template">
       <li id="<%= id %>">
-	<div id="<%= id %>-todostate"><%= todostate %></div>
-	<textarea id="<%= id %>-text" class="outline-input"><%= text %></textarea>
+	<div id="<%= id%>-content" class="content">
+	  <div id="<%= id %>-todostate"><%= todostate %></div>
+	  
+	  <textarea id="<%= id %>-text" 
+		    class="outline-input"><%= text %>
+	  </textarea>
+	  <image class="image"> </image>
+	</div>
 	<ul id="<%= id %>-children" class="square"></ul>
+	<div class="loweredge" id="<%= id %>-edge"></div>
       </li>
     </script>
     <script type="text/template" id="root-template">
@@ -25,6 +34,7 @@
     <script src="../js/underscore.js"></script>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script src="../js/jquery.autoresize.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui-1.8.16.custom.js"></script>
     <script src="../js/tabs.js"></script>
     <script src="../js/underscore.string.js"></script>
     <script src="../js/localstorage.js"></script>
@@ -38,7 +48,7 @@
 	<hr />
 
 	<div class="sixteen columns">
-	  <div class="one-third column">
+	  <div>
 	    <ul class="tabs">
 	      <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
 	      <li><a class="active" href="#main">Main</a></li>
@@ -50,15 +60,28 @@
 	      <li class="active" id="main">
 		<div id="main-outline"></div>
 		<ul id="test" class="square">
-		  <li>test</li>
+		  <li><textarea>
+		      test
+		      </textarea>
+
+		  </li>
 		  <ul class="square">
-		    <li>test</li>
+		    <li><textarea>test
+			</textarea>
+		      <image class="image"> </image>
+		    </li>
 		    <ul class="square">
-		      <li>test</li>
+		      <li><textarea>test</textarea>
+			<image class="image"> </image>
+		      </li>
 		      <ul class="square">
-			<li><textarea></textarea></li>
+			<li><textarea>  </textarea>
+			  <image class="image"> </image>
+			</li>
 			<ul class="square">
-			  <li>test</li>
+			  <li><textarea>laskdjflasdkfj;asldkfjas;ldfk</textarea>
+			    <image class="image"> </image>
+			  </li>
 			</ul>
 		      </ul>
 		    </ul>

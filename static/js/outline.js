@@ -40,10 +40,18 @@ outline.Outline.prototype.remove_child = function(child){
 outline.Outline.prototype.template = _.template($('#outline-template').html())
 roottemplate = _.template($('#root-template').html())
 outline.Outline.prototype.field_id = function(fld){
-    return this.get('id') + "-" + fld;
+    if (!fld){
+	return this.get('id');
+    }else{
+	return this.get('id') + "-" + fld;
+    }
 }
 outline.Outline.prototype.field_el = function(fld){
-    return $("#" + this.field_id(fld), this.el);
+    if (!fld){
+	return this.el;
+    }else{
+	return $("#" + this.field_id(fld), this.el);
+    }
 }
 
 outline.Outline.prototype.render_field = function(field){
@@ -106,6 +114,7 @@ outline.Outline.prototype.hook_events = function(){
 	    }
 	}
     });    				   
+    this.field_el('content').draggable({'revert':'invalid'});
 }
 outline.Outline.prototype.render = function(isroot){
     if (!this.el){
