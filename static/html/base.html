@@ -2,22 +2,50 @@
 <!-- saved from url=(0050)http://www.blueprintcss.org/tests/parts/forms.html -->
 <html lang="en">
   <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Tasks</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/skeleton.css">
+    <link rel="stylesheet" href="../css/layout.css">
     <script type="text/template" id="outline-template">
-      <div>
-	<b>&middot;</b>
+      <li>
 	<div id="<%= id %>-todostate"><%= todostate %></div>
 	<div id="<%= id %>-text"><%=text %></div>
 	<div id="<%= id %>-children"></div>
-      </div>
+      </li>
     </script>
     <script src="../js/underscore.js"></script>
     <script src="../js/jquery-1.4.4.min.js"></script>
+    <script src="../js/tabs.js"></script>
     <script src="../js/underscore.string.js"></script>
     <script src="../js/localstorage.js"></script>
     <script src="../js/model.js"></script>
     <script src="../js/outline.js"></script>
 
     <body>
-      <div id="main-outline"/>
+      <div class="container">
+	<h1 class="remove-bottom" style="margin-top: 40px">Tasks</h1>
+	<h5>Version 0.1</h5>
+	<hr />
+
+	<div class="sixteen columns">
+	  <ul class="tabs">
+	    <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
+	    <li><a class="active" href="#main">Simple</a></li>
+	    <li><a href="#account">Lightweight</a></li>
+	  </ul>
+	  <!-- Standard <ul> with class of "tabs-content" -->
+	  <ul class="tabs-content">
+	    <!-- Give ID that matches HREF of above anchors -->
+	    <li class="active" id="main">
+	      <ul id="main-outline" class="disc">
+	      </ul>
+	    <li id="account">
+	      Your Account
+	    </li>
+	  </ul>
+	</div>
+      </div>
     </body>
 </html>
