@@ -52,7 +52,7 @@ storage.Collections.prototype.save = function(key, value, collection){
     }else{
 	serialized = JSON.stringify(value)
     }
-    localStorage.setItem(this.storage_key(key, collection), JSON.stringify(value));
+    localStorage.setItem(this.storage_key(key, collection), serialized);
     this.set_mem(key, value, collection);
 }
 storage.Collections.prototype.get = function(key, collection){

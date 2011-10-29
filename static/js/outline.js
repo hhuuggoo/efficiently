@@ -19,13 +19,22 @@ outline.Outline.prototype.field_id = function(fld){
 outline.Outline.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
 }
-outline.Outline.prototype.render_children = function(field){
-
+outline.Outline.prototype.save = function(){
+    collections.save(this.id, this, 'outline');
+}
+outline.Outline.prototype.render_children = function(){
+    var ids = this.get('children');
+    var obj = this;
+    _.each(ids, function(id){
+	var child = collections.get(id, 'outline');
+	child.render();
+	$("#" + obj.field_id('children'), obj.el).append(child.el);
+    });
 }
 outline.Outline.prototype.render_function = function(field){
     var obj = this;
     if ("render_"  + field in this){
-	return this["render_" + field];
+	return function(f){obj["render_"  + field]()};
     }else{
 	return function(f) {obj.render_field(f);};
     }
@@ -38,17 +47,17 @@ outline.Outline.prototype.render = function(){
     _.each(this.fields, function(f){
 	
 	if (obj.dirty[f]){
-	    obj.render_function(f)();
+	    obj.render_function(f).call(obj);
 	    delete obj.dirty[f];
 	}
     });
 }
-
+collections = new storage.Collections('id5', {'outline' : outline.Outline});
 $(function(){
-    mycollections = new storage.Collections('id5', {'outline' : outline.Outline});
-    mycollections.load_all();
+
+    collections.load_all();
     var root_id = 'id1'
-    var root = mycollections.get(root_id, 'outline')
+    var root = collections.get(root_id, 'outline')
     root.render()
     $('#main-outline').append(root.el);
 })
