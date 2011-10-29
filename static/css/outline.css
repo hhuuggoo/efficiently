@@ -9,7 +9,7 @@ content{
     float: right;
     width:20px;
     height:20px;
-    background:blue;
+    background: #eee
 }
 textarea{
     border: 0;
@@ -19,7 +19,7 @@ textarea{
     -webkit-border-radius: 0;
     font: inherit;
     border-radius: 0;
-    color: #777;
+    color: #111;
     margin: 0;
     width: 80%;
     display: inline;
@@ -31,6 +31,7 @@ textarea{
     overflow: hidden;
     resize: none;
     clear: none;
+    font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 textarea:focus{
@@ -41,7 +42,7 @@ textarea:focus{
     -webkit-border-radius: 0;
     font: inherit;
     border-radius: 0;
-    color: #777;
+    color: #111;
     margin: 0;
     width: 80%;
     display: inline;
@@ -53,10 +54,11 @@ textarea:focus{
     overflow: hidden;
     resize: none;
     clear: none;
+    font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 
-.loweredge{
+.edge{
     width: 100%;
     height: 2px;
 }

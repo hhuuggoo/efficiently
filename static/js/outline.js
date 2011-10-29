@@ -70,7 +70,7 @@ outline.Outline.prototype.render_children = function(){
     _.each(ids, function(id){
 	var child = collections.get(id, 'outline');
 	child.render();
-	$("#" + obj.field_id('children'), obj.el).append(child.el);
+	this.field_el('children').append(child.el);
     });
 }
 outline.Outline.prototype.render_function = function(field){
@@ -83,14 +83,42 @@ outline.Outline.prototype.render_function = function(field){
 }
 outline.Outline.prototype.hook_events = function(){
     var obj = this;
-    var savetext = function(e){
-	var newval = $("#" + obj.field_id('text')).val();
+    var savetext = function(){
+	var newval = obj.field_el('text').val();
 	obj.set('text', newval);
 	obj.save();
 	delete obj.dirty['text'];
 	console.log('blur')
-	e.preventDefault();
     }
+    var deletenode = function(){
+	var parent = collections.get(obj.parent, 'outline')
+	parent.remove_child(obj);
+	collections.remove(obj.id, 'outline');
+	parent.render();
+    }
+    var addnewnode = function(){
+	var newnode = new outline.Outline(collections.new_id());
+	var parent = collections.get(obj.parent, 'outline')
+	parent.add_child(newnode);
+	parent.render();
+	newnode.field_el('text').delay(300).focus();
+    }
+    this.field_el('content').droppable(
+        {'tolerance':'pointer',
+	 'hoverClass': "ui-state-hover",
+	 'drop': function(e, ui){
+	     var dropping_id = ui.draggable.data()['id'];
+	     var droppingnode = collections.get(dropping_id, 'outline');
+	     var droppingparent = collections.get(droppingnode.parent, 'outline');
+	     droppingparent.remove_child(droppingnode);
+	     obj.add_child(droppingnode);
+	     droppingparent.render();
+	     obj.render();
+	     ui.draggable.css('position', 'static');
+	 }
+	}
+    );
+            
     this.field_el('text').blur(savetext);
     this.field_el('text').keypress(function(e){
 	if (e.keyCode == ENTER){
@@ -99,22 +127,24 @@ outline.Outline.prototype.hook_events = function(){
     });
     this.field_el('text').keyup(function(e){
 	if (e.keyCode == ENTER){
-	    obj.field_el('text').blur();
-	    var newnode = new outline.Outline(collections.new_id());
-	    var parent = collections.get(obj.parent, 'outline')
-	    parent.add_child(newnode);
-	    parent.render();
-	    newnode.field_el('text').delay(2000).focus();
-	}else if (e.keyCode == BACKSPACE){
-	    if (!obj.get('text')){
-		var parent = collections.get(obj.parent, 'outline')
-		parent.remove_child(obj);
-		collections.remove(obj.id, 'outline');
-		parent.render();
+	    obj.field_el('text').blur()
+	    var newval = obj.field_el('text').val();
+	    if (!newval && obj.get('children').length == 0){
+	    }else{
+		addnewnode();
 	    }
+	}else if (e.keyCode == BACKSPACE){
+	    var newval = obj.field_el('text').val();
+	    if (!newval && obj.get('children').length == 0
+		&& obj.last_backspace_txt==newval){
+		obj.field_el('text').blur();
+		deletenode();
+	    }
+	    obj.last_backspace_txt = newval;
 	}
     });    				   
     this.field_el('content').draggable({'revert':'invalid'});
+    this.field_el('content').data({'id':this.id});
 }
 outline.Outline.prototype.render = function(isroot){
     if (!this.el){
