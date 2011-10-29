@@ -5,8 +5,9 @@
 * Functionality
 ** done clean dirty models
 ** done local storage
-** create outline object
-** render outline object
+** done create outline object
+** done render outline object
+** done made it pretty
 ** create delete todostate hide
 ** visualization
 ** todo state
