@@ -27,14 +27,19 @@ outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
 }
 
-outline.Outline.prototype.add_child = function(child){
+outline.Outline.prototype.add_child = function(child, index){
     var children = this.get('children')
-    children.push(child.id)
+    if (!index){
+	children.push(child.id)
+    }else{
+	children.splice(index, 0, child.id);
+    }
     this.set('children', children);
     child.set('parent', this.id);
     this.save()
     child.save()
 }
+
 outline.Outline.prototype.remove_child = function(child){
     var children = this.get('children')
     children = _.filter(children, function(x){return x != child.id});
@@ -220,11 +225,35 @@ outline.Outline.prototype.hook_events = function(){
 	     obj.add_child(droppingnode);
 	     droppingparent.render();
 	     obj.render();
-	     ui.draggable.css('position', 'static');
+	     ui.draggable.css(
+		 {'top' : 0 + "px", 'left' : 0 + "px"}
+	     );
 	 }
 	}
     );
-            
+    this.field_el('edge').droppable(
+	{'tolerance':'pointer',
+	 'hoverClass': "ui-state-hover",
+	 'drop': function(e, ui){
+	     var currentparent = collections.get(obj.get('parent'), 'outline');
+	     var currentsiblings = currentparent.get('children');
+	     var currentindex = _.indexOf(currentsiblings, obj.id);
+	     var newindex = currentindex + 1;
+
+	     var dropping_id = ui.draggable.data()['id'];
+	     var droppingnode = collections.get(dropping_id, 'outline');
+	     var droppingparent = collections.get(droppingnode.parent, 'outline');
+	     droppingparent.remove_child(droppingnode);
+	     currentparent.add_child(droppingnode, newindex);
+	     droppingparent.render();
+	     currentparent.render();
+	     ui.draggable.css(
+		 {'top' : 0 + "px", 'left' : 0 + "px"}
+	     );
+
+	 }
+	}
+    )
     this.field_el('text').blur(savetext);
     this.field_el('text').keypress(function(e){
 	if (e.keyCode == ENTER){

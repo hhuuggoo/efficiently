@@ -45,7 +45,6 @@ textarea{
     width: 90%;
     display: inline;
     margin-bottom: 0;
-    background: #fff;
     height: 0;
     min-height: 18px;
     vertical-align: text-top;
@@ -53,6 +52,7 @@ textarea{
     resize: none;
     clear: none;
     font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: inherit;
 }
 
 textarea:focus{
@@ -68,7 +68,6 @@ textarea:focus{
     width: 90%;
     display: inline;
     margin-bottom: 0;
-    background: #fff;
     height: 0;
     min-height: 18px;
     vertical-align: text-top;
@@ -76,12 +75,16 @@ textarea:focus{
     resize: none;
     clear: none;
     font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: inherit;
+
 }
 
 
 .edge{
-    width: 100%;
-    height: 2px;
+    width : 100%;
+    float:left;
+    height: 5px;
+    clear: both;
 }
 
 button{
@@ -141,4 +144,7 @@ button{
     border: 1px solid #aaa;
     color: #444;
     cursor: pointer;
+}
+.ui-state-hover{
+    background : #eee
 }
