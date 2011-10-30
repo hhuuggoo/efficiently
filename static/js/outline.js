@@ -68,9 +68,9 @@ outline.Outline.prototype.render_children = function(){
     var obj = this;
     this.field_el('children').children().detach();
     if (ids.length == 0){
-	obj.field_el('children').hide();
+	obj.field_el('childcontainer').hide();
     }else{
-	obj.field_el('children').show();
+	obj.field_el('childcontainer').show();
 	_.each(ids, function(id){
 	    var child = collections.get(id, 'outline');
 	    child.render();
@@ -108,16 +108,16 @@ outline.Outline.prototype.hook_events = function(){
 	parent.render();
 	newnode.field_el('text').delay(300).focus();
     }
-    this.field_el('content').mouseout(
-    	function(){
-    	    $(".image", obj.field_el('content')).hide()
-    	}
-    );
-    this.field_el('content').mouseover(
-    	function(){
-    	    $(".image", obj.field_el('content')).show()
-    	}
-    );
+    // this.field_el('content').mouseout(
+    // 	function(){
+    // 	    $(".image", obj.field_el('content')).hide()
+    // 	}
+    // );
+    // this.field_el('content').mouseover(
+    // 	function(){
+    // 	    $(".image", obj.field_el('content')).show()
+    // 	}
+    // );
         
     this.field_el('content').droppable(
         {'tolerance':'pointer',
@@ -162,9 +162,6 @@ outline.Outline.prototype.hook_events = function(){
     this.field_el('content').draggable({'revert':'invalid'});
     this.field_el('content').data({'id':this.id});
     this.field_el('content').dblclick(
-	function(){
-	    alert('double');
-	}
     );
     
 }
@@ -178,6 +175,7 @@ outline.Outline.prototype.render = function(isroot){
 	    this.hook_events()
 	}
 	this.field_el('text').autoResize();
+	this.field_el('childcontainer').hide();
     }
     var obj = this;
     _.each(this.fields, function(f){
