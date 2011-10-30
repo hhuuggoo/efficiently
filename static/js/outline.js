@@ -3,8 +3,9 @@ var BACKSPACE = 8;
 var outline = {}
 window.todostates = ["TODO", "INPROGRESS", "DONE", null];
 window.todocolors  = {'TODO' : 'red',
-		      'INPROGRESS', 'red'
-		      'DONE' : green};
+		      'INPROGRESS': 'red',
+		      'DONE' : 'green'}
+
 
 outline.Outline = function(id){
     this.set('id', id);
@@ -68,6 +69,27 @@ outline.Outline.prototype.render_text = function(){
     var obj = this;
     node.ready(function(){node.resizeNow.call(node);});
 }
+outline.Outline.prototype.render_todostate = function(){
+    var currstate = this.get('todostate');
+    this.field_el('todostate').html(currstate);
+    if (currstate in window.todocolors){
+	this.field_el('todostate').css('color', window.todocolors[currstate]);
+    }else{
+	this.field_el('todostate').css('color', 'black');
+    }
+    //adjust width of text to match size;
+    var obj = this;
+    this.field_el('todostate').ready(
+	function(){
+	    var w1 = obj.field_el('todostate').width();
+	    var w2 = obj.field_el('content').width();
+	    console.log([w1,w2]);
+	    var factor = 0.9;
+	    obj.field_el('text').width(factor * (w2-w1));
+	    console.log(['setting', factor * (w2-w1)]);
+	}
+    );
+}
 outline.Outline.prototype.render_children = function(){
     var ids = this.get('children');
     var obj = this;
@@ -91,6 +113,20 @@ outline.Outline.prototype.render_function = function(field){
 	return function() {obj.render_field(field);};
     }
 }
+var deletenode = function(obj){
+    var parent = collections.get(obj.parent, 'outline')
+    parent.remove_child(obj);
+    collections.remove(obj.id, 'outline');
+    parent.render();
+}
+var addsibling = function(obj){
+    var newnode = new outline.Outline(collections.new_id());
+    var parent = collections.get(obj.parent, 'outline')
+    parent.add_child(newnode);
+    parent.render();
+    newnode.field_el('text').delay(300).focus();
+}
+
 outline.Outline.prototype.hook_events = function(){
     var obj = this;
     var savetext = function(){
@@ -99,19 +135,6 @@ outline.Outline.prototype.hook_events = function(){
 	obj.save();
 	delete obj.dirty['text'];
 	console.log('blur')
-    }
-    var deletenode = function(){
-	var parent = collections.get(obj.parent, 'outline')
-	parent.remove_child(obj);
-	collections.remove(obj.id, 'outline');
-	parent.render();
-    }
-    var addnewnode = function(){
-	var newnode = new outline.Outline(collections.new_id());
-	var parent = collections.get(obj.parent, 'outline')
-	parent.add_child(newnode);
-	parent.render();
-	newnode.field_el('text').delay(300).focus();
     }
     this.field_el('content').droppable(
         {'tolerance':'pointer',
@@ -141,14 +164,14 @@ outline.Outline.prototype.hook_events = function(){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0){
 	    }else{
-		addnewnode();
+		addsibling(obj);
 	    }
 	}else if (e.keyCode == BACKSPACE){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0
 		&& obj.last_backspace_txt==newval){
 		obj.field_el('text').blur();
-		deletenode();
+		deletenode(obj);
 	    }
 	    obj.last_backspace_txt = newval;
 	}
@@ -240,6 +263,7 @@ controls.hide();
 activeobj = null;
 $('#add-button').click(
     function(e){
+	addsibling(activeobj);
     }
 );
 $('#state-button').click(
@@ -263,6 +287,9 @@ $('#overview-button').click(
 );
 $('#del-button').click(
     function(e){
+	toggle_controls(e, activeobj);
+	deletenode(activeobj);
+	activeobj=null;
     }
 );
 window.controls = controls
