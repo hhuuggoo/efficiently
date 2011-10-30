@@ -10,15 +10,14 @@
     <link rel="stylesheet" href="../css/skeleton.css">
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/outline.css">
-
+    <div class="item-controls">
+      <button class="ctrl-button" id="add-button">add</button>
+      <button class="ctrl-button"  id="state-button">todo</button>
+      <button class="ctrl-button"  id="overview-button">hide</button>
+      <button class="ctrl-button" id="del-button">delete</button>
+    </div>
     <script type="text/template" id="outline-template">
       <div id="<%= id %>" class="outline">
-	<div class="item-controls" id="<%= id %>-item-controls">
-	  <button class="ctrl-button" id="<%= id %>-add-button">add</button>
-	  <button class="ctrl-button"  id="<%= id %>-state-button">todo</button>
-	  <button class="ctrl-button"  id="<%= id %>-overview-button">hide</button>
-	  <button class="ctrl-button" id="<%= id %>-del-button">delete</button>
-	</div>
 	<div class="nodecontainer">
 	  <div id="<%= id%>-content" class="content">
 	    <div class="fakedotcontainer" id="<%= id%>-fakedotcontainer">

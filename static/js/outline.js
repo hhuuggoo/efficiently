@@ -1,6 +1,11 @@
 var ENTER = 13;
 var BACKSPACE = 8;
 var outline = {}
+window.todostates = ["TODO", "INPROGRESS", "DONE", null];
+window.todocolors  = {'TODO' : 'red',
+		      'INPROGRESS', 'red'
+		      'DONE' : green};
+
 outline.Outline = function(id){
     this.set('id', id);
     this.set('text', '');
@@ -155,22 +160,21 @@ outline.Outline.prototype.hook_events = function(){
 	    toggle_controls(e, obj);
 	}
     );
-    
 }
 
 
 var toggle_controls = function(e, obj){
-    var controls = obj.field_el('item-controls');
     var activator = obj.field_el('fakedotcontainer');
     var show = function(e){
-	controls.show()
+	window.activeobj = obj;
+	window.controls.show()
 	var x = e.pageX;
 	var y = e.pageY;
 	x = x - 60;
 	y = y - 10;
 	x = 0 ? x<0 : x;
 	y = 0 ? y<0 : y;
-	controls.css(
+	window.controls.css(
 	    {'top' : y + "px", 'left' : x + "px"}
 	);
 	var border = 10;
@@ -179,10 +183,10 @@ var toggle_controls = function(e, obj){
 	var y3 = activator.offset().top;
 	var y4 = y3 + activator.height();
 
-	var x1 = controls.offset().left;
-	var x2 = x1 + controls.width();
-	var y1 = controls.offset().top;
-	var y2 = y1 + controls.height();
+	var x1 = window.controls.offset().left;
+	var x2 = x1 + window.controls.width();
+	var y1 = window.controls.offset().top;
+	var y2 = y1 + window.controls.height();
 
 	x3=x3-border; x4=x4+border; y3=y3-border; y4=y4+border;
 	x1=x1-border; x2=x2+border; y1=y1-border; y2=y2+border;
@@ -196,10 +200,16 @@ var toggle_controls = function(e, obj){
 	$(document).bind('click', callback);
     }
     var hide = function(e){
-	controls.hide();
+	window.controls.hide();
 	$(document).unbind('click');
+	window.activeobj = null;
     }
-    !controls.is(":visible") ? show(e) : hide(e);
+    if (window.activeobj != obj){
+	show(e);
+    }else{
+	!window.controls.is(":visible") ? show(e) : hide(e);
+    }
+
 }
 
 outline.Outline.prototype.render = function(isroot){
@@ -213,7 +223,6 @@ outline.Outline.prototype.render = function(isroot){
 	}
 	this.field_el('text').autoResize();
 	this.field_el('childcontainer').hide();
-	this.field_el('item-controls').hide();
     }
     var obj = this;
     _.each(this.fields, function(f){
@@ -226,6 +235,38 @@ outline.Outline.prototype.render = function(isroot){
 
 
 collections = new storage.Collections('id5', {'outline' : outline.Outline});
+controls = $('.item-controls');
+controls.hide();
+activeobj = null;
+$('#add-button').click(
+    function(e){
+    }
+);
+$('#state-button').click(
+    function(e){
+	var currstate = activeobj.get('todostate', null);	
+	var curridx = _.indexOf(window.todostates, currstate);
+	if (curridx < 0 || curridx >= window.todostates.length-1){
+	    curridx = 0;
+	}else{
+	    curridx = curridx + 1;
+	}
+	activeobj.set('todostate', window.todostates[curridx]);
+	activeobj.save();
+	activeobj.render();
+    }
+);
+
+$('#overview-button').click(
+    function(e){
+    }
+);
+$('#del-button').click(
+    function(e){
+    }
+);
+window.controls = controls
+window.activeobj = activeobj
 $(function(){
     collections.load_all();
     root_id = 'root'

@@ -112,6 +112,19 @@ button{
     position:fixed;
     z-index:2;
 }
+
+.todostate{
+    padding : 0px 10px 0px 10px;
+}
+
+.done {
+    color : green;
+}
+
+.notdone{
+    color: red;
+}
+
 .ctrl-button{
     float: left;
     clear: both;
