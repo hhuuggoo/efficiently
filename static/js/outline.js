@@ -61,16 +61,17 @@ outline.Outline.prototype.show_children = function(){
     }else{
 	this.field_el('childcontainer').hide();
     }
-    status = this.get('todostate');
+    status = this.get('todostate') ? this.get('todostate') : ''
     this.field_el('todostate').html(status);
 
 }
 outline.Outline.prototype.hide_children = function(){
     this.field_el('childcontainer').hide();
     if (this.get('children').length > 0){
-	status = this.get('todostate') + " +";
+	status = this.get('todostate') ? this.get('todostate') : ''
+	status = status + " +";
     }else{
-	status = this.get('todostate');
+	status = this.get('todostate') ? this.get('todostate') : ''
     }
     this.field_el('todostate').html(status);
 }
@@ -86,10 +87,10 @@ outline.Outline.prototype.show_all_descendants = function(){
 }
 
 outline.Outline.prototype.show_all_children = function(){
-    this.show_children();
     this.tree_apply(function(x){
 	x.hide_children();
     }, 1);
+    this.show_children();
 }
 
 outline.Outline.prototype.toggle_outline_state = function(){
@@ -259,6 +260,7 @@ outline.Outline.prototype.hook_events = function(){
 
 
 var toggle_controls = function(e, obj){
+    console.log('toggling controls')
     var activator = obj.field_el('fakedotcontainer');
     var show = function(e){
 	window.activeobj = obj;
@@ -267,8 +269,8 @@ var toggle_controls = function(e, obj){
 	var y = e.pageY;
 	x = x - 60;
 	y = y - 10;
-	x = 0 ? x<0 : x;
-	y = 0 ? y<0 : y;
+	x = x<0 ? 0 : x;
+	y = y<0 ? 0 : y;
 	window.controls.css(
 	    {'top' : y + "px", 'left' : x + "px"}
 	);
@@ -282,10 +284,11 @@ var toggle_controls = function(e, obj){
 	var x2 = x1 + window.controls.width();
 	var y1 = window.controls.offset().top;
 	var y2 = y1 + window.controls.height();
-
+	console.log([x1,x2,y1,y2]);
 	x3=x3-border; x4=x4+border; y3=y3-border; y4=y4+border;
 	x1=x1-border; x2=x2+border; y1=y1-border; y2=y2+border;
 	function callback(e){
+	    console.log([e.pageX, e.pageY]);
 	    if (!((e.pageX >= x1 && e.pageX <= x2 && e.pageY >= y1 && e.pageY <= y2) ||
 		  (e.pageX >= x3 && e.pageX <= x4 && e.pageY >= y3 && e.pageY <= y4))
 	       ){
@@ -311,9 +314,9 @@ outline.Outline.prototype.set_text_width = function(){
     var w1 = this.field_el('todostate').width();
     var w2 = this.field_el('content').width();
     var w3 = 13; //fakedotcontainer
-    console.log([w1,w2,w3]);
+    //console.log([w1,w2,w3]);
     var factor = 0.9;
-    console.log(factor * (w2-w1-w3));
+    //console.log(factor * (w2-w1-w3));
     this.field_el('text').width(factor * (w2-w1-w3));
 }
 
@@ -365,6 +368,7 @@ $('#state-button').click(
 
 $('#overview-button').click(
     function(e){
+	activeobj.toggle_outline_state();
     }
 );
 $('#del-button').click(
