@@ -161,6 +161,12 @@ outline.Outline.prototype.hook_events = function(){
     });    				   
     this.field_el('content').draggable({'revert':'invalid'});
     this.field_el('content').data({'id':this.id});
+    this.field_el('content').dblclick(
+	function(){
+	    alert('double');
+	}
+    );
+    
 }
 outline.Outline.prototype.render = function(isroot){
     if (!this.el){

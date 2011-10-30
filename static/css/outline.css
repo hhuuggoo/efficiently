@@ -4,12 +4,33 @@ content{
     clear: both;
     width: 100;
 }
-
-.image{
-    float: right;
-    width:20px;
-    height:20px;
-    background: #eee
+.outline{
+    float:left;
+    width:90%;
+}
+.todostate{
+    float: left;
+    height: 100%;
+}
+.children{
+    float:left;
+    width:90%
+}
+.nodecontainer{
+    float: left;
+    width: 90%;
+}
+.fakedotcontainer{
+    height:18px;
+    width:13px;
+    float: left;
+}
+.fakedot{
+    float: left;
+    width:5px;
+    height:5px;
+    background: #000;
+    margin: 7px 0px 0px 0px 
 }
 textarea{
     border: 0;

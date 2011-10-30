@@ -12,24 +12,34 @@
     <link rel="stylesheet" href="../css/outline.css">
 
     <script type="text/template" id="outline-template">
-      <li id="<%= id %>">
-	<div id="<%= id%>-content" class="content">
-	  <div id="<%= id %>-todostate"><%= todostate %></div>
-	  
-	  <textarea id="<%= id %>-text" 
-		    class="outline-input"><%= text %>
-	  </textarea>
-	  <image class="image hide"> </image>
+      <div id="<%= id %>" class="outline">
+	<!-- <div class="item-controls hide"> -->
+	<!--   <button class="add-button" id="<%= id %>-add-button">add</button> -->
+	<!--   <button class="state-button"  id="<%= id %>-state-button">todo</button> -->
+	<!--   <button class="overview-button"  id="<%= id %>-overview-button">hide</button> -->
+	<!--   <button class="del-button" id="<%= id %>-del-button">delete</button> -->
+	<!-- </div> -->
+	<div class="fakedotcontainer">
+	  <image class="fakedot"> </image>	  
 	</div>
-	<div class="edge"></div>
-	<ul id="<%= id %>-children" class="square"></ul>
-	<div class="edge" id="<%= id %>-edge"></div>
-      </li>
+	<div class="nodecontainer">
+	  <div id="<%= id%>-content" class="content">
+	    <div class="todostate" id="<%= id %>-todostate"><%= todostate %></div>
+	    <textarea id="<%= id %>-text" 
+		      class="outline-input"><%= text %></textarea>
+	    <!-- <div id="<%= id %>-txtdisplay"  -->
+	    <!-- 	    class="outline-input hide"><%= text %></div> -->
+	    <image class="image hide"> </image>
+	  </div>
+	  <div class="edge"></div>
+	  <div id="<%= id %>-children" class="children"></div>
+	  <div class="edge" id="<%= id %>-edge"></div>
+	</div>
     </script>
     <script type="text/template" id="root-template">
       <div id="<%= id %>">
-	<ul id="<%= id %>-children" class="square">
-	</ul>
+	<div id="<%= id %>-children" class="children">
+	</div>
       </div>
     </script>
     <script src="../js/underscore.js"></script>
