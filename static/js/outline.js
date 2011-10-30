@@ -108,17 +108,6 @@ outline.Outline.prototype.hook_events = function(){
 	parent.render();
 	newnode.field_el('text').delay(300).focus();
     }
-    // this.field_el('content').mouseout(
-    // 	function(){
-    // 	    $(".image", obj.field_el('content')).hide()
-    // 	}
-    // );
-    // this.field_el('content').mouseover(
-    // 	function(){
-    // 	    $(".image", obj.field_el('content')).show()
-    // 	}
-    // );
-        
     this.field_el('content').droppable(
         {'tolerance':'pointer',
 	 'hoverClass': "ui-state-hover",
@@ -161,10 +150,58 @@ outline.Outline.prototype.hook_events = function(){
     });    				   
     this.field_el('content').draggable({'revert':'invalid'});
     this.field_el('content').data({'id':this.id});
-    this.field_el('content').dblclick(
+    this.field_el('fakedotcontainer').click(
+	function(e){
+	    toggle_controls(e, obj);
+	}
     );
     
 }
+
+
+var toggle_controls = function(e, obj){
+    var controls = obj.field_el('item-controls');
+    var activator = obj.field_el('fakedotcontainer');
+    var show = function(e){
+	controls.show()
+	var x = e.pageX;
+	var y = e.pageY;
+	x = x - 60;
+	y = y - 10;
+	x = 0 ? x<0 : x;
+	y = 0 ? y<0 : y;
+	controls.css(
+	    {'top' : y + "px", 'left' : x + "px"}
+	);
+	var border = 10;
+	var x3 = activator.offset().left;
+	var x4 = x3 + activator.width();
+	var y3 = activator.offset().top;
+	var y4 = y3 + activator.height();
+
+	var x1 = controls.offset().left;
+	var x2 = x1 + controls.width();
+	var y1 = controls.offset().top;
+	var y2 = y1 + controls.height();
+
+	x3=x3-border; x4=x4+border; y3=y3-border; y4=y4+border;
+	x1=x1-border; x2=x2+border; y1=y1-border; y2=y2+border;
+	function callback(e){
+	    if (!((e.pageX >= x1 && e.pageX <= x2 && e.pageY >= y1 && e.pageY <= y2) ||
+		  (e.pageX >= x3 && e.pageX <= x4 && e.pageY >= y3 && e.pageY <= y4))
+	       ){
+		toggle_controls(e, obj);
+	    }
+	}
+	$(document).bind('click', callback);
+    }
+    var hide = function(e){
+	controls.hide();
+	$(document).unbind('click');
+    }
+    !controls.is(":visible") ? show(e) : hide(e);
+}
+
 outline.Outline.prototype.render = function(isroot){
     if (!this.el){
 	if (!isroot){
@@ -176,6 +213,7 @@ outline.Outline.prototype.render = function(isroot){
 	}
 	this.field_el('text').autoResize();
 	this.field_el('childcontainer').hide();
+	this.field_el('item-controls').hide();
     }
     var obj = this;
     _.each(this.fields, function(f){

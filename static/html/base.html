@@ -13,11 +13,11 @@
 
     <script type="text/template" id="outline-template">
       <div id="<%= id %>" class="outline">
-	<div class="item-controls hide">
-	  <button class="add-button" id="<%= id %>-add-button">add</button>
-	  <button class="state-button"  id="<%= id %>-state-button">todo</button>
-	  <button class="overview-button"  id="<%= id %>-overview-button">hide</button>
-	  <button class="del-button" id="<%= id %>-del-button">delete</button>
+	<div class="item-controls" id="<%= id %>-item-controls">
+	  <button class="ctrl-button" id="<%= id %>-add-button">add</button>
+	  <button class="ctrl-button"  id="<%= id %>-state-button">todo</button>
+	  <button class="ctrl-button"  id="<%= id %>-overview-button">hide</button>
+	  <button class="ctrl-button" id="<%= id %>-del-button">delete</button>
 	</div>
 	<div class="nodecontainer">
 	  <div id="<%= id%>-content" class="content">
@@ -30,7 +30,7 @@
 	    <image class="image hide"> </image>
 	  </div>
 	  <div id="<%= id%>-childcontainer" class="childcontainer">
-	    <div class="fakedotcontainer"></div>
+	    <div class="fakedotcontainer" id="<%= id%>-childspacer"></div>
 	    <div>
 	      <div class="edge"></div>
 	      <div id="<%= id %>-children" class="children"></div>
