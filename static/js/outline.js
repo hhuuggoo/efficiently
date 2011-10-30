@@ -6,26 +6,27 @@ window.todocolors  = {'TODO' : 'red',
 		      'INPROGRESS': 'red',
 		      'DONE' : 'green'}
 
-
+//outline_state, 0, show everything, 
 outline.Outline = function(id){
-    this.set('id', id);
+    this.set('id', id); 
     this.set('text', '');
     this.set('todostate', null);
-    this.set('hidden', false);
-    this.set('hide_state', 0);
     this.set('date', null);
     this.set('parent', null);
     this.set('children', []);
     this.dirty = {};
     this.el = null;
+    this.outline_state = 0;
 }
+
 //data model
 outline.Outline.prototype = new model.Model()
-outline.Outline.prototype.fields = ['id', 'text', 'todostate', 'hidden',
-				    'hide_state', 'date', 'children', 'parent']
+outline.Outline.prototype.fields = ['id', 'text', 'todostate', 
+				    'date', 'children', 'parent']
 outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
 }
+
 outline.Outline.prototype.add_child = function(child){
     var children = this.get('children')
     children.push(child.id)
@@ -40,9 +41,74 @@ outline.Outline.prototype.remove_child = function(child){
     this.set('children', children);
     this.save()
 }
-
+outline.Outline.prototype.tree_apply = function(func, level){
+    if (level>0 || level==null){
+	var new_level = (level == null) ? null : level - 1;
+	var children = this.get('children')
+	_.each(children, function(x){
+	    var child = collections.get(x, 'outline');
+	    child.tree_apply(func, new_level);
+	});
+    }
+    func(this);
+}
 
 //view
+
+outline.Outline.prototype.show_children = function(){
+    if (this.get('children').length > 0){
+	this.field_el('childcontainer').show();
+    }else{
+	this.field_el('childcontainer').hide();
+    }
+    status = this.get('todostate');
+    this.field_el('todostate').html(status);
+
+}
+outline.Outline.prototype.hide_children = function(){
+    this.field_el('childcontainer').hide();
+    if (this.get('children').length > 0){
+	status = this.get('todostate') + " +";
+    }else{
+	status = this.get('todostate');
+    }
+    this.field_el('todostate').html(status);
+}
+
+outline.Outline.prototype._get_child_hidden = function(){
+    return this.field_el('childcontainer').is(":visible");
+}
+
+outline.Outline.prototype.show_all_descendants = function(){
+    this.tree_apply(function(x){
+	x.show_children();
+    }, null);
+}
+
+outline.Outline.prototype.show_all_children = function(){
+    this.show_children();
+    this.tree_apply(function(x){
+	x.hide_children();
+    }, 1);
+}
+
+outline.Outline.prototype.toggle_outline_state = function(){
+    var curr_state = this.outline_state
+    if (curr_state < 0 || curr_state >=2){
+	curr_state = 0
+    }else{
+	curr_state = curr_state + 1;
+    }
+    this.outline_state = curr_state;
+    if (this.outline_state == 0){
+	this.show_all_descendants()
+    }else if (this.outline_state == 1){
+	this.hide_children();
+    }else if (this.outline_state == 2){
+	this.show_all_children();
+    }
+}
+
 outline.Outline.prototype.template = _.template($('#outline-template').html())
 roottemplate = _.template($('#root-template').html())
 outline.Outline.prototype.field_id = function(fld){
@@ -63,6 +129,7 @@ outline.Outline.prototype.field_el = function(fld){
 outline.Outline.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
 }
+
 outline.Outline.prototype.render_text = function(){
     var node = this.field_el('text')
     node.val(this.get('text'));
@@ -71,6 +138,8 @@ outline.Outline.prototype.render_text = function(){
 }
 outline.Outline.prototype.render_todostate = function(){
     var currstate = this.get('todostate');
+
+    	
     this.field_el('todostate').html(currstate);
     if (currstate in window.todocolors){
 	this.field_el('todostate').css('color', window.todocolors[currstate]);
@@ -79,16 +148,11 @@ outline.Outline.prototype.render_todostate = function(){
     }
     //adjust width of text to match size;
     var obj = this;
-    this.field_el('todostate').ready(
+    window.setTimeout(
 	function(){
-	    var w1 = obj.field_el('todostate').width();
-	    var w2 = obj.field_el('content').width();
-	    console.log([w1,w2]);
-	    var factor = 0.9;
-	    obj.field_el('text').width(factor * (w2-w1));
-	    console.log(['setting', factor * (w2-w1)]);
-	}
-    );
+	    obj.set_text_width();
+	}, 100);
+
 }
 outline.Outline.prototype.render_children = function(){
     var ids = this.get('children');
@@ -104,6 +168,14 @@ outline.Outline.prototype.render_children = function(){
 	    obj.field_el('children').append(child.el);
 	});
     }
+    _.each(ids, function(id){
+	var child = collections.get(id, 'outline');
+	window.setTimeout(
+	    function(){
+		child.set_text_width();
+	    }, 100)
+    });
+
 }
 outline.Outline.prototype.render_function = function(field){
     var obj = this;
@@ -235,6 +307,16 @@ var toggle_controls = function(e, obj){
 
 }
 
+outline.Outline.prototype.set_text_width = function(){
+    var w1 = this.field_el('todostate').width();
+    var w2 = this.field_el('content').width();
+    var w3 = 13; //fakedotcontainer
+    console.log([w1,w2,w3]);
+    var factor = 0.9;
+    console.log(factor * (w2-w1-w3));
+    this.field_el('text').width(factor * (w2-w1-w3));
+}
+
 outline.Outline.prototype.render = function(isroot){
     if (!this.el){
 	if (!isroot){
@@ -287,11 +369,12 @@ $('#overview-button').click(
 );
 $('#del-button').click(
     function(e){
-	toggle_controls(e, activeobj);
 	deletenode(activeobj);
+	toggle_controls(e, activeobj);
 	activeobj=null;
     }
 );
+
 window.controls = controls
 window.activeobj = activeobj
 $(function(){
