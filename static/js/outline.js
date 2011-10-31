@@ -59,7 +59,12 @@ outline.Outline.prototype.tree_apply = function(func, level){
 }
 
 //view
-
+outline.Outline.prototype.select = function(){
+    this.field_el('content').addClass('shade');
+}
+outline.Outline.prototype.unselect = function(){
+    this.field_el('content').removeClass('shade');
+}
 outline.Outline.prototype.show_children = function(){
     if (this.get('children').length > 0){
 	this.field_el('childcontainer').show();
@@ -422,4 +427,5 @@ $(function(){
     }
     root.render(true)
     $('#main-outline').append(root.el);
+    window.item_selector = new ItemSelector(root, collections);
 })

@@ -1,5 +1,6 @@
 ul ul, ul ol,
 ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
+
 .content{
     clear: both;
     width: 100%;
@@ -147,4 +148,8 @@ button{
 }
 .ui-state-hover{
     background : #eee
+}
+
+.shade{
+    background: #eee
 }
