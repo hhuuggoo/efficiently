@@ -6,8 +6,7 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     width: 100%;
 }
 .outline{
-    float:left;
-    width:90%;
+    width:100%;
 }
 .todostate{
     float: left;
@@ -15,11 +14,10 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     width: auto;
 }
 .children{
-    float:left;
-    width:90%
+    float: left;
+    width: 95%
 }
 .item-controls{
-    float: left;
 }
 .fakedotcontainer{
     height:18px;
@@ -89,7 +87,6 @@ textarea:focus{
 }
 
 button{
-    float: left;
     margin-bottom: 0px;
     padding: 0px 0px;
     background: #eee; /* Old browsers */
@@ -152,4 +149,15 @@ button{
 
 .shade{
     background: #eee
+}
+.test{
+    width:100%;
+    min-height:18px;
+    background: #0F0;
+}
+.test2{
+    float: left;
+    width:100%;
+    min-height:18px;
+    background: #F00;
 }

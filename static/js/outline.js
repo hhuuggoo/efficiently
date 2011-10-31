@@ -243,7 +243,7 @@ outline.Outline.prototype.hook_events = function(){
 	     var currentparent = collections.get(obj.get('parent'), 'outline');
 	     var currentsiblings = currentparent.get('children');
 	     var currentindex = _.indexOf(currentsiblings, obj.id);
-	     var newindex = currentindex + 1;
+	     var newindex = currentindex - 1;
 
 	     var dropping_id = ui.draggable.data()['id'];
 	     var droppingnode = collections.get(dropping_id, 'outline');
@@ -349,7 +349,7 @@ outline.Outline.prototype.set_text_width = function(){
     var w2 = this.field_el('content').width();
     var w3 = 13; //fakedotcontainer
     //console.log([w1,w2,w3]);
-    var factor = 0.9;
+    var factor = 0.90;
     //console.log(factor * (w2-w1-w3));
     this.field_el('text').width(factor * (w2-w1-w3));
 }
