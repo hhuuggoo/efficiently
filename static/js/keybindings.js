@@ -16,6 +16,10 @@ ItemSelector = function(root_node, collections){
             this.move_up();
         }else if (!e.ctrlKey && e.keyCode == DOWN){
             this.move_down();
+	}else if (e.keyCode == ENTER){
+	    if (this.curr_node){
+		this.curr_node.field_el('text').focus();
+	    }
 	}
     }
     $(document).keyup(function(e){

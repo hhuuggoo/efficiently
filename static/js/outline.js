@@ -267,12 +267,15 @@ outline.Outline.prototype.hook_events = function(){
     });
     this.field_el('text').keyup(function(e){
 	if (e.keyCode == ENTER){
-	    obj.field_el('text').blur()
+	    console.log(obj.field_el('text').val());
+	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0){
 	    }else{
 		addsibling(obj);
 	    }
+	    e.stopPropagation();
+
 	}else if (e.keyCode == BACKSPACE){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0
@@ -346,12 +349,13 @@ var toggle_controls = function(e, obj){
 
 outline.Outline.prototype.set_text_width = function(){
     var w1 = this.field_el('todostate').width();
-    var w2 = this.field_el('content').width();
+    var w2 = this.field_el('content').width()
     var w3 = 13; //fakedotcontainer
+    var error = 9;
     //console.log([w1,w2,w3]);
-    var factor = 0.90;
     //console.log(factor * (w2-w1-w3));
-    this.field_el('text').width(factor * (w2-w1-w3));
+    this.field_el('text').width((w2-w1-w3)-error);
+    this.field_el('children').width((w2-w3)-error);
 }
 
 outline.Outline.prototype.render = function(isroot){

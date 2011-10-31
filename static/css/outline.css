@@ -1,6 +1,9 @@
 ul ul, ul ol,
 ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 
+.mybox{
+    overflow:hidden;
+}
 .content{
     clear: both;
     width: 100%;
@@ -15,14 +18,13 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 }
 .children{
     float: left;
-    width: 95%
 }
 .item-controls{
 }
 .fakedotcontainer{
     height:18px;
     width:13px;
-    float: left;
+    float:left;
 }
 .fakedot{
     float: left;
@@ -41,7 +43,6 @@ textarea{
     border-radius: 0;
     color: #111;
     margin: 0;
-    width: 90%;
     display: inline;
     margin-bottom: 0;
     height: 0;
@@ -64,7 +65,6 @@ textarea:focus{
     border-radius: 0;
     color: #111;
     margin: 0;
-    width: 90%;
     display: inline;
     margin-bottom: 0;
     height: 0;
