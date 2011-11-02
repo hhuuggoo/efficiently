@@ -285,8 +285,10 @@ outline.Outline.prototype.hook_events = function(){
 	    }
 	    obj.last_backspace_txt = newval;
 	}
-    });    				   
-    this.field_el('content').draggable({'revert':'invalid'});
+    });
+    this.field_el('content').draggable({'revert':'invalid',
+					'stack': '*',
+				       });
     this.field_el('content').data({'id':this.id});
     this.field_el('fakedotcontainer').dblclick(
 	function(e){
