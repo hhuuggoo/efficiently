@@ -1,4 +1,11 @@
+use_local_storage = false;
 storage = {};
+storage.save = function(k, v){
+    if (use_local_storage){
+	localStorage.setItem(k, v);
+    }
+}
+
 storage.S4 = function(){
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
 };
@@ -20,6 +27,8 @@ storage.Collections = function(store_id, types){
 	types = {}
     }
     this.types = types;
+    this.server_queue = {};
+    this.saving = false;
 }
 storage.Collections.prototype.new_id = function(){
     return storage.guid(this.store_id);
@@ -60,7 +69,8 @@ storage.Collections.prototype.save = function(key, value, collection){
     }else{
 	serialized = JSON.stringify(value)
     }
-    localStorage.setItem(this.storage_key(key, collection), serialized);
+    storage.save(this.storage_key(key, collection), serialized);
+    this.save_server(value['id'], serialized);
     this.set_mem(key, value, collection);
 }
 storage.Collections.prototype.remove = function(key, collection){
@@ -75,6 +85,9 @@ storage.Collections.prototype.get = function(key, collection){
 }
 storage.Collections.prototype.load_all = function(){
     //retrieves from in memory structure
+    if (!use_local_storage){
+	return null;
+    }
     for (var i=0, l=localStorage.length; i<l; i++){
         var storage_key = localStorage.key(i);
 	var key;
@@ -99,4 +112,21 @@ storage.Collections.prototype.load_all = function(){
     }
 }
 
+storage.Collections.prototype.save_server = function(id, v){
+    var obj = this;
+    this.server_queue[id] = v;
+    if (this.saving){
+	return null;
+    }else{
+	obj.saving = true;
+	var tosave = []
+	_.each(obj.server_queue,
+	       function(k,v){
+		   tosave.push(v)
+		   delete 
+			     }
+	$.post(_.sprintf("/entries/%s", id), {'data':v})
+    }
+    
+}
 

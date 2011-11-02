@@ -5,15 +5,17 @@ window.todostates = ["TODO", "INPROGRESS", "DONE", null];
 window.todocolors  = {'TODO' : 'red',
 		      'INPROGRESS': 'red',
 		      'DONE' : 'green'}
+window.outlinetitle = "Main";
 
 //outline_state, 0, show everything, 
-outline.Outline = function(id){
+outline.Outline = function(id, outlinetitle){
     this.set('id', id); 
     this.set('text', '');
     this.set('todostate', null);
     this.set('date', null);
     this.set('parent', null);
     this.set('children', []);
+    this.set('outlinetitle', outlinetitle);
     this.dirty = {};
     this.el = null;
     this.outline_state = 0;
@@ -22,7 +24,7 @@ outline.Outline = function(id){
 //data model
 outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
-				    'date', 'children', 'parent']
+				    'date', 'children', 'parent', 'outlinetitle']
 outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
 }
@@ -203,7 +205,8 @@ var deletenode = function(obj){
     parent.render();
 }
 var addsibling = function(obj){
-    var newnode = new outline.Outline(collections.new_id());
+    var newnode = new outline.Outline(collections.new_id(),
+				     window.outlinetitle);
     var parent = collections.get(obj.parent, 'outline')
     parent.add_child(newnode);
     parent.render();
@@ -380,63 +383,77 @@ outline.Outline.prototype.render = function(isroot){
     });
 }
 
-
-collections = new storage.Collections('id5', {'outline' : outline.Outline});
-controls = $('.item-controls');
-controls.hide();
-activeobj = null;
-$('#add-button').click(
-    function(e){
-	addsibling(activeobj);
-    }
-);
-$('#state-button').click(
-    function(e){
-	var currstate = activeobj.get('todostate', null);	
-	var curridx = _.indexOf(window.todostates, currstate);
-	if (curridx < 0 || curridx >= window.todostates.length-1){
-	    curridx = 0;
-	}else{
-	    curridx = curridx + 1;
-	}
-	activeobj.set('todostate', window.todostates[curridx]);
-	activeobj.save();
-	activeobj.render();
-    }
-);
-
-$('#overview-button').click(
-    function(e){
-	activeobj.toggle_outline_state();
-    }
-);
-$('#del-button').click(
-    function(e){
-	deletenode(activeobj);
-	toggle_controls(e, activeobj);
-	activeobj=null;
-    }
-);
-
-window.controls = controls
-window.activeobj = activeobj
 $(function(){
+    collections = new storage.Collections('id5', {'outline' : outline.Outline});
+
+    controls = $('.item-controls');
+    controls.hide();
+    activeobj = null;
+    $('#add-button').click(
+	function(e){
+	    addsibling(activeobj);
+	}
+    );
+    $('#root-add').click(function(){
+	var root = collections.get(root_id, 'outline');
+	var newitem = new outline.Outline(collections.new_id(),
+					  window.outlinetitle);
+	root.add_child(newitem);
+	root.save();
+	root.render();
+    });
+    $('#state-button').click(
+	function(e){
+	    var currstate = activeobj.get('todostate', null);	
+	    var curridx = _.indexOf(window.todostates, currstate);
+	    if (curridx < 0 || curridx >= window.todostates.length-1){
+		curridx = 0;
+	    }else{
+		curridx = curridx + 1;
+	    }
+	    activeobj.set('todostate', window.todostates[curridx]);
+	    activeobj.save();
+	    activeobj.render();
+	}
+    );
+
+    $('#overview-button').click(
+	function(e){
+	    activeobj.toggle_outline_state();
+	}
+    );
+    $('#del-button').click(
+	function(e){
+	    deletenode(activeobj);
+	    toggle_controls(e, activeobj);
+	    activeobj=null;
+	}
+    );
+
+    window.controls = controls
+    window.activeobj = activeobj
+
     $.get("/entries/Main", function(data){
 	var entries = JSON.parse(data);
 	_.each(entries, function(x){
-	    collections.save(x['id'], x, 'outline')
+	    var tmp = new outline.Outline();
+	    console.log(x)
+	    tmp.deserialize(JSON.stringify(x));
+	    collections.save(x['id'], tmp, 'outline');
 	});
+	root_id = $("#main_root_id").html()
+	root = collections.get(root_id, 'outline');
+	if (!root){
+	    root = new outline.Outline(root_id,
+				       window.outlinetitle);
+	    newitem = new outline.Outline(collections.new_id(),
+					  window.outlinetitle);
+	    root.add_child(newitem);
+	    root.save()
+	}
+	root.render(true);
+	$('#main-outline').append(root.el);
+	window.item_selector = new ItemSelector(root, collections);
     });
-    collections.load_all();
-    root_id = $("#main_root_id").html()
-    root = collections.get(root_id, 'outline');
-    if (!root){
-	root = new outline.Outline(root_id);
-	root.save()
-	newitem = new outline.Outline(collections.new_id());
-	root.add_child(newitem)
-    }
-    root.render(true)
-    $('#main-outline').append(root.el);
-    window.item_selector = new ItemSelector(root, collections);
-})
+    
+});
