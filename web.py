@@ -105,22 +105,6 @@ class BulkSave(AuthHandler):
                                    'outlinetitle':d['outlinetitle']},
                                   upsert=True)
             self.write("success");
-                
-class Entry(AuthHandler):
-    def post(self, objid):
-        if not self.current_user:
-            return self.redirect("/register");
-        data = self.get_argument('data')
-        data = cjson.decode(data)
-        db.entries.update({'_id' : data['id']},
-                          {'_id' : data['id'],
-                           'text' : data['text'],
-                           'username' : self.current_user,
-                           'todostate' : data['todostate'],
-                           'children' : data['children'],
-                           'parent': data['parent'],
-                           'outlinetitle':data['outlinetitle']},
-                          upsert=True)
         
 class About(AuthHandler):
     def get(self):
@@ -130,7 +114,6 @@ application = tornado.web.Application([(r"/", Outline),
                                        (r"/register", Register),
                                        (r"/login", Login),
                                        (r"/entries/(.*)", Entries),
-                                       (r"/entry/(.*)", Entry),
                                        (r"/bulk", BulkSave),
                                        (r"/about", About),
                                        ],
