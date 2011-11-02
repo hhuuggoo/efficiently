@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}
+<p>Don't have an account?  <a href="/register">register here</a></p>
+<div>
+  <form action="/login" method="POST">
+    <!-- Label and text input -->
+    <label for="username">username</label>
+    <input type="text" id="username" name="username" />
+    <label for="password">password</label>
+    <input type="text" id="password" name="password"/>
+    <input type="submit">Submit</input>
+  </form>
+</div>
+{% end %}

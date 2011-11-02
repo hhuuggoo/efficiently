@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block main %}
+<div>
+  <form action="/register" method="POST">
+    <!-- Label and text input -->
+    <label for="username">username</label>
+    <input type="text" id="username" name="username" />
+    <label for="password">password</label>
+    <input type="text" id="password" name="password"/>
+    <label for="email">email</label>
+    <input type="text" id="email" name="email"/>
+    <input type="submit">Submit</input>
+  </form>
+</div>
+{% end %}

@@ -21,7 +21,7 @@ outline.Outline = function(id){
 
 //data model
 outline.Outline.prototype = new model.Model()
-outline.Outline.prototype.fields = ['id', 'text', 'todostate', 
+outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
 				    'date', 'children', 'parent']
 outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
@@ -421,8 +421,14 @@ $('#del-button').click(
 window.controls = controls
 window.activeobj = activeobj
 $(function(){
+    $.get("/entries/Main", function(data){
+	var entries = JSON.parse(data);
+	_.each(entries, function(x){
+	    collections.save(x['id'], x, 'outline')
+	});
+    });
     collections.load_all();
-    root_id = 'root'
+    root_id = $("#main_root_id").html()
     root = collections.get(root_id, 'outline');
     if (!root){
 	root = new outline.Outline(root_id);
