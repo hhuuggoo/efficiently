@@ -29,7 +29,7 @@ outline.Outline.prototype.save = function(){
 
 outline.Outline.prototype.add_child = function(child, index){
     var children = this.get('children')
-    if (!index){
+    if (index==null){
 	children.push(child.id)
     }else{
 	children.splice(index, 0, child.id);
@@ -227,7 +227,7 @@ outline.Outline.prototype.hook_events = function(){
 	     var droppingnode = collections.get(dropping_id, 'outline');
 	     var droppingparent = collections.get(droppingnode.parent, 'outline');
 	     droppingparent.remove_child(droppingnode);
-	     obj.add_child(droppingnode);
+	     obj.add_child(droppingnode, 0);
 	     droppingparent.render();
 	     obj.render();
 	     ui.draggable.css(
@@ -236,15 +236,14 @@ outline.Outline.prototype.hook_events = function(){
 	 }
 	}
     );
-    this.field_el('edge').droppable(
+    this.field_el('bottomedge').droppable(
 	{'tolerance':'pointer',
 	 'hoverClass': "ui-state-hover",
 	 'drop': function(e, ui){
 	     var currentparent = collections.get(obj.get('parent'), 'outline');
 	     var currentsiblings = currentparent.get('children');
 	     var currentindex = _.indexOf(currentsiblings, obj.id);
-	     var newindex = currentindex - 1;
-
+	     var newindex = currentindex + 1;
 	     var dropping_id = ui.draggable.data()['id'];
 	     var droppingnode = collections.get(dropping_id, 'outline');
 	     var droppingparent = collections.get(droppingnode.parent, 'outline');
@@ -258,7 +257,7 @@ outline.Outline.prototype.hook_events = function(){
 
 	 }
 	}
-    )
+    );
     this.field_el('text').blur(savetext);
     this.field_el('text').keypress(function(e){
 	if (e.keyCode == ENTER){
