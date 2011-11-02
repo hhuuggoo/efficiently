@@ -1,5 +1,9 @@
 var UP = 38;
 var DOWN = 40;
+var LEFT = 37;
+var RIGHT = 39;
+var TAB = 9;
+
 ItemSelector = function(root_node, collections){
     var obj = this;
     this.collections = collections
@@ -7,23 +11,48 @@ ItemSelector = function(root_node, collections){
     this.curr_node = null;
     this.curr_idx = 0;
     this.keyhandle = function(e){
-	console.log('keypress');
+	console.log([e.ctrlKey, e.keyCode]);
         if (e.keyCode == UP){
             this.cursor_up();
         }else if (e.keyCode == DOWN){
             this.cursor_down();
-        }else if (!e.ctrlKey && e.keyCode == UP){
+        }else if (e.ctrlKey && e.keyCode == UP){
             this.move_up();
-        }else if (!e.ctrlKey && e.keyCode == DOWN){
+        }else if (e.ctrlKey && e.keyCode == DOWN){
             this.move_down();
+	}else if (e.ctrlKey && e.keyCode == LEFT){
+            this.move_left();
+        }else if (e.ctrlKey && e.keyCode == RIGHT){
+            this.move_right();
 	}else if (e.keyCode == ENTER){
 	    if (this.curr_node){
 		this.curr_node.field_el('text').focus();
 	    }
+	}else if (e.ctrlKey && e.keyCode == BACKSPACE){
+	    if (this.curr_node){
+		var parent = this.collections.get(this.curr_node.parent, 'outline')
+		var siblings = parent.get('children');
+		var idx = _.indexOf(siblings, this.curr_node.id);
+		var next_current = null;
+		if (idx != 0){
+		    next_current = this.collections.get(siblings[idx - 1], 'outline');
+		}else if (idx < siblings.length - 1){
+		    next_current = this.collections.get(siblings[idx + 1], 'outline');
+		}else{
+		    next_current = parent;
+		}
+		deletenode(this.curr_node);
+		this.curr_node = next_current;
+		this.curr_node.select();
+	    }
+	}else if (e.keyCode == TAB){
+	    console.log('toggling!');
+	    if (this.curr_node){
+		this.curr_node.toggle_outline_state();
+	    }
 	}
     }
     $(document).keyup(function(e){
-	console.log(obj);
 	obj.keyhandle(e);
     });
     this.cursor_up = function(){
@@ -90,6 +119,39 @@ ItemSelector = function(root_node, collections){
 		return lower_sibling;
 	    }
 	}
+    }
+    this.move_right = function(){
+	var node = this.curr_node
+	var parent = this.collections.get(node.parent, 'outline');
+	var siblings = parent.get('children');
+
+	children = node.get('children')
+	var curr_idx = _.indexOf(siblings, node.id);
+	if (curr_idx == 0){
+	    return null;
+	}else{
+	    upper_sibling = this.collections.get(siblings[curr_idx - 1],
+						 'outline');
+	    parent.remove_child(node);
+	    upper_sibling.add_child(node);
+	    parent.render();
+	    upper_sibling.render();
+	}
+    }
+    this.move_left = function(){
+	var node = this.curr_node
+	var parent = this.collections.get(node.parent, 'outline');
+	var grandparent = this.collections.get(parent.parent, 'outline');
+	if (!grandparent || !parent){
+	    return null;
+	}
+	var new_idx = _.indexOf(grandparent.get('children'),
+				parent.id) + 1;
+	
+	parent.remove_child(node);
+	grandparent.add_child(node, new_idx);
+	parent.render();
+	grandparent.render();
     }
 }
 

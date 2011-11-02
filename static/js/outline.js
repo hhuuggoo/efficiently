@@ -351,7 +351,7 @@ outline.Outline.prototype.set_text_width = function(){
     var w1 = this.field_el('todostate').width();
     var w2 = this.field_el('content').width()
     var w3 = 13; //fakedotcontainer
-    var error = 9;
+    var error = 20;
     //console.log([w1,w2,w3]);
     //console.log(factor * (w2-w1-w3));
     this.field_el('text').width((w2-w1-w3)-error);
