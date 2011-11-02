@@ -70,7 +70,7 @@ storage.Collections.prototype.save = function(key, value, collection){
 	serialized = JSON.stringify(value)
     }
     storage.save(this.storage_key(key, collection), serialized);
-    this.save_server(value['id'], serialized);
+    this.save_server(value['id'], value, collection);
     this.set_mem(key, value, collection);
 }
 storage.Collections.prototype.remove = function(key, collection){
@@ -111,21 +111,42 @@ storage.Collections.prototype.load_all = function(){
 	this.set_mem(key, val, collection);
     }
 }
-
-storage.Collections.prototype.save_server = function(id, v){
+storage.Collections.prototype.save_server_queue = function(){
     var obj = this;
-    this.server_queue[id] = v;
+    if ($.isEmptyObject(obj.server_queue)){
+	obj.saving = false;
+	console.log('empty no longer saving');
+	return null;
+    }
+    obj.saving = true;
+    console.log('saving');
+    var tosave = []
+    _.each(obj.server_queue,
+	   function(v, k){
+	       tosave.push(v)
+	       delete obj.server_queue[k];
+	   });
+    console.log('posting')
+    $.post("/bulk", {'data': JSON.stringify(tosave)},
+	   function(x){
+	       console.log('callback');
+	       if (x != 'success'){
+		   alert("error saving")
+	       }else{
+		   obj.save_server_queue();
+	       }
+	   });
+}
+storage.Collections.prototype.save_server = function(k, v, collection){
+    var obj = this;
+    if (collection in this.types){
+	v = v.to_dict();
+    }
+    this.server_queue[k] = v
     if (this.saving){
 	return null;
     }else{
-	obj.saving = true;
-	var tosave = []
-	_.each(obj.server_queue,
-	       function(k,v){
-		   tosave.push(v)
-		   delete 
-			     }
-	$.post(_.sprintf("/entries/%s", id), {'data':v})
+	this.save_server_queue();
     }
     
 }

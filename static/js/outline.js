@@ -220,7 +220,6 @@ outline.Outline.prototype.hook_events = function(){
 	obj.set('text', newval);
 	obj.save();
 	delete obj.dirty['text'];
-	console.log('blur')
     }
     this.field_el('content').droppable(
         {'tolerance':'pointer',
@@ -269,7 +268,6 @@ outline.Outline.prototype.hook_events = function(){
     });
     this.field_el('text').keyup(function(e){
 	if (e.keyCode == ENTER){
-	    console.log(obj.field_el('text').val());
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0){
@@ -301,7 +299,6 @@ outline.Outline.prototype.hook_events = function(){
 
 
 var toggle_controls = function(e, obj){
-    console.log('toggling controls')
     var activator = obj.field_el('fakedotcontainer');
     var show = function(e){
 	window.activeobj = obj;
@@ -325,11 +322,9 @@ var toggle_controls = function(e, obj){
 	var x2 = x1 + window.controls.width();
 	var y1 = window.controls.offset().top;
 	var y2 = y1 + window.controls.height();
-	console.log([x1,x2,y1,y2]);
 	x3=x3-border; x4=x4+border; y3=y3-border; y4=y4+border;
 	x1=x1-border; x2=x2+border; y1=y1-border; y2=y2+border;
 	function callback(e){
-	    console.log([e.pageX, e.pageY]);
 	    if (!((e.pageX >= x1 && e.pageX <= x2 && e.pageY >= y1 && e.pageY <= y2) ||
 		  (e.pageX >= x3 && e.pageX <= x4 && e.pageY >= y3 && e.pageY <= y4))
 	       ){
@@ -437,7 +432,6 @@ $(function(){
 	var entries = JSON.parse(data);
 	_.each(entries, function(x){
 	    var tmp = new outline.Outline();
-	    console.log(x)
 	    tmp.deserialize(JSON.stringify(x));
 	    collections.save(x['id'], tmp, 'outline');
 	});

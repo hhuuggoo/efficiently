@@ -11,16 +11,13 @@ ItemSelector = function(root_node, collections){
     this.curr_node = null;
     this.curr_idx = 0;
     this.keyhandle = function(e){
-	console.log([e.ctrlKey, e.keyCode]);
         if (!e.ctrlKey && e.keyCode == UP){
             this.cursor_up();
         }else if (!e.ctrlKey && e.keyCode == DOWN){
             this.cursor_down();
         }else if (e.ctrlKey && e.keyCode == UP){
-	    console.log('moveup')
             this.move_up();
         }else if (e.ctrlKey && e.keyCode == DOWN){
-	    console.log('movedown')
             this.move_down();
 	}else if (e.ctrlKey && e.keyCode == LEFT){
             this.move_left();
@@ -48,7 +45,6 @@ ItemSelector = function(root_node, collections){
 		this.curr_node.select();
 	    }
 	}else if (e.keyCode == TAB){
-	    console.log('toggling!');
 	    if (this.curr_node){
 		this.curr_node.toggle_outline_state();
 	    }

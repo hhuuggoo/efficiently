@@ -83,21 +83,26 @@ class Entries(AuthHandler):
             for e in entries:
                 e['id'] = str(e.pop('_id'))
             self.write(cjson.encode(entries))
-    def post(self, title):
+
+class BulkSave(AuthHandler):
+    def post(self):
         if not self.current_user:
             return self.redirect("/register");
         else:
             data = self.get_argument('data')
             data = cjson.decode(data)
+            print "***********"
+            print data
+            print "***********"
             for d in data:
-                db.entries.update({'_id' : data['id']},
-                                  {'_id' : data['id'],
-                                   'text' : data['text'],
+                db.entries.update({'_id' : d['id']},
+                                  {'_id' : d['id'],
+                                   'text' : d['text'],
                                    'username' : self.current_user,
-                                   'todostate' : data['todostate'],
-                                   'children' : data['children'],
-                                   'parent': data['parent'],
-                                   'outlinetitle':data['outlinetitle']},
+                                   'todostate' : d['todostate'],
+                                   'children' : d['children'],
+                                   'parent': d['parent'],
+                                   'outlinetitle':d['outlinetitle']},
                                   upsert=True)
             self.write("success");
                 
@@ -107,7 +112,6 @@ class Entry(AuthHandler):
             return self.redirect("/register");
         data = self.get_argument('data')
         data = cjson.decode(data)
-        print data
         db.entries.update({'_id' : data['id']},
                           {'_id' : data['id'],
                            'text' : data['text'],
@@ -127,6 +131,7 @@ application = tornado.web.Application([(r"/", Outline),
                                        (r"/login", Login),
                                        (r"/entries/(.*)", Entries),
                                        (r"/entry/(.*)", Entry),
+                                       (r"/bulk", BulkSave),
                                        (r"/about", About),
                                        ],
                                       **settings.settings
