@@ -12,13 +12,15 @@ ItemSelector = function(root_node, collections){
     this.curr_idx = 0;
     this.keyhandle = function(e){
 	console.log([e.ctrlKey, e.keyCode]);
-        if (e.keyCode == UP){
+        if (!e.ctrlKey && e.keyCode == UP){
             this.cursor_up();
-        }else if (e.keyCode == DOWN){
+        }else if (!e.ctrlKey && e.keyCode == DOWN){
             this.cursor_down();
         }else if (e.ctrlKey && e.keyCode == UP){
+	    console.log('moveup')
             this.move_up();
         }else if (e.ctrlKey && e.keyCode == DOWN){
+	    console.log('movedown')
             this.move_down();
 	}else if (e.ctrlKey && e.keyCode == LEFT){
             this.move_left();
@@ -152,6 +154,32 @@ ItemSelector = function(root_node, collections){
 	grandparent.add_child(node, new_idx);
 	parent.render();
 	grandparent.render();
+    }
+    this.move_up = function(){
+	var node = this.curr_node;
+	var parent = this.collections.get(node.parent, 'outline');
+	var siblings = parent.get('children');
+	var curr_index = _.indexOf(siblings, node.id);
+	if (curr_index == 0){
+	    return null;
+	}else{
+	    parent.remove_child(node);
+	    parent.add_child(node, curr_index - 1);
+	}
+	parent.render();
+    }
+    this.move_down = function(){
+	var node = this.curr_node;
+	var parent = this.collections.get(node.parent, 'outline');
+	var siblings = parent.get('children');
+	var curr_index = _.indexOf(siblings, node.id);
+	if (curr_index >= siblings.length - 1){
+	    return null;
+	}else{
+	    parent.remove_child(node);
+	    parent.add_child(node, curr_index + 1);
+	}
+	parent.render();
     }
 }
 
