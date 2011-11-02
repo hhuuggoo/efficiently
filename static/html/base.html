@@ -24,15 +24,18 @@
 	      <image class="fakedot"> </image>	  
 	    </div>
 	    <div class="todostate" id="<%= id %>-todostate"><%= todostate %></div>
-	    <textarea id="<%= id %>-text" 
-		      class="outline-input"><%= text %></textarea>
+	    <div class="abox">
+	      <textarea id="<%= id %>-text" 
+			class="outline-input"><%= text %></textarea>
+	    </div>
 	  </div>
-	  <div class="">
-	    <!-- <div class="edge"> </div> -->
+	  <div class="clearfix">
 	    <div class="edge" id="<%= id %>-edge"></div>
-	    <div id="<%= id%>-childcontainer" class="childcontainer clearfix">
+	    <div id="<%= id%>-childcontainer" class="clearfix">
 	      <div class="fakedotcontainer" id="<%= id%>-childspacer"></div>
-	      <div id="<%= id %>-children" class="children"></div>
+	      <div class="abox">
+		<div id="<%= id %>-children" class="children"></div>
+	      </div>
 	    </div>
 	  </div>
 	</div>

@@ -84,7 +84,6 @@ textarea:focus{
 
 .edge{
     width : 100%;
-    float:left;
     height: 5px;
     clear: both;
 }
@@ -164,3 +163,8 @@ button{
     min-height:18px;
     background: #F00;
 }
+
+.abox{
+    overflow:hidden;
+}
+
