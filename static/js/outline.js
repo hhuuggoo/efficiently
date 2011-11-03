@@ -62,9 +62,17 @@ outline.Outline.prototype.tree_apply = function(func, level){
 
 //view
 outline.Outline.prototype.select = function(){
-    this.field_el('content').addClass('shade');
+    this.shade();
+    this.field_el('text').focus();
 }
 outline.Outline.prototype.unselect = function(){
+    this.unshade()
+    this.field_el('text').blur();
+}
+outline.Outline.prototype.shade = function(){
+    this.field_el('content').addClass('shade');
+}
+outline.Outline.prototype.unshade = function(){
     this.field_el('content').removeClass('shade');
 }
 outline.Outline.prototype.show_children = function(){
@@ -260,7 +268,14 @@ outline.Outline.prototype.hook_events = function(){
 	 }
 	}
     );
-    this.field_el('text').blur(savetext);
+    this.field_el('text').focus(function(e){
+	window.item_selector.curr_node = obj;
+	obj.shade();
+    });
+    this.field_el('text').blur(function(e){
+	savetext(e);
+	obj.unshade();
+    });
     this.field_el('text').keypress(function(e){
 	if (e.keyCode == ENTER){
 	    e.preventDefault();
@@ -380,7 +395,6 @@ outline.Outline.prototype.render = function(isroot){
 
 $(function(){
     collections = new storage.Collections('id5', {'outline' : outline.Outline});
-
     controls = $('.item-controls');
     controls.hide();
     activeobj = null;
