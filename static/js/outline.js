@@ -96,8 +96,8 @@ outline.Outline.prototype.hide_children = function(){
     this.field_el('todostate').html(status);
 }
 
-outline.Outline.prototype._get_child_hidden = function(){
-    return this.field_el('childcontainer').is(":visible");
+outline.Outline.prototype._child_hidden_getter = function(){
+    return !this.field_el('childcontainer').is(":visible");
 }
 
 outline.Outline.prototype.show_all_descendants = function(){
@@ -220,6 +220,13 @@ var addsibling = function(obj){
     parent.render();
     newnode.field_el('text').delay(300).focus();
 }
+var add_new_child = function(obj){
+    var newnode = new outline.Outline(collections.new_id(),
+				     window.outlinetitle);
+    obj.add_child(newnode);
+    obj.render();
+    newnode.field_el('text').delay(300).focus();
+}
 
 outline.Outline.prototype.hook_events = function(){
     var obj = this;
@@ -316,6 +323,7 @@ outline.Outline.prototype.hook_events = function(){
 var toggle_controls = function(e, obj){
     var activator = obj.field_el('fakedotcontainer');
     var show = function(e){
+	obj.select();
 	window.activeobj = obj;
 	window.controls.show()
 	var x = e.pageX;
@@ -400,7 +408,7 @@ $(function(){
     activeobj = null;
     $('#add-button').click(
 	function(e){
-	    addsibling(activeobj);
+	    add_new_child(activeobj);
 	}
     );
     $('#root-add').click(function(){

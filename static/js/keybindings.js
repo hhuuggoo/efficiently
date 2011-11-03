@@ -3,6 +3,7 @@ var DOWN = 40;
 var LEFT = 37;
 var RIGHT = 39;
 var TAB = 9;
+var GE = 190;
 
 ItemSelector = function(root_node, collections){
     var obj = this;
@@ -44,7 +45,7 @@ ItemSelector = function(root_node, collections){
 		this.curr_node = next_current;
 		this.curr_node.select();
 	    }
-	}else if (e.keyCode == TAB){
+	}else if (e.keyCode == GE && e.ctrlKey){
 	    if (this.curr_node){
 		this.curr_node.toggle_outline_state();
 	    }
@@ -60,16 +61,9 @@ ItemSelector = function(root_node, collections){
 	    this.curr_node.select();
 	}else{
 	    this.curr_node.unselect();
-	    var parent = this.collections.get(this.curr_node.parent,
-					      'outline');
-	    var siblings = parent.get('children');
-	    var curr_idx = _.indexOf(siblings, this.curr_node.id);
-	    if (curr_idx != 0){
-		this.curr_node = this.collections.get(siblings[curr_idx - 1], 
-						      'outline');
-	    }else{
-		this.curr_node = parent
-		
+	    var upper = this.find_upper_node(this.curr_node);
+	    if (upper){
+		this.curr_node = upper
 	    }
 	    this.curr_node.select()
 	}
@@ -81,7 +75,7 @@ ItemSelector = function(root_node, collections){
 	    this.curr_node.select();
 	}else{
 	    this.curr_node.unselect();
-	    var next_node = this.find_lower_node(this.curr_node);
+	    var next_node = this.find_lower_visible_node(this.curr_node);
 	    if (next_node){
 		this.curr_node = next_node;
 	    }
@@ -101,9 +95,46 @@ ItemSelector = function(root_node, collections){
 	    return null;
 	}
     }
-    this.find_lower_node = function(node){
+    this.upper_sibling = function(node){
+	var parent = this.collections.get(node.parent, 'outline');
+	if (!parent){
+	    return null;
+	}
+	var siblings = parent.get('children');
+	var curr_idx = _.indexOf(siblings, node.id);
+	if (curr_idx != 0){
+	    return this.collections.get(siblings[curr_idx - 1], 'outline');
+	}else{
+	    return null;
+	}
+    }
+    this.bottom_most_visible_descendant = function(node){
+	var children;
+	var node_iter = node;
+	while(true){
+	    children = node_iter.get('children');
+	    if(children.length == 0 || node_iter.get('child_hidden')){
+		return node_iter;
+	    }else{
+		node_iter = this.collections.get(_.last(children), 'outline');
+	    }
+	}
+    }
+    this.find_upper_node = function(node){
+	var parent = this.collections.get(node.parent, 'outline');
+	var upper_sibling = this.upper_sibling(node);
+	if (!upper_sibling){
+	    if (parent.id == this.root_node.id){
+		return null;
+	    }
+	    return parent;
+	}else{
+	    return this.bottom_most_visible_descendant(upper_sibling);
+	}
+    }
+    this.find_lower_visible_node = function(node){
 	children = node.get('children')
-	if (children.length > 0){
+	if (children.length > 0 && !node.get('child_hidden')){
 	    return this.collections.get(children[0], 'outline');
 	}
 	var node_iter = node;
