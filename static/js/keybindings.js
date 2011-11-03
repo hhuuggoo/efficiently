@@ -35,9 +35,11 @@ ItemSelector = function(root_node, collections){
 		var idx = _.indexOf(siblings, this.curr_node.id);
 		var next_current = null;
 		if (idx != 0){
-		    next_current = this.collections.get(siblings[idx - 1], 'outline');
+		    next_current = this.collections.get(siblings[idx - 1], 
+							'outline');
 		}else if (idx < siblings.length - 1){
-		    next_current = this.collections.get(siblings[idx + 1], 'outline');
+		    next_current = this.collections.get(siblings[idx + 1],
+							'outline');
 		}else{
 		    next_current = parent;
 		}
@@ -48,6 +50,10 @@ ItemSelector = function(root_node, collections){
 	}else if (e.keyCode == GE && e.ctrlKey){
 	    if (this.curr_node){
 		this.curr_node.toggle_outline_state();
+	    }
+	}else if (e.keyCode == GE && e.altKey){
+	    if (this.curr_node){
+		this.curr_node.toggle_todo_state();
 	    }
 	}
     }

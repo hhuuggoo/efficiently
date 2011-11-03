@@ -112,6 +112,18 @@ outline.Outline.prototype.show_all_children = function(){
     }, 1);
     this.show_children();
 }
+outline.Outline.prototype.toggle_todo_state = function(){
+    var currstate = this.get('todostate', null);	
+    var curridx = _.indexOf(window.todostates, currstate);
+    if (curridx < 0 || curridx >= window.todostates.length-1){
+	curridx = 0;
+    }else{
+	curridx = curridx + 1;
+    }
+    this.set('todostate', window.todostates[curridx]);
+    this.save();
+    this.render();
+}
 
 outline.Outline.prototype.toggle_outline_state = function(){
     var curr_state = this.outline_state
@@ -421,16 +433,7 @@ $(function(){
     });
     $('#state-button').click(
 	function(e){
-	    var currstate = activeobj.get('todostate', null);	
-	    var curridx = _.indexOf(window.todostates, currstate);
-	    if (curridx < 0 || curridx >= window.todostates.length-1){
-		curridx = 0;
-	    }else{
-		curridx = curridx + 1;
-	    }
-	    activeobj.set('todostate', window.todostates[curridx]);
-	    activeobj.save();
-	    activeobj.render();
+	    activeobj.toggle_todo_state();
 	}
     );
 
