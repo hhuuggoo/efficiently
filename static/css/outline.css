@@ -25,15 +25,15 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 }
 .fakedotcontainer{
     height:18px;
-    width:13px;
+    width:20px;
     float:left;
 }
 .fakedot{
-    float: left;
+    float: right;
     width:5px;
     height:5px;
     background: #000;
-    margin: 7px 0px 0px 0px 
+    margin: 7px 10px 0px 0px 
 }
 textarea{
     border: 0;
@@ -171,10 +171,10 @@ button{
 .root-button{
     float: left;
     clear: both;
-    width: 30px;
+    width: 40px;
     font: 75%;
-    height: 20px;
-    padding: 0px 0px;
+    height: 25px;
+    margin : 7px 7px 7px 0px;
     background: #eee; Old browsers
     background: #eee -moz-linear-gradient(top, rgba(255,255,255,.2) 0%, rgba(0,0,0,.2) 100%); /* FF3.6+ */
     background: #eee -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.2)), color-stop(100%,rgba(0,0,0,.2))); /* Chrome,Safari4+ */

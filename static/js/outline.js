@@ -431,6 +431,7 @@ $(function(){
 	root.save();
 	root.render();
     });
+
     $('#state-button').click(
 	function(e){
 	    activeobj.toggle_todo_state();
