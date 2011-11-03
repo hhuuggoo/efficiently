@@ -200,6 +200,7 @@ ItemSelector = function(root_node, collections){
 	    parent.add_child(node, curr_index - 1);
 	}
 	parent.render();
+	node.shade();
     }
     this.move_down = function(){
 	var node = this.curr_node;
@@ -213,6 +214,7 @@ ItemSelector = function(root_node, collections){
 	    parent.add_child(node, curr_index + 1);
 	}
 	parent.render();
+	node.shade();
     }
 }
 
