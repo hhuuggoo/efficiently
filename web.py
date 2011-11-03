@@ -105,6 +105,10 @@ class BulkSave(AuthHandler):
                                    'outlinetitle':d['outlinetitle']},
                                   upsert=True)
             self.write("success");
+class Logout(AuthHandler):
+    def get(self):
+        self.clear_all_cookies()
+        self.redirect("/login")
         
 class About(AuthHandler):
     def get(self):
@@ -116,6 +120,7 @@ application = tornado.web.Application([(r"/", Outline),
                                        (r"/entries/(.*)", Entries),
                                        (r"/bulk", BulkSave),
                                        (r"/about", About),
+                                       (r"/logout", Logout),
                                        ],
                                       **settings.settings
                                       )
