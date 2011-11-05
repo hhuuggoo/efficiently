@@ -111,7 +111,7 @@ button{
     width: 50px;
     float: left;
     padding: 0px 0px 0px 0px;
-    position:fixed;
+    position: absolute;
     z-index:2;
 }
 
@@ -170,11 +170,10 @@ button{
 
 .root-button{
     float: left;
-    clear: both;
     width: 40px;
     font: 75%;
-    height: 25px;
-    margin : 7px 7px 7px 0px;
+    height: 22px;
+    margin : 0px 7px 7px 0px; 
     background: #eee; Old browsers
     background: #eee -moz-linear-gradient(top, rgba(255,255,255,.2) 0%, rgba(0,0,0,.2) 100%); /* FF3.6+ */
     background: #eee -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,.2)), color-stop(100%,rgba(0,0,0,.2))); /* Chrome,Safari4+ */
@@ -187,9 +186,18 @@ button{
     cursor: pointer;
 }
 
-.logout{
+.right{
     float:right;
 }
-.version{
+.left{
     float:left;
+}
+
+.search{
+    width: 70%;
+    margin: 0px 0px 0px 7px;
+}
+
+.textborder{
+    border: 3px solid #ccc;
 }
