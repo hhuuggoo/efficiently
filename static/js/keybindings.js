@@ -4,6 +4,8 @@ var LEFT = 37;
 var RIGHT = 39;
 var TAB = 9;
 var GE = 190;
+var LT = 188;
+var SLASH = 191;
 
 ItemSelector = function(root_node, collections){
     var obj = this;
@@ -47,11 +49,16 @@ ItemSelector = function(root_node, collections){
 		deletenode(this.curr_node);
 		this.curr_node = next_current;
 	    }
-	}else if (e.keyCode == GE && e.ctrlKey){
+	}else if (e.keyCode == GE && e.altKey && !e.ctrlKey){
 	    if (this.curr_node){
 		this.curr_node.toggle_outline_state();
+		this.curr_node.show_outline_state();
 	    }
-	}else if (e.keyCode == GE && e.altKey){
+	}else if (e.keyCode == SLASH && e.altKey && !e.ctrlKey){
+	    if (this.curr_node){
+		this.root_node.toggle_child_outline_state();
+	    }
+	}else if (e.keyCode == LT && e.altKey && !e.ctrlKey){
 	    if (this.curr_node){
 		this.curr_node.toggle_todo_state();
 	    }

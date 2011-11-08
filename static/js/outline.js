@@ -189,18 +189,29 @@ outline.Outline.prototype.toggle_outline_state = function(){
 	curr_state = curr_state + 1;
     }
     this.outline_state = curr_state;
+    return this.outline_state;
+}
+outline.Outline.prototype.show_outline_state = function(){
     if (this.outline_state == 0){
-	console.log('show all d')
 	this.show_all_descendants()
     }else if (this.outline_state == 1){
-	console.log('hide c')
 	this.hide_children();
     }else if (this.outline_state == 2){
-	console.log('show all c')
 	this.show_all_children();
     }
 }
-
+outline.Outline.prototype.toggle_child_outline_state = function(){
+    var curr_state = this.toggle_outline_state();
+    _.each(this.get('children'), function(x){
+	var child = collections.get(x, 'outline')
+	child.outline_state = curr_state
+    });
+    _.each(this.get('children'), function(x){
+	var child = collections.get(x, 'outline')
+	child.show_outline_state();
+    });
+    
+}
 outline.Outline.prototype.template = _.template($('#outline-template').html())
 roottemplate = _.template($('#root-template').html())
 outline.Outline.prototype.field_id = function(fld){
@@ -355,12 +366,7 @@ outline.Outline.prototype.hook_events = function(){
 	savetext(e);
 	obj.unshade();
     });
-    this.field_el('text').keypress(function(e){
-	if (e.keyCode == ENTER){
-	    e.preventDefault();
-	}
-    });
-    this.field_el('text').keyup(function(e){
+    this.field_el('text').keydown(function(e){
 	if (e.keyCode == ENTER){
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
@@ -370,7 +376,7 @@ outline.Outline.prototype.hook_events = function(){
 	    }
 	    e.stopPropagation();
 
-	}else if (e.keyCode == BACKSPACE){
+	}else if (e.keyCode == BACKSPACE && !e.ctrlKey){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0
 		&& obj.last_backspace_txt==newval){
@@ -503,6 +509,7 @@ $(function(){
     $('#overview-button').click(
 	function(e){
 	    activeobj.toggle_outline_state();
+	    activeobj.show_outline_state();
 	}
     );
     $('#del-button').click(
