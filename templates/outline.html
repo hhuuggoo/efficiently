@@ -14,6 +14,7 @@
 	  <image class="fakedot"> </image>	  
 	</div>
 	<div class="todostate" id="<%= id %>-todostate"><%= todostate %></div>
+	<div class="hideindicator" id="<%= id %>-hideindicator"></div>
 	<div class="abox">
 	  <textarea id="<%= id %>-text" 
 		    class="outline-input"><%= text %></textarea>
@@ -33,7 +34,9 @@
 </script>
 <script type="text/template" id="root-template">
   <div id="<%= id %>" class="outline clearfix ">
-    <div id="<%= id %>-children" class=" clearfix">
+    <div id="<%= id%>-childcontainer" class="clearfix">
+      <div id="<%= id %>-children" class=" clearfix">
+      </div>
     </div>
   </div>
 </script>
@@ -55,7 +58,15 @@
     <!-- Give ID that matches HREF of above anchors -->
     <li class="active" id="main">
       <div id="main_root_id" class="hide">{{root_id}}</div>
-      <button class="root-button" id="root-add">add</button>
+      <div class="eight columns clearfix">
+	<div class="content">
+	  <button class="root-button left" id="root-add">add</button>
+	  <div class="abox">
+	    <!-- <span class="left">Search:</span>  -->
+	    <input type="text" id="search" class="left search textborder"></input>
+	  </div>
+	</div>
+      </div>
       <div id="main-outline" class="">
       </div>
     <li id="account">

@@ -91,9 +91,6 @@ class BulkSave(AuthHandler):
         else:
             data = self.get_argument('data')
             data = cjson.decode(data)
-            print "***********"
-            print data
-            print "***********"
             for d in data:
                 db.entries.update({'_id' : d['id']},
                                   {'_id' : d['id'],

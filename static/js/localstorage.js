@@ -115,21 +115,21 @@ storage.Collections.prototype.save_server_queue = function(){
     var obj = this;
     if ($.isEmptyObject(obj.server_queue)){
 	obj.saving = false;
-	console.log('empty no longer saving');
+	//console.log('empty no longer saving');
 	return null;
     }
     obj.saving = true;
-    console.log('saving');
+    //console.log('saving');
     var tosave = []
     _.each(obj.server_queue,
 	   function(v, k){
 	       tosave.push(v)
 	       delete obj.server_queue[k];
 	   });
-    console.log('posting')
+    //console.log('posting')
     $.post("/bulk", {'data': JSON.stringify(tosave)},
 	   function(x){
-	       console.log('callback');
+	       //console.log('callback');
 	       if (x != 'success'){
 		   alert("error saving")
 	       }else{

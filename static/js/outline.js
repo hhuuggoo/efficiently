@@ -59,8 +59,55 @@ outline.Outline.prototype.tree_apply = function(func, level){
     }
     func(this);
 }
-
+outline.Outline.prototype.tree_apply_bfs = function(func, level){
+    var retval = func(this);
+    if (!retval){
+	return null;
+    }
+    if (level>0 || level==null){
+	var new_level = (level == null) ? null : level - 1;
+	var children = this.get('children')
+	_.each(children, function(x){
+	    var child = collections.get(x, 'outline');
+	    child.tree_apply(func, new_level);
+	});
+    }
+}
 //view
+outline.Outline.prototype.tree_search = function(txt){
+    //searches but also returns 
+    this.show_all_descendants();
+    this.el.show();
+    var f = function (x) {
+	var matched = false;
+	var children_matched = _.map(x.get('children'), function(cid){
+	    return f(collections.get(cid, 'outline'));
+	})
+	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
+	    matched = true;
+	}
+	if (!_.any(children_matched) && !matched){
+	    x.el.hide();
+	    return false;
+	}else{
+	    return true;
+	}
+    }
+    f(this);
+}
+
+outline.Outline.prototype.visible_children = function(){
+    if (this.get('child_hidden')){
+	return []
+    }else{
+	var children = this.get('children')
+	children = _.filter(children,
+			    function(x){
+				return !collections.get(x, 'outline').get('hidden')
+			    });
+	return children
+    }
+}
 outline.Outline.prototype.select = function(){
     this.shade();
     this.field_el('text').focus();
@@ -69,6 +116,7 @@ outline.Outline.prototype.unselect = function(){
     this.unshade()
     this.field_el('text').blur();
 }
+
 outline.Outline.prototype.shade = function(){
     this.field_el('content').addClass('shade');
 }
@@ -83,7 +131,10 @@ outline.Outline.prototype.show_children = function(){
     }
     status = this.get('todostate') ? this.get('todostate') : ''
     this.field_el('todostate').html(status);
-
+    _.each(this.get('children'), function(x){
+	var child = collections.get(x, 'outline');
+	child.el.show();
+    });
 }
 outline.Outline.prototype.hide_children = function(){
     this.field_el('childcontainer').hide();
@@ -99,7 +150,9 @@ outline.Outline.prototype.hide_children = function(){
 outline.Outline.prototype._child_hidden_getter = function(){
     return !this.field_el('childcontainer').is(":visible");
 }
-
+outline.Outline.prototype._hidden_getter = function(){
+    return !this.el.is(":visible");
+}
 outline.Outline.prototype.show_all_descendants = function(){
     this.tree_apply(function(x){
 	x.show_children();
@@ -244,9 +297,10 @@ outline.Outline.prototype.hook_events = function(){
     var obj = this;
     var savetext = function(){
 	var newval = obj.field_el('text').val();
-	obj.set('text', newval);
-	obj.save();
-	delete obj.dirty['text'];
+	if (newval != obj.get('text')){
+	    obj.set('text', newval);
+	    obj.save();
+	}
     }
     this.field_el('content').droppable(
         {'tolerance':'pointer',
@@ -340,6 +394,7 @@ var toggle_controls = function(e, obj){
 	window.controls.show()
 	var x = e.pageX;
 	var y = e.pageY;
+	console.log([x,y]);
 	x = x - 60;
 	y = y - 10;
 	x = x<0 ? 0 : x;
@@ -347,6 +402,7 @@ var toggle_controls = function(e, obj){
 	window.controls.css(
 	    {'top' : y + "px", 'left' : x + "px"}
 	);
+	console.log({'top' : y + "px", 'left' : x + "px"});
 	var border = 10;
 	var x3 = activator.offset().left;
 	var x4 = x3 + activator.width();
@@ -450,7 +506,16 @@ $(function(){
 	    activeobj=null;
 	}
     );
-
+    $('#search').keydown(
+	function(e){
+	    console.log('searching');
+	    if (e.keyCode == ENTER){
+		e.stopPropagation();
+		console.log('stopping propagation');
+		root.tree_search($('#search').val());
+	    }
+	}
+    )
     window.controls = controls
     window.activeobj = activeobj
 

@@ -115,6 +115,9 @@ button{
     z-index:2;
 }
 
+.hideindicator{
+    padding : 0px 10px 0px 0px;
+}
 .todostate{
     padding : 0px 10px 0px 0px;
 }
