@@ -1,4 +1,4 @@
-var ENTER = 13;
+ var ENTER = 13;
 var BACKSPACE = 8;
 var outline = {}
 window.todostates = ["TODO", "INPROGRESS", "DONE", null];
@@ -292,10 +292,29 @@ outline.Outline.prototype.render_function = function(field){
 }
 var deletenode = function(obj){
     var parent = collections.get(obj.parent, 'outline')
-    parent.remove_child(obj);
-    collections.remove(obj.id, 'outline');
-    parent.render();
+    if (parent){
+	parent.remove_child(obj);
+	parent.render();
+    }
+    if (obj.get('status') == 'ACTIVE'){
+	totrash(obj)
+    }else{
+	todelete(obj)
+    }
 }
+var totrash = function(obj){
+    obj.set('status', 'TRASH')
+    obj.save()
+    $('#trash').append(obj.el)
+}
+
+var todelete = function(obj){
+    obj.set('status', 'DELETE')
+    obj.save()
+    obj.el.remove();
+    collections.remove(obj.id, 'outline');
+}
+
 var addsibling = function(obj){
     var newnode = new outline.Outline(collections.new_id(),
 				     window.outlinetitle);
@@ -547,7 +566,7 @@ $(function(){
 	_.each(entries, function(x){
 	    var tmp = new outline.Outline();
 	    tmp.deserialize(JSON.stringify(x));
-	    collections.save(x['id'], tmp, 'outline');
+	    collections.set_mem(x['id'], tmp, 'outline');
 	});
 	root_id = $("#main_root_id").html()
 	root = collections.get(root_id, 'outline');
@@ -562,6 +581,21 @@ $(function(){
 	root.render(true);
 	$('#main-outline').append(root.el);
 	window.item_selector = new ItemSelector(root, collections);
+	_.each(collections.collections['outline'],
+	       function(x){
+		   if(x.get('status') == 'TRASH'){
+		       x.render()
+		       $('#trash').append(x.el)
+		   }
+	       });
+	$('#root-clear-trash').click(function(e){
+	    _.each(collections.collections['outline'],
+		   function(x){
+		       if(x.get('status') == 'TRASH'){
+			   deletenode(x);
+		       }
+		   });
+	});
     });
     
 });

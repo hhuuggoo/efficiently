@@ -72,23 +72,33 @@ class Outline(AuthHandler):
             self.render("templates/outline.html", root_id=outlines['root'])
                         
 #handler if we are indexing elems by list name            
-def separate_orphans(root_id, nodes):
+def separate_orphans(root_id, nodes, user):
     dictnodes = {}
     for n in nodes:
         dictnodes[n['id']] = n
-    root = dictnodes.pop(root_id)
+    root = dictnodes[root_id]
     traverse_ids = set()
     def traverse(x):
         traverse_ids.add(x['id'])
         children = x['children']
         for c in children:
             traverse (dictnodes[c])
+    traverse(root)
+    good_nodes = []
     for traversed_ids in traverse_ids:
-        dictnodes.pop(traversed_ids)
-
-    assert len(root) == 1
-    root = root[0]
-    
+        good_nodes.append(dictnodes.pop(traversed_ids))
+    print(traverse_ids)
+    print([x['id'] for x in good_nodes])
+    print(dictnodes.values())
+    for node in dictnodes.values():
+        node['status'] = 'TRASH'
+        node['children'] = []
+        node['parent'] = []
+        save_entry(entry_app_to_mongo(node, user))
+    for node in good_nodes:
+        node['status'] = 'ACTIVE'
+        save_entry(entry_app_to_mongo(node, user))
+    return good_nodes, dictnodes.values()
 
 class Entries(AuthHandler):
     def get(self, title):
@@ -138,6 +148,7 @@ class BulkSave(AuthHandler):
                 d = entry_app_to_mongo(d, self.current_user)
                 save_entry(d)
             self.write("success");
+
 class Logout(AuthHandler):
     def get(self):
         self.clear_all_cookies()
@@ -158,12 +169,6 @@ application = tornado.web.Application([(r"/", Outline),
                                       **settings.settings
                                       )
 
-
-create_email = True
 if __name__ == "__main__":
     application.listen(9000)
     tornado.ioloop.IOLoop.instance().start()
-    import sys
-    if sys.argv[1] == 'noemail':
-        create_email = False
-
