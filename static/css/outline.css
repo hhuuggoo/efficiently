@@ -12,6 +12,12 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 .outline{
     width:100%;
 }
+
+.hideindicator{
+    float: left;
+    height: 100%;
+    width: auto;
+}
 .todostate{
     float: left;
     height: 100%;

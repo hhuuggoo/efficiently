@@ -49,6 +49,7 @@ outline.Outline.prototype.remove_child = function(child){
     this.save()
 }
 outline.Outline.prototype.tree_apply = function(func, level){
+    func(this);
     if (level>0 || level==null){
 	var new_level = (level == null) ? null : level - 1;
 	var children = this.get('children')
@@ -57,7 +58,6 @@ outline.Outline.prototype.tree_apply = function(func, level){
 	    child.tree_apply(func, new_level);
 	});
     }
-    func(this);
 }
 outline.Outline.prototype.tree_apply_bfs = function(func, level){
     var retval = func(this);
@@ -74,6 +74,15 @@ outline.Outline.prototype.tree_apply_bfs = function(func, level){
     }
 }
 //view
+outline.Outline.prototype.render_hidden = function(){
+    var visible_children = this.visible_children();
+    var children = this.get('children')
+    if (children.length > visible_children.length){
+	this.field_el('hideindicator').html("+");
+    }else{
+	this.field_el('hideindicator').html("");
+    }
+}
 outline.Outline.prototype.tree_search = function(txt){
     //searches but also returns 
     this.show_all_descendants();
@@ -91,6 +100,7 @@ outline.Outline.prototype.tree_search = function(txt){
 	    return false;
 	}else{
 	    return true;
+	    this.render_hidden();
 	}
     }
     f(this);
@@ -129,22 +139,15 @@ outline.Outline.prototype.show_children = function(){
     }else{
 	this.field_el('childcontainer').hide();
     }
-    status = this.get('todostate') ? this.get('todostate') : ''
-    this.field_el('todostate').html(status);
     _.each(this.get('children'), function(x){
 	var child = collections.get(x, 'outline');
 	child.el.show();
     });
+    this.render_hidden();
 }
 outline.Outline.prototype.hide_children = function(){
     this.field_el('childcontainer').hide();
-    if (this.get('children').length > 0){
-	status = this.get('todostate') ? this.get('todostate') : ''
-	status = status + " +";
-    }else{
-	status = this.get('todostate') ? this.get('todostate') : ''
-    }
-    this.field_el('todostate').html(status);
+    this.render_hidden();
 }
 
 outline.Outline.prototype._child_hidden_getter = function(){
@@ -187,10 +190,13 @@ outline.Outline.prototype.toggle_outline_state = function(){
     }
     this.outline_state = curr_state;
     if (this.outline_state == 0){
+	console.log('show all d')
 	this.show_all_descendants()
     }else if (this.outline_state == 1){
+	console.log('hide c')
 	this.hide_children();
     }else if (this.outline_state == 2){
+	console.log('show all c')
 	this.show_all_children();
     }
 }
@@ -542,3 +548,15 @@ $(function(){
     });
     
 });
+
+function get_matching_text(data){
+    var output = []
+    _.each(collections.collections['outline'],
+	     function(v,k){
+		 if (_.includes(v.get('text'), data)){
+		     output.push(v)
+		 }
+	     }
+	  );
+    return output
+}
