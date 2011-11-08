@@ -71,19 +71,62 @@ class Outline(AuthHandler):
                                              'outlinetitle':'Main'})
             self.render("templates/outline.html", root_id=outlines['root'])
                         
-            
+#handler if we are indexing elems by list name            
+def separate_orphans(root_id, nodes):
+    dictnodes = {}
+    for n in nodes:
+        dictnodes[n['id']] = n
+    root = dictnodes.pop(root_id)
+    traverse_ids = set()
+    def traverse(x):
+        traverse_ids.add(x['id'])
+        children = x['children']
+        for c in children:
+            traverse (dictnodes[c])
+    for traversed_ids in traverse_ids:
+        dictnodes.pop(traversed_ids)
+
+    assert len(root) == 1
+    root = root[0]
+    
+
 class Entries(AuthHandler):
     def get(self, title):
         if not self.current_user:
             return self.redirect("/register");
         else:
             entries = db.entries.find({'outlinetitle': title,
-                                       'username':self.current_user})
+                                       'username':self.current_user,
+                                       'status' : {'$ne' : 'DELETE'}})
             entries = list(entries)
-            for e in entries:
-                e['id'] = str(e.pop('_id'))
+            entries = [entry_mongo_to_app(e, self.current_user)
+                           for e in entries]
             self.write(cjson.encode(entries))
 
+def entry_mongo_to_app(d, user):
+    return {'id' : str(d['_id']),
+            'text' : d['text'],
+            'username' : user,
+            'todostate' : d['todostate'],
+            'children' : d['children'],
+            'parent': d['parent'],
+            'outlinetitle': d['outlinetitle'],
+            'status' : d.get('status', 'ACTIVE')}
+
+def entry_app_to_mongo(d, user):
+    return {'_id' : d['id'],
+            'text' : d['text'],
+            'username' : user,
+            'todostate' : d['todostate'],
+            'children' : d['children'],
+            'parent': d['parent'],
+            'outlinetitle':d['outlinetitle'],
+            'status' : d.get('status', 'ACTIVE')}
+
+def save_entry(d):
+    db.entries.update({'_id':d['_id']}, d, upsert=True)
+
+#handler if we are indexing elems by ID
 class BulkSave(AuthHandler):
     def post(self):
         if not self.current_user:
@@ -92,15 +135,8 @@ class BulkSave(AuthHandler):
             data = self.get_argument('data')
             data = cjson.decode(data)
             for d in data:
-                db.entries.update({'_id' : d['id']},
-                                  {'_id' : d['id'],
-                                   'text' : d['text'],
-                                   'username' : self.current_user,
-                                   'todostate' : d['todostate'],
-                                   'children' : d['children'],
-                                   'parent': d['parent'],
-                                   'outlinetitle':d['outlinetitle']},
-                                  upsert=True)
+                d = entry_app_to_mongo(d, self.current_user)
+                save_entry(d)
             self.write("success");
 class Logout(AuthHandler):
     def get(self):

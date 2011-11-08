@@ -16,6 +16,7 @@ outline.Outline = function(id, outlinetitle){
     this.set('parent', null);
     this.set('children', []);
     this.set('outlinetitle', outlinetitle);
+    this.set('status', 'ACTIVE');
     this.dirty = {};
     this.el = null;
     this.outline_state = 0;
@@ -24,7 +25,8 @@ outline.Outline = function(id, outlinetitle){
 //data model
 outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
-				    'date', 'children', 'parent', 'outlinetitle']
+				    'date', 'children', 'parent', 'outlinetitle',
+				   'status']
 outline.Outline.prototype.save = function(){
     collections.save(this.id, this, 'outline');
 }
@@ -550,12 +552,12 @@ $(function(){
 	root_id = $("#main_root_id").html()
 	root = collections.get(root_id, 'outline');
 	if (!root){
-	    root = new outline.Outline(root_id,
-				       window.outlinetitle);
-	    newitem = new outline.Outline(collections.new_id(),
-					  window.outlinetitle);
-	    root.add_child(newitem);
-	    root.save()
+	    // root = new outline.Outline(root_id,
+	    // 			       window.outlinetitle);
+	    // newitem = new outline.Outline(collections.new_id(),
+	    // 				  window.outlinetitle);
+	    // root.add_child(newitem);
+	    // root.save()
 	}
 	root.render(true);
 	$('#main-outline').append(root.el);
