@@ -58,16 +58,44 @@
     <!-- Give ID that matches HREF of above anchors -->
     <li class="active" id="main">
       <div id="main_root_id" class="hide">{{root_id}}</div>
-      <div class="eight columns clearfix">
-	<div class="content">
+      <div class="ten columns clearfix alpha">
+	<div class="abox">
 	  <button class="root-button left" id="root-add">add</button>
 	  <div class="abox">
-	    <!-- <span class="left">Search:</span>  -->
 	    <input type="text" id="search" class="left search textborder"></input>
 	  </div>
 	</div>
+	<div id="main-outline" class="">
+	</div>
       </div>
-      <div id="main-outline" class="">
+      <div class="six columns clearfix omega">
+	<h4>Instructions</h4>
+	<ul class="square">
+	  <li>
+	    Hit the add button to add a topic
+	  </li>
+	  <li>
+	    click on the bullet points to drag topics and subtopics around
+	  </li>
+	  <li>
+	    double clicking the bullet point gives you a menu for topic
+	  </li>
+	</ul>
+	<h5>Keyboard</h5>
+	<ul class="square">
+	  <li>use the arrow keys to navigate
+	  </li>
+	  <li>
+	    ctrl + arrow keys will move items around, ctrl + backspace will
+	    delete an item
+	  </li>
+	  <li>
+	    alt + / will hide topics, alt + > will hide subtopics of the selected item, alt + < will change the todo status
+	  </li>
+	  <li>
+	    enter key will create another topic.  ctrl + enter will create a subtopic
+	  </li>
+	</ul>
       </div>
     <li id="account">
       Your Account
