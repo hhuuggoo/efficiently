@@ -61,11 +61,7 @@ outline.Outline.prototype.tree_apply = function(func, level){
 	});
     }
 }
-outline.Outline.prototype.tree_apply_bfs = function(func, level){
-    var retval = func(this);
-    if (!retval){
-	return null;
-    }
+outline.Outline.prototype.tree_apply_children_first = function(func, level){
     if (level>0 || level==null){
 	var new_level = (level == null) ? null : level - 1;
 	var children = this.get('children')
@@ -74,6 +70,7 @@ outline.Outline.prototype.tree_apply_bfs = function(func, level){
 	    child.tree_apply(func, new_level);
 	});
     }
+    func(this);
 }
 //view
 outline.Outline.prototype.render_hidden = function(){
@@ -291,16 +288,19 @@ outline.Outline.prototype.render_function = function(field){
     }
 }
 var deletenode = function(obj){
-    var parent = collections.get(obj.parent, 'outline')
-    if (parent){
-	parent.remove_child(obj);
-	parent.render();
+    var f  = function(target){
+	var parent = collections.get(target.parent, 'outline')
+	if (parent){
+	    parent.remove_child(target);
+	    parent.render();
+	}
+	if (target.get('status') == 'ACTIVE'){
+	    totrash(target)
+	}else{
+	    todelete(target)
+	}
     }
-    if (obj.get('status') == 'ACTIVE'){
-	totrash(obj)
-    }else{
-	todelete(obj)
-    }
+    obj.tree_apply_children_first(f);
 }
 var totrash = function(obj){
     obj.set('status', 'TRASH')

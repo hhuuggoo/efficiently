@@ -25,7 +25,7 @@ def create_initial_data(user, passwd, email):
                     'passhash':passhash,
                     'email':email})
     objid = db.entries.insert({'username':user,
-                               'outline':'Main'})
+                               'outlinetitle':'Main'})
     db.entries.update({'_id' : objid},
                       {'$set' : {'_id':str(objid)}})
     
@@ -115,22 +115,22 @@ class Entries(AuthHandler):
 
 def entry_mongo_to_app(d, user):
     return {'id' : str(d['_id']),
-            'text' : d['text'],
+            'text' : d.get('text', ''),
             'username' : user,
-            'todostate' : d['todostate'],
-            'children' : d['children'],
-            'parent': d['parent'],
-            'outlinetitle': d['outlinetitle'],
+            'todostate' : d.get('todostate',''),
+            'children' : d.get('children', []),
+            'parent': d.get('parent', None),
+            'outlinetitle': d.get('outlinetitle', ''),
             'status' : d.get('status', 'ACTIVE')}
 
 def entry_app_to_mongo(d, user):
     return {'_id' : d['id'],
-            'text' : d['text'],
+            'text' : d.get('text', ''),
             'username' : user,
-            'todostate' : d['todostate'],
-            'children' : d['children'],
-            'parent': d['parent'],
-            'outlinetitle':d['outlinetitle'],
+            'todostate' : d.get('todostate',''),
+            'children' : d.get('children', []),
+            'parent': d.get('parent', None),
+            'outlinetitle': d.get('outlinetitle', ''),
             'status' : d.get('status', 'ACTIVE')}
 
 def save_entry(d):
