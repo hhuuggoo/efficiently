@@ -40,6 +40,7 @@ outline.Outline.prototype.add_child = function(child, index){
     }
     this.set('children', children);
     child.set('parent', this.id);
+    child.set('status', 'ACTIVE');
     this.save()
     child.save()
 }
