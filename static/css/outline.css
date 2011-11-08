@@ -205,8 +205,14 @@ button{
 .search{
     width: 70%;
     margin: 0px 0px 0px 7px;
+    height: 18px;
+    padding: 0px 0px 0px 0px;
+    border: 3px solid #ccc;    
 }
-
-.textborder{
-    border: 3px solid #ccc;
+.search:focus{
+    width: 70%;
+    margin: 0px 0px 0px 7px;
+    height: 18px;
+    padding: 0px 0px 0px 0px;
+    border: 3px solid #ccc;    
 }

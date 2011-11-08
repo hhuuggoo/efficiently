@@ -83,9 +83,8 @@ outline.Outline.prototype.render_hidden = function(){
     }
 }
 outline.Outline.prototype.tree_search = function(txt){
-    //searches but also returns 
+    //searches but also returns
     this.show_all_descendants();
-    this.el.show();
     var f = function (x) {
 	var matched = false;
 	var children_matched = _.map(x.get('children'), function(cid){
@@ -99,8 +98,8 @@ outline.Outline.prototype.tree_search = function(txt){
 	    return false;
 	}else{
 	    return true;
-	    this.render_hidden();
 	}
+	this.render_hidden();
     }
     f(this);
 }
@@ -156,6 +155,7 @@ outline.Outline.prototype._hidden_getter = function(){
     return !this.el.is(":visible");
 }
 outline.Outline.prototype.show_all_descendants = function(){
+    this.el.show();
     this.tree_apply(function(x){
 	x.show_children();
     }, null);
@@ -548,13 +548,14 @@ $(function(){
 	    activeobj=null;
 	}
     );
-    $('#search').keydown(
+    $('#search').keypress(
 	function(e){
 	    console.log('searching');
 	    if (e.keyCode == ENTER){
 		e.stopPropagation();
 		console.log('stopping propagation');
 		root.tree_search($('#search').val());
+		e.preventDefault();
 	    }
 	}
     )
