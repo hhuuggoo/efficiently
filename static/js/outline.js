@@ -298,14 +298,15 @@ var addsibling = function(obj){
     var newnode = new outline.Outline(collections.new_id(),
 				     window.outlinetitle);
     var parent = collections.get(obj.parent, 'outline')
-    parent.add_child(newnode);
+    var curr_index = _.indexOf(parent.get('children'), obj.get('id'))
+    parent.add_child(newnode, curr_index + 1);
     parent.render();
     newnode.field_el('text').delay(300).focus();
 }
-var add_new_child = function(obj){
+var add_new_child = function(obj, index){
     var newnode = new outline.Outline(collections.new_id(),
 				     window.outlinetitle);
-    obj.add_child(newnode);
+    obj.add_child(newnode, index);
     obj.render();
     newnode.field_el('text').delay(300).focus();
 }
@@ -366,8 +367,13 @@ outline.Outline.prototype.hook_events = function(){
 	savetext(e);
 	obj.unshade();
     });
-    this.field_el('text').keydown(function(e){
+    this.field_el('text').keypress(function(e){
 	if (e.keyCode == ENTER){
+	    e.preventDefault();
+	}
+    });
+    this.field_el('text').keyup(function(e){
+	if (e.keyCode == ENTER && !e.ctrlKey){
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0){
@@ -376,6 +382,8 @@ outline.Outline.prototype.hook_events = function(){
 	    }
 	    e.stopPropagation();
 
+	}else if (e.keyCode == ENTER && e.ctrlKey){
+	    add_new_child(obj, 0);
 	}else if (e.keyCode == BACKSPACE && !e.ctrlKey){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0

@@ -26,11 +26,6 @@ ItemSelector = function(root_node, collections){
             this.move_left();
         }else if (e.ctrlKey && e.keyCode == RIGHT){
             this.move_right();
-	}else if (e.keyCode == ENTER){
-	    console.log('got enter');
-	    if (this.curr_node){
-		this.curr_node.field_el('text').focus();
-	    }
 	}else if (e.ctrlKey && e.keyCode == BACKSPACE){
 	    if (this.curr_node){
 		var parent = this.collections.get(this.curr_node.parent, 'outline')
