@@ -389,12 +389,12 @@ outline.Outline.prototype.hook_events = function(){
 	savetext(e);
 	obj.unshade();
     });
-    this.field_el('text').keypress(function(e){
-	if (e.keyCode == ENTER){
-	    e.preventDefault();
-	}
+    this.field_el('text').keydown(function(e){
+    	// if (e.keyCode == ENTER){
+	//     return false;
+    	// }
     });
-    this.field_el('text').keyup(function(e){
+    this.field_el('text').keydown(function(e){
 	if (e.keyCode == ENTER && !e.ctrlKey){
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
@@ -402,16 +402,17 @@ outline.Outline.prototype.hook_events = function(){
 	    }else{
 		addsibling(obj);
 	    }
-	    e.stopPropagation();
-
+	    return false;
 	}else if (e.keyCode == ENTER && e.ctrlKey){
 	    add_new_child(obj, 0);
+	    return false;
 	}else if (e.keyCode == BACKSPACE && !e.ctrlKey){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0
 		&& obj.last_backspace_txt==newval){
 		obj.field_el('text').blur();
 		deletenode(obj);
+		return false;
 	    }
 	    obj.last_backspace_txt = newval;
 	}

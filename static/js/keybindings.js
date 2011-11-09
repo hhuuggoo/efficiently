@@ -59,16 +59,13 @@ ItemSelector = function(root_node, collections){
 		this.curr_node.toggle_todo_state();
 	    }
 	}else{
-	    return;  
+	    return true
 	}
 	this.curr_node.select();
+	return false;
     }
     $(document).keydown(function(e){
-	console.log('press!!')
-	obj.keyhandle(e);
-    });
-    $(document).keypress(function(e){
-	e.preventDefault();
+	return obj.keyhandle(e);
     });
     this.cursor_up = function(){
 	if (!this.curr_node){
