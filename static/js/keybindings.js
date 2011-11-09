@@ -13,6 +13,7 @@ ItemSelector = function(root_node, collections){
     this.root_node = root_node;
     this.curr_node = null;
     this.curr_idx = 0;
+    
     this.keyhandle = function(e){
         if (!e.ctrlKey && e.keyCode == UP){
             this.cursor_up();
@@ -63,7 +64,11 @@ ItemSelector = function(root_node, collections){
 	this.curr_node.select();
     }
     $(document).keydown(function(e){
+	console.log('press!!')
 	obj.keyhandle(e);
+    });
+    $(document).keypress(function(e){
+	e.preventDefault();
     });
     this.cursor_up = function(){
 	if (!this.curr_node){
