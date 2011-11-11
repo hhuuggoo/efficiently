@@ -13,10 +13,76 @@ ItemSelector = function(root_node, collections){
     this.root_node = root_node;
     this.curr_node = null;
     this.curr_idx = 0;
-    
+    this.get_keyfunction = function(e){
+        if (!e.ctrlKey && e.keyCode == UP){
+	    return this.keyfunctions['cursor_up'];
+	}else if (!e.ctrlKey && e.keyCode == DOWN){
+            return this.keyfunctions['cursor_down'];
+        }else if (e.ctrlKey && e.keyCode == UP){
+	    return this.keyfunctions['move_up'];
+        }else if (e.ctrlKey && e.keyCode == DOWN){
+	    return this.keyfunctions['move_down'];
+	}else if (e.ctrlKey && e.keyCode == LEFT){
+	    return this.keyfunctions['move_left'];
+        }else if (e.ctrlKey && e.keyCode == RIGHT){
+	    return this.keyfunctions['move_right'];
+	}else if (e.ctrlKey && e.keyCode == BACKSPACE){
+	    return this.keyfunctions['delete'];
+	}else if (e.keyCode == GE && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['toggle_outline'];
+	}else if (e.keyCode == SLASH && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['toggle_all_outline'];
+	}else if (e.keyCode == LT && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['toggle_todo'];
+	}else{
+	    return null;
+	}
+    }
+    $(document).keydown(
+	function(e){
+	    var func = obj.get_keyfunction(e);
+	    if (func){
+		func.call(obj);
+		obj.curr_node.select();
+		return false;
+	    }else{
+		return true;
+	    }
+	}
+    );
+    $(document).keyup(
+	function(e){
+	    var func = obj.get_keyfunction(e);
+	    if (func){
+		return false;
+	    }else{
+		return true;
+	    }
+	}
+    );
+    this.deletenode = function(){
+	if (this.curr_node){
+	    var parent = this.collections.get(this.curr_node.parent, 'outline')
+	    var siblings = parent.visible_children()
+	    var idx = _.indexOf(siblings, this.curr_node.id);
+	    var next_current = null;
+	    if (idx != 0){
+		next_current = this.collections.get(siblings[idx - 1], 
+						    'outline');
+	    }else if (idx < siblings.length - 1){
+		next_current = this.collections.get(siblings[idx + 1],
+						    'outline');
+	    }else{
+		next_current = parent;
+	    }
+	    deletenode(this.curr_node);
+	    this.curr_node = next_current;
+	}
+    }
+
     this.keyhandle = function(e){
         if (!e.ctrlKey && e.keyCode == UP){
-            this.cursor_up();
+
         }else if (!e.ctrlKey && e.keyCode == DOWN){
             this.cursor_down();
         }else if (e.ctrlKey && e.keyCode == UP){
@@ -64,10 +130,8 @@ ItemSelector = function(root_node, collections){
 	this.curr_node.select();
 	return false;
     }
-    $(document).keydown(function(e){
-	return obj.keyhandle(e);
-    });
     this.cursor_up = function(){
+	console.log('cursor up function');
 	if (!this.curr_node){
 	    this.curr_node = this.collections.get(
 		root.visible_children()[0], 'outline');
@@ -219,5 +283,31 @@ ItemSelector = function(root_node, collections){
 	parent.render();
 	node.shade();
     }
+    this.keyfunctions = {
+	'cursor_up' : this.cursor_up,
+	'cursor_down' : this.cursor_down,
+	'move_up':this.move_up,
+	'move_down':this.move_down,
+	'move_left':this.move_left,
+	'move_right':this.move_right,
+	'delete':this.deletenode,
+	'toggle_outline': function(){
+	    if (this.curr_node){
+		this.curr_node.toggle_outline_state();
+		this.curr_node.show_outline_state();
+	    }
+	},
+	'toggle_all_outline':function(){
+	    if (this.curr_node){
+		this.root_node.toggle_child_outline_state();
+	    }
+	},
+	'toggle_todo': function(){
+	    if (this.curr_node){
+		this.curr_node.toggle_todo_state();
+	    }
+	}
+    }
+
 }
 

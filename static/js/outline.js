@@ -390,11 +390,6 @@ outline.Outline.prototype.hook_events = function(){
 	obj.unshade();
     });
     this.field_el('text').keydown(function(e){
-    	// if (e.keyCode == ENTER){
-	//     return false;
-    	// }
-    });
-    this.field_el('text').keydown(function(e){
 	if (e.keyCode == ENTER && !e.ctrlKey){
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
