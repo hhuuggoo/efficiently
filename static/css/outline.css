@@ -216,3 +216,7 @@ button{
     padding: 0px 0px 0px 0px;
     border: 3px solid #ccc;    
 }
+
+.debug{
+    display: None;
+}

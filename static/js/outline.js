@@ -234,10 +234,14 @@ outline.Outline.prototype.render_field = function(field){
 }
 
 outline.Outline.prototype.render_text = function(){
+    console.log('render_text');
     var node = this.field_el('text')
     node.val(this.get('text'));
     var obj = this;
-    node.ready(function(){node.resizeNow.call(node);});
+    window.setTimeout(function(){
+	console.log('resizing');
+	node.resizeNow.call(node);}, 100);
+
 }
 outline.Outline.prototype.render_todostate = function(){
     var currstate = this.get('todostate');
@@ -593,6 +597,12 @@ $(function(){
 			   deletenode(x);
 		       }
 		   });
+	});
+	$('#debugbtn').click(function(e){
+	    var node = get_matching_text('release')[0];
+	    node.render_text();
+	    var ht = node.field_el('text')[0].scrollHeight;
+	    $('#debug').html(ht);
 	});
     });
     
