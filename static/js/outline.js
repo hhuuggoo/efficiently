@@ -46,6 +46,8 @@ outline.Outline.prototype.add_child = function(child, index){
 }
 
 outline.Outline.prototype.remove_child = function(child){
+    child.set('parent', null);
+    child.save();
     var children = this.get('children')
     children = _.filter(children, function(x){return x != child.id});
     this.set('children', children);
