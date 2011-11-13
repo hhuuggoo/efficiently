@@ -220,3 +220,24 @@ button{
 .debug{
     display: None;
 }
+
+.searchtext,
+.searchtext:focus{
+    width:90%;
+    height:18px;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 7px 0px 7px;
+    border: 3px solid #aaa;    
+}
+.searchbox{
+    position: fixed;
+    bottom:0px;
+    right:0px;
+    opacity:1.0;
+    background-color:#ddd;
+    border: 3px solid #aaa;
+    z-index:100;
+    margin: 10px 10px 10px 10px;
+    padding: 10px 10px 10px 10px;
+
+}

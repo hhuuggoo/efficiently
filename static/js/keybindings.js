@@ -6,6 +6,13 @@ var TAB = 9;
 var GE = 190;
 var LT = 188;
 var SLASH = 191;
+var S_KEY = 83;
+var F_KEY = 70;
+var R_KEY = 82;
+var P_KEY = 80;
+var L_BRACKET = 219;
+var R_BRACKET = 221;
+var FADEOUT_DELAY = 4000;
 
 ItemSelector = function(root_node, collections){
     var obj = this;
@@ -34,7 +41,14 @@ ItemSelector = function(root_node, collections){
 	    return this.keyfunctions['toggle_all_outline'];
 	}else if (e.keyCode == LT && e.altKey && !e.ctrlKey){
 	    return this.keyfunctions['toggle_todo'];
-	}else{
+	}else if (e.keyCode == P_KEY && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['focus_isearch']
+	}else if (e.keyCode == L_BRACKET && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['isearch_down'];
+	}else if (e.keyCode == R_BRACKET && e.altKey && !e.ctrlKey){
+	    return this.keyfunctions['isearch_up'];
+	}
+	else{
 	    return null;
 	}
     }
@@ -43,7 +57,9 @@ ItemSelector = function(root_node, collections){
 	    var func = obj.get_keyfunction(e);
 	    if (func){
 		func.call(obj);
-		obj.curr_node.select();
+		if (!func.noselect){
+		    obj.curr_node.select();
+		}
 		return false;
 	    }else{
 		return true;
@@ -131,7 +147,6 @@ ItemSelector = function(root_node, collections){
 	return false;
     }
     this.cursor_up = function(){
-	console.log('cursor up function');
 	if (!this.curr_node){
 	    this.curr_node = this.collections.get(
 		root.visible_children()[0], 'outline');
@@ -283,6 +298,110 @@ ItemSelector = function(root_node, collections){
 	parent.render();
 	node.shade();
     }
+    this.search_fade_out = function(){
+	var timestamp = storage.timestamp();
+	if (timestamp - this.search_active_timestamp >= FADEOUT_DELAY){
+	    console.log('fading out');
+	    $('#searchbox').fadeOut(300);
+	}
+    }
+    this.search_fade_in = function(){
+	if (!$('#searchbox').is(':visible')){
+	    $('#searchbox').fadeIn(300);
+	    this.search_active_timestamp = storage.timestamp();
+	    window.setTimeout(function(){
+		obj.search_fade_out.call(obj);
+	    }, FADEOUT_DELAY);
+	}
+    }
+    this.isearch_down = function(){
+	if (!this.curr_node){
+	    this.cursor_down();
+	}
+	this.search_fade_in();
+	var new_idx;
+	var val = $('#searchtext').val();
+	var curr_point = this.curr_node.field_el('text')[0].selectionEnd;
+	var try_select_text = function (node, curr_point){
+	    new_idx = node.get('text').indexOf(val, curr_point);
+	    if (new_idx > 0){
+		node.select()
+		node.field_el('text')[0].setSelectionRange(
+		    new_idx, new_idx + val.length);
+		return true;
+	    }else{
+		return false;
+	    }
+	}
+	var success = try_select_text(this.curr_node, curr_point);
+	if(!success){
+	    var node_iter = this.curr_node;
+	    while(true){
+		node_iter = this.find_lower_visible_node(node_iter);
+		console.log(['searching', node_iter.get('text')]);
+		if (!node_iter){
+		    break
+		}else{
+		    success = try_select_text(node_iter, 0);
+		    if (success){
+			break;
+		    }
+		}
+	    }
+	}
+    }
+
+    this.isearch_down.noselect = true;
+
+    this.isearch_up = function(){
+	//should refactor this to share with isearch_down
+	if (!this.curr_node){
+	    this.cursor_down();
+	}
+	this.search_fade_in();
+	var new_idx;
+	var val = $('#searchtext').val();
+	var curr_point = this.curr_node.field_el('text')[0].selectionStart;
+	var try_select_text = function (node, curr_point){
+	    new_idx = node.get('text').lastIndexOf(val, curr_point);
+	    if (new_idx > 0){
+		node.select()
+		node.field_el('text')[0].setSelectionRange(
+		    new_idx - val.length, new_idx);
+		return true;
+	    }else{
+		return false;
+	    }
+	}
+	var success = try_select_text(this.curr_node, curr_point);
+	if(!success){
+	    var node_iter = this.curr_node;
+	    while(true){
+		node_iter = this.find_upper_node(node_iter);
+		console.log(['searching', node_iter.get('text')]);
+		if (!node_iter){
+		    break
+		}else{
+		    success = try_select_text(node_iter, node_iter.get('text').length);
+		    if (success){
+			break;
+		    }
+		}
+	    }
+	}
+	
+    }
+    this.isearch_up.noselect = true;
+
+    this.focus_isearch = function(){
+	$('#searchbox').fadeIn(300);
+	console.log('focus isearch');
+	$('#searchtext').focus();
+    }
+    this.focus_isearch.noselect = true;
+    $('#searchtext').blur(function(){
+	$('#searchbox').fadeOut(300);
+    });
     this.keyfunctions = {
 	'cursor_up' : this.cursor_up,
 	'cursor_down' : this.cursor_down,
@@ -306,8 +425,11 @@ ItemSelector = function(root_node, collections){
 	    if (this.curr_node){
 		this.curr_node.toggle_todo_state();
 	    }
-	}
+	},
+	'isearch_up': this.isearch_up,
+	'isearch_down':this.isearch_down,
+    	'focus_isearch': this.focus_isearch
     }
-
+    $('#searchbox').hide();
 }
 

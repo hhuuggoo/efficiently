@@ -1,4 +1,4 @@
- var ENTER = 13;
+var ENTER = 13;
 var BACKSPACE = 8;
 var outline = {}
 window.todostates = ["TODO", "INPROGRESS", "DONE", null];
@@ -234,12 +234,10 @@ outline.Outline.prototype.render_field = function(field){
 }
 
 outline.Outline.prototype.render_text = function(){
-    console.log('render_text');
     var node = this.field_el('text')
     node.val(this.get('text'));
     var obj = this;
     window.setTimeout(function(){
-	console.log('resizing');
 	node.resizeNow.call(node);}, 100);
 
 }
@@ -436,7 +434,6 @@ var toggle_controls = function(e, obj){
 	window.controls.show()
 	var x = e.pageX;
 	var y = e.pageY;
-	console.log([x,y]);
 	x = x - 60;
 	y = y - 10;
 	x = x<0 ? 0 : x;
@@ -444,7 +441,6 @@ var toggle_controls = function(e, obj){
 	window.controls.css(
 	    {'top' : y + "px", 'left' : x + "px"}
 	);
-	console.log({'top' : y + "px", 'left' : x + "px"});
 	var border = 10;
 	var x3 = activator.offset().left;
 	var x4 = x3 + activator.width();
@@ -551,10 +547,8 @@ $(function(){
     );
     $('#search').keypress(
 	function(e){
-	    console.log('searching');
 	    if (e.keyCode == ENTER){
 		e.stopPropagation();
-		console.log('stopping propagation');
 		root.tree_search($('#search').val());
 		e.preventDefault();
 	    }
