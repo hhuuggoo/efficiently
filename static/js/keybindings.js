@@ -324,7 +324,7 @@ ItemSelector = function(root_node, collections){
 	var curr_point = this.curr_node.field_el('text')[0].selectionEnd;
 	var try_select_text = function (node, curr_point){
 	    new_idx = node.get('text').indexOf(val, curr_point);
-	    if (new_idx > 0){
+	    if (new_idx >= 0){
 		node.select()
 		node.field_el('text')[0].setSelectionRange(
 		    new_idx, new_idx + val.length);
@@ -361,13 +361,16 @@ ItemSelector = function(root_node, collections){
 	this.search_fade_in();
 	var new_idx;
 	var val = $('#searchtext').val();
-	var curr_point = this.curr_node.field_el('text')[0].selectionStart;
+	var curr_point = this.curr_node.field_el('text')[0].selectionStart - 1;
 	var try_select_text = function (node, curr_point){
+	    if (curr_point < 0){
+		return false;
+	    }
 	    new_idx = node.get('text').lastIndexOf(val, curr_point);
-	    if (new_idx > 0){
+	    if (new_idx >= 0){
 		node.select()
 		node.field_el('text')[0].setSelectionRange(
-		    new_idx - val.length, new_idx);
+		    new_idx, new_idx + val.length);
 		return true;
 	    }else{
 		return false;
