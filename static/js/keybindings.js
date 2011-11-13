@@ -314,6 +314,13 @@ ItemSelector = function(root_node, collections){
 	    }, FADEOUT_DELAY);
 	}
     }
+    this.isearch_strings = function(target, text){
+	if (target.toLowerCase() == target){
+	    return [target.toLowerCase(), text.toLowerCase()];
+	}else{
+	    return [target, text];
+	}
+    }
     this.isearch_down = function(){
 	if (!this.curr_node){
 	    this.cursor_down();
@@ -322,8 +329,14 @@ ItemSelector = function(root_node, collections){
 	var new_idx;
 	var val = $('#searchtext').val();
 	var curr_point = this.curr_node.field_el('text')[0].selectionEnd;
+	var curr_text;
+	var temp;
 	var try_select_text = function (node, curr_point){
-	    new_idx = node.get('text').indexOf(val, curr_point);
+	    temp = obj.isearch_strings(val, node.get('text'));
+	    val = temp[0];
+	    curr_txt = temp[1];
+	    console.log(['searching', val, curr_txt]);
+	    new_idx = curr_txt.indexOf(val, curr_point);
 	    if (new_idx >= 0){
 		node.select()
 		node.field_el('text')[0].setSelectionRange(
@@ -338,7 +351,6 @@ ItemSelector = function(root_node, collections){
 	    var node_iter = this.curr_node;
 	    while(true){
 		node_iter = this.find_lower_visible_node(node_iter);
-		console.log(['searching', node_iter.get('text')]);
 		if (!node_iter){
 		    break
 		}else{
@@ -362,11 +374,17 @@ ItemSelector = function(root_node, collections){
 	var new_idx;
 	var val = $('#searchtext').val();
 	var curr_point = this.curr_node.field_el('text')[0].selectionStart - 1;
+	var curr_text;
+	var temp;
 	var try_select_text = function (node, curr_point){
 	    if (curr_point < 0){
 		return false;
 	    }
-	    new_idx = node.get('text').lastIndexOf(val, curr_point);
+	    temp = obj.isearch_strings(val, node.get('text'));
+	    val = temp[0];
+	    curr_txt = temp[1];
+	    console.log(['searching', val, curr_txt]);
+	    new_idx = curr_txt.lastIndexOf(val, curr_point);
 	    if (new_idx >= 0){
 		node.select()
 		node.field_el('text')[0].setSelectionRange(
