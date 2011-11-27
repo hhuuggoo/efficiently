@@ -13,6 +13,8 @@ var P_KEY = 80;
 var L_BRACKET = 219;
 var R_BRACKET = 221;
 var FADEOUT_DELAY = 4000;
+var ENTER = 13;
+var BACKSPACE = 8;
 
 ItemSelector = function(root_node, collections){
     var obj = this;

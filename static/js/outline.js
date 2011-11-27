@@ -1,21 +1,20 @@
-var ENTER = 13;
-var BACKSPACE = 8;
-var outline = {}
-window.todostates = ["TODO", "INPROGRESS", "DONE", null];
-window.todocolors  = {'TODO' : 'red',
-		      'INPROGRESS': 'red',
-		      'DONE' : 'green'}
-window.outlinetitle = "Main";
+//operations
+//cut paste subtopic, paste above, paste below
+//delete hide todo new
+//for mobile version, separate focus of node from focus of textarea, only focus
+//textarea on click.  display control panel at the bottom constantly.
 
+
+var outline = {}
 //outline_state, 0, show everything, 
-outline.Outline = function(id, outlinetitle){
+outline.Outline = function(id, documentid){
     this.set('id', id); 
     this.set('text', '');
     this.set('todostate', null);
     this.set('date', null);
     this.set('parent', null);
     this.set('children', []);
-    this.set('outlinetitle', outlinetitle);
+    this.set('documentid', documentid);
     this.set('status', 'ACTIVE');
     this.dirty = {};
     this.el = null;
@@ -25,10 +24,10 @@ outline.Outline = function(id, outlinetitle){
 //data model
 outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
-				    'date', 'children', 'parent', 'outlinetitle',
+				    'date', 'children', 'parent', 'documentid',
 				   'status']
 outline.Outline.prototype.save = function(){
-    collections.save(this.id, this, 'outline');
+    window.collections.save(this.id, this, 'outline');
 }
 
 outline.Outline.prototype.add_child = function(child, index){
@@ -59,7 +58,7 @@ outline.Outline.prototype.tree_apply = function(func, level){
 	var new_level = (level == null) ? null : level - 1;
 	var children = this.get('children')
 	_.each(children, function(x){
-	    var child = collections.get(x, 'outline');
+	    var child = window.collections.get(x, 'outline');
 	    child.tree_apply(func, new_level);
 	});
     }
@@ -69,153 +68,15 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 	var new_level = (level == null) ? null : level - 1;
 	var children = this.get('children')
 	_.each(children, function(x){
-	    var child = collections.get(x, 'outline');
+	    var child = window.collections.get(x, 'outline');
 	    child.tree_apply(func, new_level);
 	});
     }
     func(this);
 }
+
 //view
-outline.Outline.prototype.render_hidden = function(){
-    var visible_children = this.visible_children();
-    var children = this.get('children')
-    if (children.length > visible_children.length){
-	this.field_el('hideindicator').html("+");
-    }else{
-	this.field_el('hideindicator').html("");
-    }
-}
-outline.Outline.prototype.tree_search = function(txt){
-    //searches but also returns
-    this.show_all_descendants();
-    var f = function (x) {
-	var matched = false;
-	var children_matched = _.map(x.get('children'), function(cid){
-	    return f(collections.get(cid, 'outline'));
-	})
-	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
-	    matched = true;
-	}
-	if (!_.any(children_matched) && !matched){
-	    x.el.hide();
-	    return false;
-	}else{
-	    return true;
-	}
-	this.render_hidden();
-    }
-    f(this);
-}
-
-outline.Outline.prototype.visible_children = function(){
-    if (this.get('child_hidden')){
-	return []
-    }else{
-	var children = this.get('children')
-	children = _.filter(children,
-			    function(x){
-				return !collections.get(x, 'outline').get('hidden')
-			    });
-	return children
-    }
-}
-outline.Outline.prototype.select = function(){
-    this.shade();
-    this.field_el('text').focus();
-}
-outline.Outline.prototype.unselect = function(){
-    this.unshade()
-    this.field_el('text').blur();
-}
-
-outline.Outline.prototype.shade = function(){
-    this.field_el('content').addClass('shade');
-}
-outline.Outline.prototype.unshade = function(){
-    this.field_el('content').removeClass('shade');
-}
-outline.Outline.prototype.show_children = function(){
-    if (this.get('children').length > 0){
-	this.field_el('childcontainer').show();
-    }else{
-	this.field_el('childcontainer').hide();
-    }
-    _.each(this.get('children'), function(x){
-	var child = collections.get(x, 'outline');
-	child.el.show();
-    });
-    this.render_hidden();
-}
-outline.Outline.prototype.hide_children = function(){
-    this.field_el('childcontainer').hide();
-    this.render_hidden();
-}
-
-outline.Outline.prototype._child_hidden_getter = function(){
-    return !this.field_el('childcontainer').is(":visible");
-}
-outline.Outline.prototype._hidden_getter = function(){
-    return !this.el.is(":visible");
-}
-outline.Outline.prototype.show_all_descendants = function(){
-    this.el.show();
-    this.tree_apply(function(x){
-	x.show_children();
-    }, null);
-}
-
-outline.Outline.prototype.show_all_children = function(){
-    this.tree_apply(function(x){
-	x.hide_children();
-    }, 1);
-    this.show_children();
-}
-outline.Outline.prototype.toggle_todo_state = function(){
-    var currstate = this.get('todostate', null);	
-    var curridx = _.indexOf(window.todostates, currstate);
-    if (curridx < 0 || curridx >= window.todostates.length-1){
-	curridx = 0;
-    }else{
-	curridx = curridx + 1;
-    }
-    this.set('todostate', window.todostates[curridx]);
-    this.save();
-    this.render();
-}
-
-outline.Outline.prototype.toggle_outline_state = function(){
-    var curr_state = this.outline_state
-    if (curr_state < 0 || curr_state >=2){
-	curr_state = 0
-    }else{
-	curr_state = curr_state + 1;
-    }
-    this.outline_state = curr_state;
-    return this.outline_state;
-}
-outline.Outline.prototype.show_outline_state = function(){
-    if (this.outline_state == 0){
-	this.show_all_descendants()
-    }else if (this.outline_state == 1){
-	this.hide_children();
-    }else if (this.outline_state == 2){
-	this.show_all_children();
-    }
-}
-outline.Outline.prototype.toggle_child_outline_state = function(){
-    var curr_state = this.toggle_outline_state();
-    _.each(this.get('children'), function(x){
-	var child = collections.get(x, 'outline')
-	child.outline_state = curr_state
-    });
-    _.each(this.get('children'), function(x){
-	var child = collections.get(x, 'outline')
-	child.show_outline_state();
-    });
-    
-}
-outline.Outline.prototype.template = _.template($('#outline-template').html())
-roottemplate = _.template($('#root-template').html())
+//utils
 outline.Outline.prototype.field_id = function(fld){
     if (!fld){
 	return this.get('id');
@@ -231,6 +92,7 @@ outline.Outline.prototype.field_el = function(fld){
     }
 }
 
+//render
 outline.Outline.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
 }
@@ -255,10 +117,6 @@ outline.Outline.prototype.render_todostate = function(){
     }
     //adjust width of text to match size;
     var obj = this;
-    window.setTimeout(
-	function(){
-	    obj.set_text_width();
-	}, 100);
 
 }
 outline.Outline.prototype.render_children = function(){
@@ -270,19 +128,11 @@ outline.Outline.prototype.render_children = function(){
     }else{
 	obj.field_el('childcontainer').show();
 	_.each(ids, function(id){
-	    var child = collections.get(id, 'outline');
+	    var child = window.collections.get(id, 'outline');
 	    child.render();
 	    obj.field_el('children').append(child.el);
 	});
     }
-    _.each(ids, function(id){
-	var child = collections.get(id, 'outline');
-	window.setTimeout(
-	    function(){
-		child.set_text_width();
-	    }, 100)
-    });
-
 }
 outline.Outline.prototype.render_function = function(field){
     var obj = this;
@@ -292,9 +142,180 @@ outline.Outline.prototype.render_function = function(field){
 	return function() {obj.render_field(field);};
     }
 }
+
+outline.Outline.prototype.render_hidden = function(){
+    var visible_children = this.visible_children();
+    var children = this.get('children')
+    if (children.length > visible_children.length){
+	this.field_el('hideindicator').html("+");
+    }else{
+	this.field_el('hideindicator').html("");
+    }
+}
+outline.Outline.prototype.render = function(isroot){
+    if (!this.el){
+	if (!isroot){
+	    this.el = $(this.template(this.to_dict()));
+	    this.hook_events()
+	}else{
+	    this.el = $(roottemplate(this.to_dict()));
+	    this.hook_events()
+	}
+	this.field_el('text').autoResize();
+	this.field_el('childcontainer').hide();
+    }
+    var obj = this;
+    _.each(this.fields, function(f){
+	if (obj.dirty[f]){
+	    obj.render_function(f).call(obj);
+	    delete obj.dirty[f];
+	}
+    });
+}
+outline.Outline.prototype.toggle_todo_state = function(){
+    var currstate = this.get('todostate', null);	
+    var todostates = collections.get('document', this.get('documentid')).get('todostates')
+    var curridx = _.indexOf(window.todostates, currstate);
+    if (curridx < 0 || curridx >= window.todostates.length-1){
+	curridx = 0;
+    }else{
+	curridx = curridx + 1;
+    }
+    this.set('todostate', window.todostates[curridx]);
+    this.save();
+    this.render();
+}
+
+//view operations
+outline.Outline.prototype.select = function(){
+    this.shade();
+    this.field_el('text').focus();
+}
+outline.Outline.prototype.unselect = function(){
+    this.unshade()
+    this.field_el('text').blur();
+}
+outline.Outline.prototype.shade = function(){
+    this.field_el('content').addClass('shade');
+}
+outline.Outline.prototype.unshade = function(){
+    this.field_el('content').removeClass('shade');
+}
+
+//view properties
+outline.Outline.prototype._child_hidden_getter = function(){
+    return !this.field_el('childcontainer').is(":visible");
+}
+outline.Outline.prototype._hidden_getter = function(){
+    return !this.el.is(":visible");
+}
+
+outline.Outline.prototype.visible_children = function(){
+    if (this.get('child_hidden')){
+	return []
+    }else{
+	var children = this.get('children')
+	children = _.filter(children,
+			    function(x){
+				return !window.collections.get(x, 'outline').get('hidden')
+			    });
+	return children
+    }
+}
+
+//view tree operations
+outline.Outline.prototype.tree_search = function(txt){
+    //searches but also returns
+    this.show_all_descendants();
+    var f = function (x) {
+	var matched = false;
+	var children_matched = _.map(x.get('children'), function(cid){
+	    return f(window.collections.get(cid, 'outline'));
+	})
+	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
+	    matched = true;
+	}
+	if (!_.any(children_matched) && !matched){
+	    x.el.hide();
+	    return false;
+	}else{
+	    return true;
+	}
+	this.render_hidden();
+    }
+    f(this);
+}
+
+
+outline.Outline.prototype.show_children = function(){
+    if (this.get('children').length > 0){
+	this.field_el('childcontainer').show();
+    }else{
+	this.field_el('childcontainer').hide();
+    }
+    _.each(this.get('children'), function(x){
+	var child = window.collections.get(x, 'outline');
+	child.el.show();
+    });
+    this.render_hidden();
+}
+outline.Outline.prototype.hide_children = function(){
+    this.field_el('childcontainer').hide();
+    this.render_hidden();
+}
+
+outline.Outline.prototype.show_all_descendants = function(){
+    this.el.show();
+    this.tree_apply(function(x){
+	x.show_children();
+    }, null);
+}
+
+outline.Outline.prototype.show_all_children = function(){
+    this.tree_apply(function(x){
+	x.hide_children();
+    }, 1);
+    this.show_children();
+}
+outline.Outline.prototype.toggle_outline_state = function(){
+    var curr_state = this.outline_state
+    if (curr_state < 0 || curr_state >=2){
+	curr_state = 0
+    }else{
+	curr_state = curr_state + 1;
+    }
+    this.outline_state = curr_state;
+    return this.outline_state;
+}
+outline.Outline.prototype.show_outline_state = function(){
+    if (this.outline_state == 0){
+	this.show_all_descendants()
+    }else if (this.outline_state == 1){
+	this.hide_children();
+    }else if (this.outline_state == 2){
+	this.show_all_children();
+    }
+}
+outline.Outline.prototype.toggle_child_outline_state = function(){
+    var curr_state = this.toggle_outline_state();
+    _.each(this.get('children'), function(x){
+	var child = window.collections.get(x, 'outline')
+	child.outline_state = curr_state
+    });
+    _.each(this.get('children'), function(x){
+	var child = window.collections.get(x, 'outline')
+	child.show_outline_state();
+    });
+    
+}
+
+outline.Outline.prototype.template = _.template($('#outline-template').html())
+roottemplate = _.template($('#root-template').html())
+
+
 var deletenode = function(obj){
     var f  = function(target){
-	var parent = collections.get(target.parent, 'outline')
+	var parent = window.collections.get(target.parent, 'outline')
 	if (parent){
 	    parent.remove_child(target);
 	    parent.render();
@@ -317,26 +338,27 @@ var todelete = function(obj){
     obj.set('status', 'DELETE')
     obj.save()
     obj.el.remove();
-    collections.remove(obj.id, 'outline');
+    window.collections.remove(obj.id, 'outline');
 }
 
 var addsibling = function(obj){
-    var newnode = new outline.Outline(collections.new_id(),
-				     window.outlinetitle);
-    var parent = collections.get(obj.parent, 'outline')
+    var newnode = new outline.Outline(window.collections.new_id(),
+				     window.documentid);
+    var parent = window.collections.get(obj.parent, 'outline')
     var curr_index = _.indexOf(parent.get('children'), obj.get('id'))
     parent.add_child(newnode, curr_index + 1);
     parent.render();
     newnode.field_el('text').delay(300).focus();
 }
 var add_new_child = function(obj, index){
-    var newnode = new outline.Outline(collections.new_id(),
-				     window.outlinetitle);
+    var newnode = new outline.Outline(window.collections.new_id(),
+				     window.documentid);
     obj.add_child(newnode, index);
     obj.render();
     newnode.field_el('text').delay(300).focus();
 }
 
+//event handling
 outline.Outline.prototype.hook_events = function(){
     var obj = this;
     var savetext = function(){
@@ -351,8 +373,8 @@ outline.Outline.prototype.hook_events = function(){
 	 'hoverClass': "ui-state-hover",
 	 'drop': function(e, ui){
 	     var dropping_id = ui.draggable.data()['id'];
-	     var droppingnode = collections.get(dropping_id, 'outline');
-	     var droppingparent = collections.get(droppingnode.parent, 'outline');
+	     var droppingnode = window.collections.get(dropping_id, 'outline');
+	     var droppingparent = window.collections.get(droppingnode.parent, 'outline');
 	     droppingparent.remove_child(droppingnode);
 	     obj.add_child(droppingnode, 0);
 	     droppingparent.render();
@@ -367,13 +389,13 @@ outline.Outline.prototype.hook_events = function(){
 	{'tolerance':'pointer',
 	 'hoverClass': "ui-state-hover",
 	 'drop': function(e, ui){
-	     var currentparent = collections.get(obj.get('parent'), 'outline');
+	     var currentparent = window.collections.get(obj.get('parent'), 'outline');
 	     var currentsiblings = currentparent.get('children');
 	     var currentindex = _.indexOf(currentsiblings, obj.id);
 	     var newindex = currentindex + 1;
 	     var dropping_id = ui.draggable.data()['id'];
-	     var droppingnode = collections.get(dropping_id, 'outline');
-	     var droppingparent = collections.get(droppingnode.parent, 'outline');
+	     var droppingnode = window.collections.get(dropping_id, 'outline');
+	     var droppingparent = window.collections.get(droppingnode.parent, 'outline');
 	     droppingparent.remove_child(droppingnode);
 	     currentparent.add_child(droppingnode, newindex);
 	     droppingparent.render();
@@ -424,9 +446,33 @@ outline.Outline.prototype.hook_events = function(){
 	function(e){
 	    toggle_controls(e, obj);
 	}
-    );
+    )
 }
 
+outline.Document = function(title, root){
+    this.set('title', title);
+    this.set('root_id', root.id);
+    this.set('username', root.username;)
+    this.set('todostates', ["TODO", "INPROGRESS", "DONE", null]);
+    this.set('todocolors', {'TODO' : 'red',
+			    'INPROGRESS': 'red',
+			    'DONE' : 'green'})
+}
+
+//data model
+outline.Outline.prototype = new model.Model()
+outline.Outline.prototype.fields = ['title', 'id', 'root_id', 'username', 
+				    'todostates', 'todocolors'];
+outline.Outline.prototype.save = function(){
+    window.collections.save(this.id, this, 'document');
+}
+
+
+//globals
+window.active_obj = null;
+window.item_selector = null;
+window.controls = null;
+window.collections = null;
 
 var toggle_controls = function(e, obj){
     var activator = obj.field_el('fakedotcontainer');
@@ -474,55 +520,18 @@ var toggle_controls = function(e, obj){
     }else{
 	!window.controls.is(":visible") ? show(e) : hide(e);
     }
-
 }
 
-outline.Outline.prototype.set_text_width = function(){
-    // var w1 = this.field_el('todostate').width();
-    // var w2 = this.field_el('content').width()
-    // var w3 = 13; //fakedotcontainer
-    // var error = 20;
-    // //console.log([w1,w2,w3]);
-    // //console.log(factor * (w2-w1-w3));
-    // this.field_el('text').width((w2-w1-w3)-error);
-    // this.field_el('children').width((w2-w3)-error);
-}
-
-outline.Outline.prototype.render = function(isroot){
-    if (!this.el){
-	if (!isroot){
-	    this.el = $(this.template(this.to_dict()));
-	    this.hook_events()
-	}else{
-	    this.el = $(roottemplate(this.to_dict()));
-	    this.hook_events()
-	}
-	this.field_el('text').autoResize();
-	this.field_el('childcontainer').hide();
-    }
-    var obj = this;
-    _.each(this.fields, function(f){
-	if (obj.dirty[f]){
-	    obj.render_function(f).call(obj);
-	    delete obj.dirty[f];
-	}
-    });
-}
-
-$(function(){
-    collections = new storage.Collections('id5', {'outline' : outline.Outline});
-    controls = $('.item-controls');
-    controls.hide();
-    activeobj = null;
+var global_event_hooks = function(){
     $('#add-button').click(
 	function(e){
-	    add_new_child(activeobj);
+	    add_new_child(window.activeobj);
 	}
     );
     $('#root-add').click(function(){
-	var root = collections.get(root_id, 'outline');
-	var newitem = new outline.Outline(collections.new_id(),
-					  window.outlinetitle);
+	var root = window.collections.get(root_id, 'outline');
+	var newitem = new outline.Outline(window.collections.new_id(),
+					  window.documentid);
 	root.add_child(newitem);
 	root.save();
 	root.render();
@@ -530,21 +539,21 @@ $(function(){
 
     $('#state-button').click(
 	function(e){
-	    activeobj.toggle_todo_state();
+	    window.activeobj.toggle_todo_state();
 	}
     );
 
     $('#overview-button').click(
 	function(e){
-	    activeobj.toggle_outline_state();
-	    activeobj.show_outline_state();
+	    window.activeobj.toggle_outline_state();
+	    window.activeobj.show_outline_state();
 	}
     );
     $('#del-button').click(
 	function(e){
-	    deletenode(activeobj);
-	    toggle_controls(e, activeobj);
-	    activeobj=null;
+	    deletenode(window.activeobj);
+	    toggle_controls(e, window.activeobj);
+	    window.activeobj=null;
 	}
     );
     $('#search').keypress(
@@ -556,30 +565,37 @@ $(function(){
 	    }
 	}
     )
+
+}
+
+$(function(){
+    window.collections = new storage.Collections('id5', {'outline' : outline.Outline});
+    window.controls = $('.item-controls');
+    window.controls.hide();
     window.controls = controls
-    window.activeobj = activeobj
+    window.activeobj = null;
 
     $.get("/entries/Main", function(data){
 	var entries = JSON.parse(data);
 	_.each(entries, function(x){
 	    var tmp = new outline.Outline();
 	    tmp.deserialize(JSON.stringify(x));
-	    collections.set_mem(x['id'], tmp, 'outline');
+	    window.collections.set_mem(x['id'], tmp, 'outline');
 	});
 	root_id = $("#main_root_id").html()
-	root = collections.get(root_id, 'outline');
+	root = window.collections.get(root_id, 'outline');
 	if (!root){
 	    // root = new outline.Outline(root_id,
-	    // 			       window.outlinetitle);
+	    // 			       window.documentid);
 	    // newitem = new outline.Outline(collections.new_id(),
-	    // 				  window.outlinetitle);
+	    // 				  window.documentid);
 	    // root.add_child(newitem);
 	    // root.save()
 	}
 	root.render(true);
 	$('#main-outline').append(root.el);
-	window.item_selector = new ItemSelector(root, collections);
-	_.each(collections.collections['outline'],
+	window.item_selector = new ItemSelector(root, window.collections);
+	_.each(window.collections.collections['outline'],
 	       function(x){
 		   if(x.get('status') == 'TRASH'){
 		       x.render()
@@ -587,7 +603,7 @@ $(function(){
 		   }
 	       });
 	$('#root-clear-trash').click(function(e){
-	    _.each(collections.collections['outline'],
+	    _.each(window.collections.collections['outline'],
 		   function(x){
 		       if(x.get('status') == 'TRASH'){
 			   deletenode(x);
@@ -604,9 +620,10 @@ $(function(){
     
 });
 
+//debug function
 function get_matching_text(data){
     var output = []
-    _.each(collections.collections['outline'],
+    _.each(window.collections.collections['outline'],
 	     function(v,k){
 		 if (_.includes(v.get('text'), data)){
 		     output.push(v)
