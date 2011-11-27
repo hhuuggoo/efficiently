@@ -19,19 +19,19 @@ hostname = "localhost"
 
 def create_initial_data(user, passwd, email):
     salt = bcrypt.gensalt(log_rounds=7)
-    passhash = bcrypt.hashpw(passwd, salt)  
+    passhash = bcrypt.hashpw(passwd, salt)
     db.user.insert({'username':user,
                     'salt' : salt,
                     'passhash':passhash,
-                    'email':email})
+                    'email':email}, safe=True)
     objid = db.entries.insert({'username':user,
-                               'outlinetitle':'Main'})
+                               'outlinetitle':'Main'}, safe=True)
     db.entries.update({'_id' : objid},
-                      {'$set' : {'_id':str(objid)}})
+                      {'$set' : {'_id':str(objid)}}, safe=True)
     
     db.outlines.insert({'username':user,
                         'outlinetitle': 'Main',
-                        'root': objid})
+                        'root': objid}, safe=True)
 class AuthHandler(tornado.web.RequestHandler):
     @property
     def current_user(self):
@@ -134,7 +134,7 @@ def entry_app_to_mongo(d, user):
             'status' : d.get('status', 'ACTIVE')}
 
 def save_entry(d):
-    db.entries.update({'_id':d['_id']}, d, upsert=True)
+    db.entries.update({'_id':d['_id']}, d, upsert=True, safe=True)
 
 #handler if we are indexing elems by ID
 class BulkSave(AuthHandler):
