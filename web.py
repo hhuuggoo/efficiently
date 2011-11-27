@@ -113,6 +113,23 @@ class Entries(AuthHandler):
                            for e in entries]
             self.write(cjson.encode(entries))
 
+def doc_mongo_to_app(d, user):
+    return {'id' : str(d['_id']),
+            'text' : d.get('text', ''),
+            'username' : user,
+            'todostate' : d.get('todostate',''),
+            'children' : d.get('children', []),
+            'parent': d.get('parent', None),
+            'outlinetitle': d.get('outlinetitle', ''),
+            'status' : d.get('status', 'ACTIVE')}
+
+def doc_app_to_mongo(d, user):
+    pass
+
+def save_doc(d):
+    id_val = d.pop('_id')
+    pass
+
 def entry_mongo_to_app(d, user):
     return {'id' : str(d['_id']),
             'text' : d.get('text', ''),
@@ -141,13 +158,15 @@ def save_entry(d):
 class BulkSave(AuthHandler):
     def post(self):
         if not self.current_user:
-            return self.redirect("/register");
+            raise Exception('not logged in!!');
         else:
             data = self.get_argument('data')
             data = cjson.decode(data)
-            for d in data:
-                d = entry_app_to_mongo(d, self.current_user)
-                save_entry(d)
+            for dtype, objects in data.iteritems():
+                for k, d in objects.iteritems():
+                    if dtype == 'outline':
+                        d = entry_app_to_mongo(d, self.current_user)
+                        save_entry(d)
             self.write("success");
 
 class Logout(AuthHandler):
