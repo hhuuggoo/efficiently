@@ -134,7 +134,8 @@ def entry_app_to_mongo(d, user):
             'status' : d.get('status', 'ACTIVE')}
 
 def save_entry(d):
-    db.entries.update({'_id':d['_id']}, d, upsert=True, safe=True)
+    id_val = d.pop('_id')
+    db.entries.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
 #handler if we are indexing elems by ID
 class BulkSave(AuthHandler):
