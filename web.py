@@ -272,12 +272,13 @@ class AliasedUserHandler(AuthHandler):
                 valid_users.update(document['ruser'])
                 valid_users.update(document['rwuser'])
                 if 'all' in valid_users or \
-                self.real_user in valid_users:
+                       self.real_user in valid_users:
                     return document['username']
             elif self.mode =='rw':
                 valid_users = set()
                 valid_users.update(document['rwuser'])
-                if self.real_user in valid_users:
+                if 'all' in valid_users or \
+                       self.real_user in valid_users:
                     return document['username']
         return self.real_user
     
