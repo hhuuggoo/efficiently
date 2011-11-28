@@ -133,11 +133,16 @@ storage.Collections.prototype.save_server_queue = function(){
 	       });
 	   });
     
-    //console.log('posting')
-    $.post(window.active_doc.get('saveurl'), {'data': JSON.stringify(tosave)},
-	   function(x){
-	       obj.save_server_queue();
-	   }).error(function(x){alert('failure saving')});
+    console.log(['posting', window.active_doc.get('saveurl')]);
+    var save_url = window.active_doc.get('saveurl');
+    if (save_url == ''){
+	return null;
+    }else{
+	$.post(save_url, {'data': JSON.stringify(tosave)},
+	       function(x){
+		   obj.save_server_queue();
+	       }).error(function(x){alert('failure saving')});
+    }
 }
 storage.Collections.prototype.save_server = function(k, v, collection){
     var obj = this;

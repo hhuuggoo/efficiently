@@ -571,9 +571,9 @@ $(function(){
 	tmp.update(document);
 	window.active_doc = tmp;
 	if (mode == 'rw'){
-	    tmp.save_url = "/bulk/" + tmp.get('id')
+	    tmp.set('saveurl', "/bulk/" + tmp.get('id'))
 	}else{
-	    tmp.save_url = "/trash"
+	    tmp.set('saveurl', '')
 	}
 	window.collections.set_mem(tmp['id'], tmp, 'document');
 	_.each(outlines, function(x){

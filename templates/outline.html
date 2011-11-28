@@ -37,10 +37,10 @@
 <script type="text/template" id="doc-template">
 
 </script>
-<script src="../static/js/localstorage.js"></script>
-<script src="../static/js/model.js"></script>
-<script src="../static/js/outline.js"></script>
-<script src="../static/js/keybindings.js"></script>
+<script src="/static/js/localstorage.js"></script>
+<script src="/static/js/model.js"></script>
+<script src="/static/js/outline.js"></script>
+<script src="/static/js/keybindings.js"></script>
 
 {% end %}
 {% block main %}
@@ -60,7 +60,11 @@
 </div>
 <div>
   <div class="ten columns clearfix alpha">
-
+    <h4>{{ title }}: by {{ user }}</h4>
+    {% if mode == 'r' %}
+    Warning, this document is opened in read only mode, 
+    you will not be able to save any changes
+    {% end %}
     <div class="abox" id="{{document_id}}-display}}">
       <button class="global-button left" id="{{document_id}}-add">add</button>
       <div class="left">search:  </div>

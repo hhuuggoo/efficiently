@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block other_scripts%}
+{% end %}
+{% block main %}
+<h4>Your Documents</h4>
+<div class="ten columns clearfix alpha">
+  <ul class="square">
+    {% for doc in documents %}
+    <li>
+      <a href="/docview/rw/{{doc['id']}}">{{doc['title']}}</a>
+    </li>
+    {% end %}
+  </ul>
+</div>
+<div class="six columns clearfix omega">
+</div>
+</ul>
+</div>
+{% end %}
