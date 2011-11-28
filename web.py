@@ -392,7 +392,8 @@ class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
     def on_close(self, *args, **kwargs):
         if hasattr(self, 'docid'):
             if hasattr(self, 'clientid'):
-                self.clients[self.docid].remove(self.clientid)
+                logging.debug("%s, %s", self.clientid, self.clients)
+                self.clients[self.docid].remove(self)
 
     @classmethod
     def broadcast(cls, docid, msg, clientid=None):
