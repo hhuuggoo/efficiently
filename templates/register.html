@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block main %}
+<p>Already have an account?  <a href="/login">login here</a></p>
 <div>
   <form action="/register" method="POST">
     <!-- Label and text input -->
@@ -9,7 +10,7 @@
     <input type="password" id="password" name="password"/>
     <label for="email">email</label>
     <input type="text" id="email" name="email"/>
-    <input type="submit">Submit</input>
+    <input type="submit"></input>
   </form>
 </div>
 {% end %}
