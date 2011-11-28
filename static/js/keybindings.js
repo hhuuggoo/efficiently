@@ -454,5 +454,18 @@ ItemSelector = function(root_node, collections){
     	'focus_isearch': this.focus_isearch
     }
     $('#searchbox').hide();
+    var savetext = function(){
+	if (obj.curr_node){
+	    var newval = obj.curr_node.field_el('text').val();
+	    if (newval != obj.curr_node.get('text')){
+		obj.curr_node.set('text', newval);
+		obj.curr_node.save();
+	    }
+	}
+	window.setTimeout(function(){
+	    savetext();
+	}, 1000);
+    }
+    savetext();
 }
 
