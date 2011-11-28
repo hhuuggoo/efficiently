@@ -1,4 +1,5 @@
 import tornado
+import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import settings
@@ -365,5 +366,10 @@ application = tornado.web.Application([(r"/register", Register),
                                       )
 
 if __name__ == "__main__":
-    application.listen(9000)
+    server = tornado.httpserver.HTTPServer(
+        application,
+        ssl_options={'certfile' : "/etc/nginx/server.crt",
+                     'keyfile' : "/etc/nginx/server.key"}
+        )
+    server.listen(9000)
     tornado.ioloop.IOLoop.instance().start()
