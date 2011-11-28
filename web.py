@@ -7,6 +7,10 @@ import pymongo
 import pymongo.objectid
 import bcrypt
 import cjson
+import tornadio
+import tornadio.router
+import tornadio.server
+
 
 conn = pymongo.Connection()
 db = conn['task']
@@ -221,7 +225,7 @@ class Manage(AuthHandler):
     @tornado.web.authenticated
     def get(self, *args):
         #disregard docid
-        root_url = "http://" + self.request.headers['Host'] + "/"
+        root_url = "https://" + self.request.headers['Host'] + "/"
         documents = db.document.find({'username':self.current_user, 'status' : 'ACTIVE'})
         documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
         self.render("templates/manage.html", documents=documents,
@@ -272,16 +276,18 @@ class AliasedUserHandler(AuthHandler):
                 valid_users = set()
                 valid_users.update(document['ruser'])
                 valid_users.update(document['rwuser'])
+                valid_users.add(document['username'])
                 if 'all' in valid_users or \
                        self.real_user in valid_users:
                     return document['username']
             elif self.mode =='rw':
                 valid_users = set()
                 valid_users.update(document['rwuser'])
+                valid_users.add(document['username'])
                 if 'all' in valid_users or \
                        self.real_user in valid_users:
                     return document['username']
-        return self.real_user
+        return None;
     
     def get(self, docid):
         self.docid = docid
@@ -335,17 +341,59 @@ class BulkSave(AliasedUserHandler):
         docid = self.docid
         data = self.get_argument('data')
         data = cjson.decode(data)
+        to_broadcast = []
+        if 'clientid' in data:
+            clientid = data.pop('clientid')
+        else:
+            clientid = None
+            
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':
+                    to_broadcast.append(d)
                     d = outline_app_to_mongo(d, self.current_user)
                     save_outline(d)
                 # elif dtype == 'document':
                 #     d = doc_app_to_mongo(d, self.current_user)
                 #     save_doc(d)
+        PubHandler.broadcast(self.docid, 
+                             cjson.encode({'type' : 'outlines',
+                                           'outline' : to_broadcast}),
+                             clientid=clientid)
         self.write("success");
 
 
+class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
+    mode = 'r'
+    clients = {}
+    top_id = 0
+    def on_message(self, message):
+        message = cjson.decode(message)
+        if message['type'] == 'registration':
+            PubHandler.top_id += 1
+            self.clientid = PubHandler.top_id
+            self.docid = message['docid']
+            if self.current_user:
+                self.clients.setdefault(self.docid, set()).add(self)
+                self.send(cjson.encode(
+                    {'type' : 'registration_confirmation',
+                     'clientid' : self.clientid}))
+        
+            
+    def on_disconnect(self, *args, **kwargs):
+        if hasattr(self, 'docid'):
+            if hasattr(self, 'clientid'):
+                del self.clients[self.docid][self.clientid]
+
+    @classmethod
+    def broadcast(cls, docid, msg, clientid=None):
+        if docid in cls.clients:
+            for client in cls.clients[docid]:
+                if client.clientid != clientid:
+                    print 'sending', msg, client.clientid
+                    client.send(msg)
+        
+route = tornadio.get_router(PubHandler);
 application = tornado.web.Application([(r"/register", Register),
                                        (r"/login", Login),
                                        (r"/about", About),
@@ -361,15 +409,14 @@ application = tornado.web.Application([(r"/register", Register),
                                        (r"/docview/r/(.*)", ReadOnlyDocView),
                                        (r"/document/(.*)", Document),
                                        (r"/bulk/(.*)", BulkSave),
+                                       route.route()
                                        ],
                                       **settings.settings
                                       )
 
 if __name__ == "__main__":
-    server = tornado.httpserver.HTTPServer(
+    server = tornadio.server.SocketServer(
         application,
         ssl_options={'certfile' : "/etc/nginx/server.crt",
                      'keyfile' : "/etc/nginx/server.key"}
         )
-    server.listen(9000)
-    tornado.ioloop.IOLoop.instance().start()

@@ -607,6 +607,7 @@ $(function(){
 		}
 	    });
 	global_event_hooks();
+	window.register_sockets();
     });
 });
 

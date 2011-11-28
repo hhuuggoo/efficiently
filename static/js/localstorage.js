@@ -138,6 +138,9 @@ storage.Collections.prototype.save_server_queue = function(){
     if (save_url == ''){
 	return null;
     }else{
+	if ('id' in window.active_doc.socket_subscriber){
+	    tosave['clientid'] = window.active_doc.socket_subscriber.id;
+	}
 	$.post(save_url, {'data': JSON.stringify(tosave)},
 	       function(x){
 		   obj.save_server_queue();
