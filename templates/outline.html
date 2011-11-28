@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 {% block other_scripts%}
-<div class="item-controls">
-  <button class="ctrl-button" id="add-button">add</button>
-  <button class="ctrl-button"  id="state-button">todo</button>
-  <button class="ctrl-button"  id="overview-button">hide</button>
-  <button class="ctrl-button" id="del-button">delete</button>
-</div>
 <script type="text/template" id="outline-template">
   <div id="<%= id %>" class="outline clearfix ">
     <div class="clearfix ">
@@ -40,6 +34,9 @@
     </div>
   </div>
 </script>
+<script type="text/template" id="doc-template">
+
+</script>
 <script src="../static/js/localstorage.js"></script>
 <script src="../static/js/model.js"></script>
 <script src="../static/js/outline.js"></script>
@@ -47,73 +44,71 @@
 
 {% end %}
 {% block main %}
+<div class="item-controls">
+  <button class="ctrl-button hide" id="add-button">add</button>
+  <button class="ctrl-button hide"  id="state-button">todo</button>
+  <button class="ctrl-button hide"  id="overview-button">hide</button>
+  <button class="ctrl-button hide" id="del-button">delete</button>
+</div>
+<!-- information passed down to client -->
+<div id="document_id" class="hide">{{document_id}}</div>
+<div id="root_id" class="hide">{{root_id}}</div>
+<div class="searchbox hide" id="searchbox">
+  <textarea class="searchtext" id="searchtext"></textarea>
+  <div>Incremental Search Alt + [ and alt + ] to search forward and backwards</div> 
+</div>
 <div>
-  <ul class="tabs">
-    <!-- Give href an ID value of corresponding "tabs-content" <li>'s -->
-    <li><a class="active" href="#main">Main</a></li>
-    <li><a href="#account">Your Account</a></li>
-  </ul>
-  <!-- Standard <ul> with class of "tabs-content" -->
-  <ul class="tabs-content">
-    <!-- Give ID that matches HREF of above anchors -->
-    <li class="active" id="main">
-      <div id="main_root_id" class="hide">{{root_id}}</div>
-      <div class="ten columns clearfix alpha">
-	<div class="abox">
-	  <button class="root-button left" id="root-add">add</button>
-	  <div class="left">search:  </div>
-	  <div class="abox">
-	    <textarea type="text" id="search" class="left search textborder"></textarea>
-	  </div>
-	  <div class="searchbox" id="searchbox">
-	    <textarea class="searchtext" id="searchtext"></textarea>
-	    <div>Incremental Search Alt + [ and alt + ] to search forward and backwards</div> 
-	  </div>
-	</div>
-	<div id="main-outline" class="">
-	</div>
-	<div id="main-trash" class="">
-	  <button class="left" id="root-clear-trash">clear trash
-	  </button>
-	  <div class="clearfix" id="trash">
-	  </div>
-	</div>
+  <div class="ten columns clearfix alpha">
+
+    <div class="abox" id="{{document_id}}-display}}">
+      <button class="global-button left" id="{{document_id}}-add">add</button>
+      <div class="left">search:  </div>
+      <div class="abox">
+	<textarea type="text" id="{{document_id}}-search" class="left search textborder"></textarea>
       </div>
-      <div class="six columns clearfix omega">
-	<h4>Instructions</h4>
-	<ul class="square">
-	  <li>
-	    Hit the add button to add a topic
-	  </li>
-	  <li>
-	    click on the bullet points to drag topics and subtopics around
-	  </li>
-	  <li>
-	    double clicking the bullet point gives you a menu for topic
-	  </li>
-	</ul>
-	<h5>Keyboard</h5>
-	<ul class="square">
-	  <li>use the arrow keys to navigate
-	  </li>
-	  <li>
-	    ctrl + arrow keys will move items around, ctrl + backspace will
-	    delete an item
-	  </li>
-	  <li>
-	    alt + / will hide topics, alt + > will hide subtopics of the selected item, alt + < will change the todo status
-	  </li>
-	  <li>
-	    enter key will create another topic.  ctrl + enter will create a subtopic
-	  </li>
-	  <li>
-	    Incremental Search Alt + [ and alt + ] to search forward and backwards
-	  </li>
-	</ul>
+    </div>
+    <div id="{{document_id}}-outline" class="">
+    </div>
+
+    <div id="trash" class="">
+      <button class="left" id="global-clear-trash">clear trash
+      </button>
+      <div class="clearfix" id="trash">
       </div>
-    <li id="account">
-      Your Account
-    </li>
-  </ul>
+    </div>
+  </div>
+  <div class="six columns clearfix omega">
+    <h4>Instructions</h4>
+    <ul class="square">
+      <li>
+	Hit the add button to add a topic
+      </li>
+      <li>
+	click on the bullet points to drag topics and subtopics around
+      </li>
+      <li>
+	double clicking the bullet point gives you a menu for topic
+      </li>
+    </ul>
+    <h5>Keyboard</h5>
+    <ul class="square">
+      <li>use the arrow keys to navigate
+      </li>
+      <li>
+	ctrl + arrow keys will move items around, ctrl + backspace will
+	delete an item
+      </li>
+      <li>
+	alt + / will hide topics, alt + > will hide subtopics of the selected item, alt + < will change the todo status
+											    </li>
+      <li>
+	enter key will create another topic.  ctrl + enter will create a subtopic
+      </li>
+      <li>
+	Incremental Search Alt + [ and alt + ] to search forward and backwards
+      </li>
+    </ul>
+  </div>
+</ul>
 </div>
 {% end %}

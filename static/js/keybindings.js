@@ -151,7 +151,7 @@ ItemSelector = function(root_node, collections){
     this.cursor_up = function(){
 	if (!this.curr_node){
 	    this.curr_node = this.collections.get(
-		root.visible_children()[0], 'outline');
+		this.root_node.visible_children()[0], 'outline');
 	}else{
 	    this.curr_node.unselect();
 	    var upper = this.find_upper_node(this.curr_node);
@@ -163,7 +163,7 @@ ItemSelector = function(root_node, collections){
     this.cursor_down = function(){
 	if (!this.curr_node){
 	    this.curr_node = this.collections.get(
-		root.visible_children()[0], 'outline');
+		this.root_node.visible_children()[0], 'outline');
 	}else{
 	    this.curr_node.unselect();
 	    var next_node = this.find_lower_visible_node(this.curr_node);

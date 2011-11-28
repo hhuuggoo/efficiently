@@ -177,7 +177,7 @@ button{
     overflow:hidden;
 }
 
-.root-button{
+.global-button{
     float: left;
     width: 40px;
     font: 75%;

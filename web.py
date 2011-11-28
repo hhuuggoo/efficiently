@@ -3,6 +3,7 @@ import tornado.ioloop
 import tornado.web
 import settings
 import pymongo
+import pymongo.objectid
 import bcrypt
 import cjson
 
@@ -17,21 +18,36 @@ logging.basicConfig(level=logging.DEBUG)
 
 hostname = "localhost"
 
-def create_initial_data(user, passwd, email):
+def create_document(user, title):
+    docid =  str(pymongo.objectid.ObjectId())
+    rootid = docid + "-" + str(pymongo.objectid.ObjectId())
+    
+    docid = db.document.insert(
+        {'_id' : docid,
+         'root_id' : rootid,
+         'username':user,
+         'title': 'Main',
+         'todostates' : ["TODO", "INPROGRESS", "DONE", None],
+         'todocolors': {'TODO' : 'red',
+                        'INPROGRESS': 'red',
+                        'DONE' : 'green'},
+         'status': 'FOCUS'
+         },
+        safe=True)
+    objid = db.outline.insert({
+        '_id' : rootid,
+        'username':user,
+        'documentid' : docid}, safe=True)
+    
+def create_initial_data(user, passwd, email, title):
     salt = bcrypt.gensalt(log_rounds=7)
     passhash = bcrypt.hashpw(passwd, salt)
     db.user.insert({'username':user,
                     'salt' : salt,
                     'passhash':passhash,
                     'email':email}, safe=True)
-    objid = db.entries.insert({'username':user,
-                               'outlinetitle':'Main'}, safe=True)
-    db.entries.update({'_id' : objid},
-                      {'$set' : {'_id':str(objid)}}, safe=True)
-    
-    db.outlines.insert({'username':user,
-                        'outlinetitle': 'Main',
-                        'root': objid}, safe=True)
+    create_document(user, title)
+
 class AuthHandler(tornado.web.RequestHandler):
     @property
     def current_user(self):
@@ -58,7 +74,7 @@ class Register(AuthHandler):
         username = self.get_argument('username')
         password = self.get_argument('password')
         email = self.get_argument('email')
-        create_initial_data(username, password, email)
+        create_initial_data(username, password, email, 'main')
         self.set_secure_cookie('username', username)
         self.redirect("/")
 
@@ -67,9 +83,9 @@ class Outline(AuthHandler):
         if not self.current_user:
             return self.redirect("/login");
         else:
-            outlines = db.outlines.find_one({'username':self.current_user,
-                                             'outlinetitle':'Main'})
-            self.render("templates/outline.html", root_id=outlines['root'])
+            document = db.document.find_one({'username':self.current_user})
+            self.render("templates/outline.html", root_id=document['root_id'],
+                        document_id=document['_id'])
                         
 #handler if we are indexing elems by list name            
 def separate_orphans(root_id, nodes, user):
@@ -94,65 +110,81 @@ def separate_orphans(root_id, nodes, user):
         node['status'] = 'TRASH'
         node['children'] = []
         node['parent'] = []
-        save_entry(entry_app_to_mongo(node, user))
+        save_outline(outline_app_to_mongo(node, user))
     for node in good_nodes:
         node['status'] = 'ACTIVE'
-        save_entry(entry_app_to_mongo(node, user))
+        save_outline(outline_app_to_mongo(node, user))
     return good_nodes, dictnodes.values()
 
-class Entries(AuthHandler):
-    def get(self, title):
+class Document(AuthHandler):
+    def get(self, docid):
         if not self.current_user:
-            return self.redirect("/register");
+            return self.redirect("/register")
         else:
-            entries = db.entries.find({'outlinetitle': title,
+            document = db.document.find_one({'_id':docid})
+            document = doc_mongo_to_app(document, self.current_user)
+            outline = db.outline.find({'documentid': docid,
                                        'username':self.current_user,
                                        'status' : {'$ne' : 'DELETE'}})
-            entries = list(entries)
-            entries = [entry_mongo_to_app(e, self.current_user)
-                           for e in entries]
-            self.write(cjson.encode(entries))
-
+            
+            outline = list(outline)
+            outline = [outline_mongo_to_app(e, self.current_user) \
+                       for e in outline]
+            self.write(cjson.encode({'document':document,
+                                     'outline': outline}))
+                       
 def doc_mongo_to_app(d, user):
+    assert 'root_id' in d
+    assert '_id' in d
     return {'id' : str(d['_id']),
-            'text' : d.get('text', ''),
+            'root_id':d.get('root_id'),
+            'title' : d.get('title', ''),
             'username' : user,
-            'todostate' : d.get('todostate',''),
-            'children' : d.get('children', []),
-            'parent': d.get('parent', None),
-            'outlinetitle': d.get('outlinetitle', ''),
-            'status' : d.get('status', 'ACTIVE')}
-
+            'todostates' : d.get('todostates',[]),
+            'todocolors' : d.get('todocolors', {}),
+            'status': d.get('status', 'ACTIVE')
+            }
 def doc_app_to_mongo(d, user):
-    pass
+    assert 'root_id' in d
+    assert '_id' in d
+    return {'_id' : str(d['_id']),
+            'root_id':d.get('root_id'),
+            'title' : d.get('title', ''),
+            'username' : user,
+            'todostates' : d.get('todostates',[]),
+            'todocolors' : d.get('todocolors', {}),
+            'status': d.get('status', 'ACTIVE')
+            }
 
 def save_doc(d):
     id_val = d.pop('_id')
-    pass
+    db.document.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
-def entry_mongo_to_app(d, user):
+def outline_mongo_to_app(d, user):
+    assert 'documentid' in d
     return {'id' : str(d['_id']),
             'text' : d.get('text', ''),
             'username' : user,
             'todostate' : d.get('todostate',''),
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
-            'outlinetitle': d.get('outlinetitle', ''),
+            'documentid': d.get('documentid'),
             'status' : d.get('status', 'ACTIVE')}
 
-def entry_app_to_mongo(d, user):
+def outline_app_to_mongo(d, user):
+    assert 'documentid' in d
     return {'_id' : d['id'],
             'text' : d.get('text', ''),
             'username' : user,
             'todostate' : d.get('todostate',''),
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
-            'outlinetitle': d.get('outlinetitle', ''),
+            'documentid': d.get('documentid'),
             'status' : d.get('status', 'ACTIVE')}
 
-def save_entry(d):
+def save_outline(d):
     id_val = d.pop('_id')
-    db.entries.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
+    db.outline.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
 #handler if we are indexing elems by ID
 class BulkSave(AuthHandler):
@@ -165,8 +197,11 @@ class BulkSave(AuthHandler):
             for dtype, objects in data.iteritems():
                 for k, d in objects.iteritems():
                     if dtype == 'outline':
-                        d = entry_app_to_mongo(d, self.current_user)
-                        save_entry(d)
+                        d = outline_app_to_mongo(d, self.current_user)
+                        save_outline(d)
+                    elif dtype == 'document':
+                        d = doc_app_to_mongo(d, self.current_user)
+                        save_doc(d)
             self.write("success");
 
 class Logout(AuthHandler):
@@ -181,7 +216,7 @@ class About(AuthHandler):
 application = tornado.web.Application([(r"/", Outline),
                                        (r"/register", Register),
                                        (r"/login", Login),
-                                       (r"/entries/(.*)", Entries),
+                                       (r"/document/(.*)", Document),
                                        (r"/bulk", BulkSave),
                                        (r"/about", About),
                                        (r"/logout", Logout),

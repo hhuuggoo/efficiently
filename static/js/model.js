@@ -53,3 +53,18 @@ model.Model.prototype.deserialize = function(str){
     var data = JSON.parse(str);
     this.update(data);
 }
+
+model.Model.prototype.field_id = function(fld){
+    if (!fld){
+	return this.get('id');
+    }else{
+	return this.get('id') + "-" + fld;
+    }
+}
+model.Model.prototype.field_el = function(fld){
+    if (!fld){
+	return this.el;
+    }else{
+	return $("#" + this.field_id(fld), this.el);
+    }
+}

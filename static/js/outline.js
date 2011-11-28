@@ -6,7 +6,8 @@
 
 
 var outline = {}
-//outline_state, 0, show everything, 
+//outline_state, 0, show everything,
+
 outline.Outline = function(id, documentid){
     this.set('id', id); 
     this.set('text', '');
@@ -76,22 +77,6 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 }
 
 //view
-//utils
-outline.Outline.prototype.field_id = function(fld){
-    if (!fld){
-	return this.get('id');
-    }else{
-	return this.get('id') + "-" + fld;
-    }
-}
-outline.Outline.prototype.field_el = function(fld){
-    if (!fld){
-	return this.el;
-    }else{
-	return $("#" + this.field_id(fld), this.el);
-    }
-}
-
 //render
 outline.Outline.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
@@ -107,11 +92,10 @@ outline.Outline.prototype.render_text = function(){
 }
 outline.Outline.prototype.render_todostate = function(){
     var currstate = this.get('todostate');
-
-    	
+    var todocolors = window.collections.get(this.documentid, 'document').get('todocolors');
     this.field_el('todostate').html(currstate);
-    if (currstate in window.todocolors){
-	this.field_el('todostate').css('color', window.todocolors[currstate]);
+    if (currstate in todocolors){
+	this.field_el('todostate').css('color', todocolors[currstate]);
     }else{
 	this.field_el('todostate').css('color', 'black');
     }
@@ -174,14 +158,14 @@ outline.Outline.prototype.render = function(isroot){
 }
 outline.Outline.prototype.toggle_todo_state = function(){
     var currstate = this.get('todostate', null);	
-    var todostates = collections.get('document', this.get('documentid')).get('todostates')
-    var curridx = _.indexOf(window.todostates, currstate);
-    if (curridx < 0 || curridx >= window.todostates.length-1){
+    var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
+    var curridx = _.indexOf(todostates, currstate);
+    if (curridx < 0 || curridx >= todostates.length-1){
 	curridx = 0;
     }else{
 	curridx = curridx + 1;
     }
-    this.set('todostate', window.todostates[curridx]);
+    this.set('todostate', todostates[curridx]);
     this.save();
     this.render();
 }
@@ -343,7 +327,7 @@ var todelete = function(obj){
 
 var addsibling = function(obj){
     var newnode = new outline.Outline(window.collections.new_id(),
-				     window.documentid);
+				      obj.get('documentid'));
     var parent = window.collections.get(obj.parent, 'outline')
     var curr_index = _.indexOf(parent.get('children'), obj.get('id'))
     parent.add_child(newnode, curr_index + 1);
@@ -352,7 +336,7 @@ var addsibling = function(obj){
 }
 var add_new_child = function(obj, index){
     var newnode = new outline.Outline(window.collections.new_id(),
-				     window.documentid);
+				      obj.get('documentid'))
     obj.add_child(newnode, index);
     obj.render();
     newnode.field_el('text').delay(300).focus();
@@ -449,21 +433,22 @@ outline.Outline.prototype.hook_events = function(){
     )
 }
 
-outline.Document = function(title, root){
-    this.set('title', title);
-    this.set('root_id', root.id);
-    this.set('username', root.username;)
+outline.Document = function(){
+    this.set('title', '');
+    this.set('root_id', null);
+    this.set('username', null);
     this.set('todostates', ["TODO", "INPROGRESS", "DONE", null]);
     this.set('todocolors', {'TODO' : 'red',
 			    'INPROGRESS': 'red',
 			    'DONE' : 'green'})
+    this.set('status', 'ACTIVE');
 }
 
 //data model
-outline.Outline.prototype = new model.Model()
-outline.Outline.prototype.fields = ['title', 'id', 'root_id', 'username', 
-				    'todostates', 'todocolors'];
-outline.Outline.prototype.save = function(){
+outline.Document.prototype = new model.Model()
+outline.Document.prototype.fields = ['id', 'title', 'root_id', 'username', 
+				    'todostates', 'todocolors', 'status'];
+outline.Document.prototype.save = function(){
     window.collections.save(this.id, this, 'document');
 }
 
@@ -473,6 +458,7 @@ window.active_obj = null;
 window.item_selector = null;
 window.controls = null;
 window.collections = null;
+window.active_doc = null;
 
 var toggle_controls = function(e, obj){
     var activator = obj.field_el('fakedotcontainer');
@@ -528,14 +514,6 @@ var global_event_hooks = function(){
 	    add_new_child(window.activeobj);
 	}
     );
-    $('#root-add').click(function(){
-	var root = window.collections.get(root_id, 'outline');
-	var newitem = new outline.Outline(window.collections.new_id(),
-					  window.documentid);
-	root.add_child(newitem);
-	root.save();
-	root.render();
-    });
 
     $('#state-button').click(
 	function(e){
@@ -556,44 +534,51 @@ var global_event_hooks = function(){
 	    window.activeobj=null;
 	}
     );
-    $('#search').keypress(
-	function(e){
-	    if (e.keyCode == ENTER){
-		e.stopPropagation();
-		root.tree_search($('#search').val());
-		e.preventDefault();
-	    }
-	}
-    )
-
+    $('#global-clear-trash').click(function(e){
+	_.each(window.collections.collections['outline'],
+	       function(x){
+		   if(x.get('status') == 'TRASH'){
+		       deletenode(x);
+		   }
+	       });
+    });
+    $('#debugbtn').click(function(e){
+	var node = get_matching_text('release')[0];
+	node.render_text();
+	var ht = node.field_el('text')[0].scrollHeight;
+	$('#debug').html(ht);
+    });
 }
 
 $(function(){
-    window.collections = new storage.Collections('id5', {'outline' : outline.Outline});
+    var doc_id = $("#document_id").html()
+    var root_id = $("#root_id").html()    
+    window.collections = new storage.Collections(
+	'id5', 
+	{'outline' : outline.Outline, 
+	 'document' : outline.Document}
+    );
     window.controls = $('.item-controls');
     window.controls.hide();
-    window.controls = controls
     window.activeobj = null;
-
-    $.get("/entries/Main", function(data){
-	var entries = JSON.parse(data);
-	_.each(entries, function(x){
-	    var tmp = new outline.Outline();
-	    tmp.deserialize(JSON.stringify(x));
+    
+    $.get("/document/" + doc_id, function(data){
+	//we have some redundant deserialization/serializations that occur
+	var document = JSON.parse(data);
+	var outlines = document['outline'];
+	var document = document['document'];
+	var tmp = new outline.Document()
+	tmp.update(document);
+	window.active_doc = tmp;
+	window.collections.set_mem(tmp['id'], tmp, 'document');
+	_.each(outlines, function(x){
+	    tmp = new outline.Outline();
+	    tmp.update(x);
 	    window.collections.set_mem(x['id'], tmp, 'outline');
 	});
-	root_id = $("#main_root_id").html()
-	root = window.collections.get(root_id, 'outline');
-	if (!root){
-	    // root = new outline.Outline(root_id,
-	    // 			       window.documentid);
-	    // newitem = new outline.Outline(collections.new_id(),
-	    // 				  window.documentid);
-	    // root.add_child(newitem);
-	    // root.save()
-	}
+	var root = window.collections.get(window.active_doc.root_id, 'outline');
 	root.render(true);
-	$('#main-outline').append(root.el);
+	window.active_doc.field_el('outline').append(root.el);
 	window.item_selector = new ItemSelector(root, window.collections);
 	_.each(window.collections.collections['outline'],
 	       function(x){
@@ -602,22 +587,22 @@ $(function(){
 		       $('#trash').append(x.el)
 		   }
 	       });
-	$('#root-clear-trash').click(function(e){
-	    _.each(window.collections.collections['outline'],
-		   function(x){
-		       if(x.get('status') == 'TRASH'){
-			   deletenode(x);
-		       }
-		   });
+	window.active_doc.field_el('add').click(function(){
+	    var root = window.collections.get(window.active_doc.root_id, 'outline');
+	    add_new_child(root)
 	});
-	$('#debugbtn').click(function(e){
-	    var node = get_matching_text('release')[0];
-	    node.render_text();
-	    var ht = node.field_el('text')[0].scrollHeight;
-	    $('#debug').html(ht);
-	});
+	window.active_doc.field_el('search').keypress(
+	    function(e){
+		if (e.keyCode == ENTER){
+		    e.stopPropagation();
+		    var root = window.collections.get(window.active_doc.root_id, 'outline');
+		    var txt = window.active_doc.field_el('search').val();
+		    root.tree_search(txt);
+		    e.preventDefault();
+		}
+	    });
+	global_event_hooks();
     });
-    
 });
 
 //debug function
