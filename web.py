@@ -26,12 +26,12 @@ def create_document(user, title):
         {'_id' : docid,
          'root_id' : rootid,
          'username':user,
-         'title': 'Main',
+         'title': title,
          'todostates' : ["TODO", "INPROGRESS", "DONE", None],
          'todocolors': {'TODO' : 'red',
                         'INPROGRESS': 'red',
                         'DONE' : 'green'},
-         'status': 'FOCUS'
+         'status': 'ACTIVE'
          },
         safe=True)
     objid = db.outline.insert({
