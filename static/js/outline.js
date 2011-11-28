@@ -452,7 +452,6 @@ outline.Document.prototype.save = function(){
     window.collections.save(this.id, this, 'document');
 }
 
-
 //globals
 window.active_obj = null;
 window.item_selector = null;
@@ -553,6 +552,7 @@ var global_event_hooks = function(){
 $(function(){
     var doc_id = $("#document_id").html()
     var root_id = $("#root_id").html()    
+    var mode = $('#mode').html()
     window.collections = new storage.Collections(
 	'id5', 
 	{'outline' : outline.Outline, 
@@ -570,6 +570,11 @@ $(function(){
 	var tmp = new outline.Document()
 	tmp.update(document);
 	window.active_doc = tmp;
+	if (mode == 'rw'){
+	    tmp.save_url = "/bulk/" + tmp.get('id')
+	}else{
+	    tmp.save_url = "/trash"
+	}
 	window.collections.set_mem(tmp['id'], tmp, 'document');
 	_.each(outlines, function(x){
 	    tmp = new outline.Outline();

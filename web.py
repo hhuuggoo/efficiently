@@ -91,6 +91,27 @@ class DocList(AuthHandler):
         documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
         self.render("templates/doclist.html", documents=documents)
 
+class Manage(AuthHandler):
+    @tornado.web.authenticated
+    def get(self, docid):
+        #disregard docid
+        root_url = "http://" + self.request.headers['Host'] + "/"
+        documents = db.document.find({'username':self.current_user})
+        documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
+        self.render("templates/manage.html", documents=documents,
+                    root_url=root_url)
+
+    @tornado.web.authenticated
+    def post(self, docid):
+        rwuser = self.get_argument('rwuser', '')
+        ruser = self.get_argument('ruser', '')
+        rwuser = [x.strip() for x in rwuser.split(',')]
+        ruser = [x.strip() for x in ruser.split(',')]
+        db.document.update({'_id' : docid},
+                           {'$set': {'rwuser' : rwuser, 'ruser' : ruser}}, safe=True)
+        return self.get(None)
+    
+
 class Register(SmartDocRedirector):
     def get(self):
         self.render("templates/register.html");
@@ -108,7 +129,7 @@ class DocView(AuthHandler):
         document = db.document.find_one({'username':self.current_user,
                                          '_id' : docid})
         self.render("templates/outline.html", root_id=document['root_id'],
-                    document_id=document['_id'])
+                    document_id=document['_id'], mode='rw')
                         
 #handler if we are indexing elems by list name            
 def separate_orphans(root_id, nodes, user):
@@ -163,7 +184,9 @@ def doc_mongo_to_app(d, user):
             'username' : user,
             'todostates' : d.get('todostates',[]),
             'todocolors' : d.get('todocolors', {}),
-            'status': d.get('status', 'ACTIVE')
+            'status': d.get('status', 'ACTIVE'),
+            'rwuser': d.get('rwuser', []),
+            'ruser': d.get('ruser', []),
             }
 def doc_app_to_mongo(d, user):
     assert 'root_id' in d
@@ -174,7 +197,9 @@ def doc_app_to_mongo(d, user):
             'username' : user,
             'todostates' : d.get('todostates',[]),
             'todocolors' : d.get('todocolors', {}),
-            'status': d.get('status', 'ACTIVE')
+            'status': d.get('status', 'ACTIVE'),
+            'rwuser': d.get('rwuser', []),
+            'ruser': d.get('ruser', []),
             }
 
 def save_doc(d):
@@ -232,15 +257,18 @@ class About(AuthHandler):
     def get(self):
         return self.render("templates/about.html", heading="About")
 
-application = tornado.web.Application([(r"/", SmartDocRedirector),
-                                       (r"/docview/(.*)", DocView),
-                                       (r"/register", Register),
+application = tornado.web.Application([(r"/register", Register),
                                        (r"/login", Login),
-                                       (r"/document/(.*)", Document),
-                                       (r"/bulk", BulkSave),
                                        (r"/about", About),
                                        (r"/logout", Logout),
+                                       (r"/", SmartDocRedirector),
+
                                        (r"/doclist", DocList),
+                                       (r"/manage/(.*)", Manage),
+                                       
+                                       (r"/docview/(.*)", DocView),
+                                       (r"/document/(.*)", Document),
+                                       (r"/bulk", BulkSave),
                                        ],
                                       **settings.settings
                                       )

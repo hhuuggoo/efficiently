@@ -134,7 +134,7 @@ storage.Collections.prototype.save_server_queue = function(){
 	   });
     
     //console.log('posting')
-    $.post("/bulk", {'data': JSON.stringify(tosave)},
+    $.post(window.active_doc.get('saveurl'), {'data': JSON.stringify(tosave)},
 	   function(x){
 	       obj.save_server_queue();
 	   }).error(function(x){alert('failure saving')});
