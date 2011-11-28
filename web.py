@@ -356,10 +356,14 @@ class BulkSave(AliasedUserHandler):
                 # elif dtype == 'document':
                 #     d = doc_app_to_mongo(d, self.current_user)
                 #     save_doc(d)
-        PubHandler.broadcast(self.docid, 
-                             cjson.encode({'type' : 'outlines',
-                                           'outline' : to_broadcast}),
-                             clientid=clientid)
+        try:
+            PubHandler.broadcast(self.docid, 
+                                 cjson.encode({'type' : 'outlines',
+                                               'outline' : to_broadcast}),
+                                 clientid=clientid)
+        except Exception as e:
+            log.exception(e)
+            
         self.write("success");
 
 
@@ -367,6 +371,11 @@ class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
     mode = 'r'
     clients = {}
     top_id = 0
+    
+    def on_open(self, *args, **kwargs):
+        logging.debug('connected')
+        self.request = args[0]
+        
     def on_message(self, message):
         message = cjson.decode(message)
         if message['type'] == 'registration':
@@ -380,10 +389,10 @@ class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
                      'clientid' : self.clientid}))
         
             
-    def on_disconnect(self, *args, **kwargs):
+    def on_close(self, *args, **kwargs):
         if hasattr(self, 'docid'):
             if hasattr(self, 'clientid'):
-                del self.clients[self.docid][self.clientid]
+                self.clients[self.docid].remove(self.clientid)
 
     @classmethod
     def broadcast(cls, docid, msg, clientid=None):
@@ -413,7 +422,7 @@ application = tornado.web.Application([(r"/register", Register),
                                        ],
                                       **settings.settings
                                       )
-
+PubHandler.application = application
 if __name__ == "__main__":
     server = tornadio.server.SocketServer(
         application,
