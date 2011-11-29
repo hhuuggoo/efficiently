@@ -474,6 +474,7 @@ var toggle_controls = function(e, obj){
 	window.controls.css(
 	    {'top' : y + "px", 'left' : x + "px"}
 	);
+	console.log({'top' : y + "px", 'left' : x + "px"});
 	var border = 10;
 	var x3 = activator.offset().left;
 	var x4 = x3 + activator.width();
