@@ -4,35 +4,69 @@ $(function(){
 	    window.location.hostname, {'port': 443, 'secure' : true, 'rememberTransport':true}
 	)
 	window.active_doc.socket_subscriber.connect()
+	window.active_doc.socket_subscriber.render_queue = {}
 	window.active_doc.socket_subscriber.on(
 	    'message',
 	    function(data){
+		var sub = window.active_doc.socket_subscriber
 		var data  = JSON.parse(data);
 		if (data['type'] == 'registration_confirmation'){
 		    window.active_doc.socket_subscriber.id = data['clientid']
 		}else{
-		    _.each(data['outline'], function(v){
-			var id = v['id']
-			var node = window.collections.get(id, 'outline')
-			if (!node){
-			    node = new outline.Outline();
-			}
-			node.update(v)
-			_.each(node.get('children'), function(nodeid){
-			    if (!window.collections.get(nodeid, 'outline')){
-				var newnode = new outline.Outline(nodeid,
-								  node.documentid);
-				window.collections.set_mem(nodeid, 
-							   newnode,
-							  'outline');
-			    }
-			});
-			node.render()
-			node.field_el('content').fadeOut(100).delay(100).fadeIn(100);
+		    _.each(data['outline'],
+			   function(x){
+			       var node = window.collections.get(
+				   x['id'], 'outline');
+			       if (node){
+				   node.update(x);
+			       }else{
+				   node = new outline.Outline();
+				   node.update(x)
+				   window.collections.set_mem(
+				       node.get('id'), node, 'outline');
+			       }
+			       // console.log(['updated', node.get('id')]);
+			       sub.render_queue[node.get('id')] = node;
+			   });
+		    var to_process, process_later;
+		    to_process = _.filter(_.keys(sub.render_queue), 
+					  function(x){
+					      var node = window.collections.get(x, 'outline');
+					      var parent = node.get('parent')
+					      var children = node.get('children')
+					      var parent_loaded = window.collections.get(parent, 'outline');
+					      var children_loaded = _.all(
+						  children,
+						  function(x){
+						      return window.collections.get(x, 'outline');
+						  });
+					      return parent_loaded && children_loaded;
+					  });
+		    process_later = _.filter(_.keys(sub.render_queue),
+					     function(x){
+						 var node = window.collections.get(x, 'outline');
+						 var parent = node.get('parent')
+						 var children = node.get('children')
+						 var parent_loaded = window.collections.get(parent, 'outline');
+						 var children_loaded = _.all(
+						     children,
+						     function(x){
+							 return window.collections.get(x, 'outline');
+						     });
+						 return !(parent_loaded && children_loaded);
+					     });
+		    // console.log(['process_now', to_process]);
+		    // console.log(['process_later', process_later]);
+					
+		    _.each(to_process, function(x){
+			window.collections.get(x, 'outline').render();
+		    });
+		    sub.render_queue = {};
+		    _.each(process_later, function(x){
+			sub.render_queue[x] = window.collections.get(x, 'outline');
 		    });
 		}
-	    }
-	);
+	    });
 	window.active_doc.socket_subscriber.on('connect', function(){
 	    console.log('connected sockets');
 	    window.active_doc.socket_subscriber.send(JSON.stringify({'type':'registration', 'docid' : window.active_doc.id}));
