@@ -34,8 +34,8 @@ $(function(){
 					      var node = window.collections.get(x, 'outline');
 					      var parent = node.get('parent')
 					      var children = node.get('children')
-					      var parent_loaded = window.collections.get(parent, 'outline');
-					      var children_loaded = _.all(
+					      var parent_loaded = !parent || window.collections.get(parent, 'outline');
+					      var children_loaded = !children || _.all(
 						  children,
 						  function(x){
 						      return window.collections.get(x, 'outline');
@@ -47,8 +47,8 @@ $(function(){
 						 var node = window.collections.get(x, 'outline');
 						 var parent = node.get('parent')
 						 var children = node.get('children')
-						 var parent_loaded = window.collections.get(parent, 'outline');
-						 var children_loaded = _.all(
+						 var parent_loaded = !parent || window.collections.get(parent, 'outline');
+						 var children_loaded = !children || _.all(
 						     children,
 						     function(x){
 							 return window.collections.get(x, 'outline');
