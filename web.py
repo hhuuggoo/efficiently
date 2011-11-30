@@ -172,7 +172,7 @@ class SmartDocRedirector(AuthHandler):
 class Register(SmartDocRedirector):
     def get(self):
         self.clear_all_cookies()
-        self.render("templates/register.html");
+        self.render("templates/register.html", user=self.current_user);
 
     def post(self):
         username = self.get_argument('username')
@@ -188,7 +188,7 @@ class Register(SmartDocRedirector):
 
 class Login(SmartDocRedirector):
     def get(self):
-        self.render("templates/login.html");
+        self.render("templates/login.html", user=None);
         
     def post(self):
         username = self.get_argument('username')
@@ -209,7 +209,8 @@ class Logout(AuthHandler):
 
 class About(AuthHandler):
     def get(self):
-        return self.render("templates/about.html", heading="About")
+        return self.render("templates/about.html", heading="About",
+                           user=None)
 
 
     
@@ -219,7 +220,8 @@ class DocList(AuthHandler):
     def get(self):
         documents = db.document.find({'username':self.current_user, 'status' : 'ACTIVE'})
         documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
-        self.render("templates/doclist.html", documents=documents)
+        self.render("templates/doclist.html", documents=documents,
+                    user=self.current_user)
 
 class Manage(AuthHandler):
     @tornado.web.authenticated
@@ -229,7 +231,7 @@ class Manage(AuthHandler):
         documents = db.document.find({'username':self.current_user, 'status' : 'ACTIVE'})
         documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
         self.render("templates/manage.html", documents=documents,
-                    root_url=root_url)
+                    root_url=root_url, user=self.current_user)
 
     @tornado.web.authenticated
     def post(self, docid):
@@ -305,7 +307,8 @@ class DocView(AliasedUserHandler):
                                          '_id' : self.docid})
         self.render("templates/outline.html", root_id=document['root_id'],
                     document_id=document['_id'], mode=self.mode,
-                    user=self.current_user, title=document['title'])
+                    user=self.real_user, title=document['title'],
+                    owner=self.current_user)
         
 class ReadOnlyDocView(DocView):
     """

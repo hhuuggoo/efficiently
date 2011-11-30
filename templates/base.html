@@ -27,10 +27,16 @@
 	</div>
 	<div class="right">
 	  <div class="nav">
-	    <ul>	      
+	    <ul>
+	      {% if user is not None %}
+	      <li><a href="/manage">Logged in as {{user}}</a></li>
 	      <li><a href="/manage">Management</a></li>
 	      <li><a href="/doclist">All Documents</a></li>
 	      <li><a href="/logout">Logout</a></li>
+	      {% else %}
+	      <li><a href="/login">Login</a></li>
+	      <li><a href="/register">Register</a></li>
+	      {% end %}
 	    </ul>
 	  </div>
 	</div>
