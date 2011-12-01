@@ -270,3 +270,14 @@ padding: .2em 1em;
 .manageform input[type="text"]{
     width: 100%;
 }
+
+.import{
+    border: 1px solid #000;
+    width : 60%;
+    height : 500px;
+}
+.import:focus{
+    border: 1px solid #000;
+    width : 60%;
+    height : 500px;
+}

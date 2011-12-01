@@ -10,6 +10,7 @@ import cjson
 import tornadio
 import tornadio.router
 import tornadio.server
+import numpy as np
 
 
 conn = pymongo.Connection()
@@ -365,11 +366,96 @@ class BulkSave(AliasedUserHandler):
                                                'outline' : to_broadcast}),
                                  clientid=clientid)
         except Exception as e:
-            log.exception(e)
+            logging.exception(e)
             
         self.write("success");
 
+class Import(AliasedUserHandler):
+    mode = 'rw'
+    def get_fake_auth_view(self):
+        return self.render("templates/import.html", docid=self.docid,
+                           user=self.real_user)
+        
+    def post_fake_auth_view(self):
+        outlines = update_db_from_txt(self.get_argument('data'),
+            self.current_user, self.docid)
+        # PubHandler.broadcast(self.docid, 
+        #                      cjson.encode({'type' : 'outlines',
+        #                                    'outline' : outlines}))
 
+                        
+def update_db_from_txt(txt, user, docid, prefix="*"):
+    document = db.document.find_one({'_id' : docid, 'username' : user})
+    document = doc_mongo_to_app(document, document['username'])
+    nodes = outlines_from_text(txt, user, docid, prefix=prefix)
+    add_to_root = []
+    for n in nodes:
+        if n['parent'] is None:
+            n['parent'] = document['root_id']
+            add_to_root.append(n['id'])
+    print add_to_root
+    for n in nodes:
+        n = outline_app_to_mongo(n, user)
+        data = "parent: %s id: %s txt: %s children: %s" % (str(n['parent']), str(n['_id']), str(n['text']), str(n['children']))
+        print data
+        save_outline(n)
+    db.outline.update({'_id' : document['root_id'], 'username' : user},
+                      {'$pushAll' : {'children' : add_to_root}},
+                      safe=True)
+    return nodes
+    
+def outlines_from_text(txt, user, docid, prefix="*"):
+    def bare_outline(txt, user, docid):
+        return {'id' : str(pymongo.objectid.ObjectId()),
+                'text' : txt, 
+                'username' : user,
+                'todostate' : '',
+                'children' : [],
+                'parent': None,
+                'documentid': docid,
+                'status' : 'ACTIVE'}
+    def prefix_count(txtentry):
+        non_prefix_idx =  np.nonzero(np.array(list(txtentry)) == prefix)[0]
+        if len(non_prefix_idx) == 0:
+            return 0
+        else:
+            return non_prefix_idx[-1] + 1
+        
+    if not txt.startswith(prefix):
+        return [bare_outline(txt, user, docid)]
+    outlines = {}
+    outline_order = []
+    node_order = []
+
+    for idx, line in enumerate(txt.splitlines()):
+        level = prefix_count(line)
+        logging.debug("level %s", level)
+        node = bare_outline(line[level:], user, docid)
+
+        outlines[node['id']] = node
+        outline_order.append(node)
+        if len(node_order) == 0:
+            node_order.append((level, node))
+        else:
+            node_levels = np.array([x[0] for x in node_order])
+            node_parent_idx = np.nonzero(node_levels < level)[0]
+            logging.debug('parent %s', str(node_parent_idx))
+            if len(node_parent_idx) == 0:
+                node_order = [(level, node)]
+                continue
+            else:
+                node_parent_idx = node_parent_idx[-1]
+            del node_order[node_parent_idx + 1:]
+            node_order[-1][1]['children'].append(node['id'])
+            node['parent'] = node_order[-1][1]['id']
+            node_order.append((level, node))
+    for n in outline_order:
+        data = "parent: %s id: %s txt: %s children: %s" % (str(n['parent']), str(n['id']), str(n['text']), str(n['children']))
+        print data
+    return outline_order
+    
+class Export(AliasedUserHandler):
+    pass
 class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
     mode = 'r'
     clients = {}
@@ -422,6 +508,8 @@ application = tornado.web.Application([(r"/register", Register),
                                        (r"/docview/r/(.*)", ReadOnlyDocView),
                                        (r"/document/(.*)", Document),
                                        (r"/bulk/(.*)", BulkSave),
+                                       (r"/import/(.*)", Import),
+                                       (r"/export/(.*)", Export),
                                        route.route()
                                        ],
                                       **settings.settings
