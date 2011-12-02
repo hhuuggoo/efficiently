@@ -592,7 +592,7 @@ application = tornado.web.Application([(r"/register", Register),
 PubHandler.application = application
 if __name__ == "__main__":
     mail_listener = tornado.ioloop.PeriodicCallback(check_mail,
-                                                    1000)
+                                                    10000)
     mail_listener.start()
     server = tornadio.server.SocketServer(
         application,
