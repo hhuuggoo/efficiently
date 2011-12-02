@@ -23,16 +23,16 @@
       <div class="container">
 	<h1 class="remove-bottom" style="margin-top: 40px">Yata</h1>
 	<div class="left">
-	  <h5>Yet Another Task Application - Version 0.1</h5>
+	  <h5>Yet Another Task Application - 0.1</h5>
 	</div>
 	<div class="right">
 	  <div class="nav">
 	    <ul>
 	      {% if 'document_id' in globals() and handler.mode == 'rw'%}
-	      <li><a href="/import/{{ document_id }}">Import Data</a></li>
+	      <li><a href="/import/{{ document_id }}">Import</a></li>
 	      {% end %}
 	      {% if 'document_id' in globals() %}
-	      <li><a href="/export/{{ document_id }}">Export Data</a></li>
+	      <li><a href="/export/{{ document_id }}">Export</a></li>
 	      {% end %}
 	      {% if user is not None %}
 	      <li><a href="/manage">Logged in as {{user}}</a></li>

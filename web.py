@@ -385,7 +385,40 @@ class Import(AliasedUserHandler):
 
 
         self.redirect("/docview/rw/" + self.docid)
-                        
+
+def check_mail():
+    import mailbox
+    box = mailbox.mbox("/var/mail/yata")
+    logging.debug("checking mail")
+    try:
+        box.lock()
+        while(1):
+            _, msg = box.popitem()
+            logging.debug(str((msg['To'], msg['Subject'], msg.get_payload())))
+            user = msg['To'].split('@')[0]
+            title = msg['Subject']
+            doc = db.document.find_one({'username':user,
+                                        'title' : title})
+
+            if doc is None:
+                continue
+            else:
+                outlines = update_db_from_txt(msg.get_payload(),
+                                              user,
+                                              doc['_id'],)
+                logging.debug(outlines)
+                PubHandler.broadcast(doc['_id'],
+                                     cjson.encode({'type' : 'outlines',
+                                                   'outline' : outlines}))
+    except KeyError as e:
+        pass
+    
+    finally:
+        box.unlock()
+        box.close()
+
+
+
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = db.document.find_one({'_id' : docid, 'username' : user})
     document = doc_mongo_to_app(document, document['username'])
@@ -434,6 +467,8 @@ def outlines_from_text(txt, user, docid, prefix="*"):
     node_order = []
 
     for idx, line in enumerate(txt.splitlines()):
+        if not line.startswith(prefix):
+            continue
         level = prefix_count(line)
         logging.debug("level %s", level)
         node = bare_outline(line[level:], user, docid)
@@ -556,6 +591,9 @@ application = tornado.web.Application([(r"/register", Register),
                                       )
 PubHandler.application = application
 if __name__ == "__main__":
+    mail_listener = tornado.ioloop.PeriodicCallback(check_mail,
+                                                    1000)
+    mail_listener.start()
     server = tornadio.server.SocketServer(
         application,
         ssl_options={'certfile' : "/etc/nginx/server.crt",
