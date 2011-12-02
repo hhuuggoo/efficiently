@@ -379,6 +379,11 @@ class Import(AliasedUserHandler):
     def post_fake_auth_view(self):
         outlines = update_db_from_txt(self.get_argument('data'),
             self.current_user, self.docid)
+        PubHandler.broadcast(self.docid, 
+                             cjson.encode({'type' : 'outlines',
+                                           'outline' : outlines}))
+
+
         self.redirect("/docview/rw/" + self.docid)
                         
 def update_db_from_txt(txt, user, docid, prefix="*"):
@@ -399,6 +404,10 @@ def update_db_from_txt(txt, user, docid, prefix="*"):
     db.outline.update({'_id' : document['root_id'], 'username' : user},
                       {'$pushAll' : {'children' : add_to_root}},
                       safe=True)
+    root = db.outline.find_one({'_id' : document['root_id'],
+                                'username' : user})
+    root = outline_mongo_to_app(root, user)
+    nodes.insert(0, root)
     return nodes
     
 def outlines_from_text(txt, user, docid, prefix="*"):
