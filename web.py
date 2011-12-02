@@ -379,10 +379,7 @@ class Import(AliasedUserHandler):
     def post_fake_auth_view(self):
         outlines = update_db_from_txt(self.get_argument('data'),
             self.current_user, self.docid)
-        # PubHandler.broadcast(self.docid, 
-        #                      cjson.encode({'type' : 'outlines',
-        #                                    'outline' : outlines}))
-
+        self.redirect("/docview/rw/" + self.docid)
                         
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = db.document.find_one({'_id' : docid, 'username' : user})
@@ -455,7 +452,41 @@ def outlines_from_text(txt, user, docid, prefix="*"):
     return outline_order
     
 class Export(AliasedUserHandler):
-    pass
+    mode='r'
+    def get_fake_auth_view(self):
+        doc = db.document.find_one({'_id' : self.docid,
+                                    'username' : self.current_user})
+        doc = doc_mongo_to_app(doc, self.current_user)
+        self.write(doc_to_text(doc, self.current_user))
+        self.set_header('Content-Type','text/plain')
+        
+
+def doc_to_text(document, user, prefix="*"):
+    outlines = db.outline.find({'documentid': document['id'],
+                                'username': user,
+                                'status' : {'$ne' : 'DELETE'}})
+    outline_dict = {}
+    for o in outlines:
+        o = outline_mongo_to_app(o, user)
+        outline_dict[o['id']] = o
+    root = outline_dict[document['root_id']]
+    output = node_to_text(outline_dict, root, user, prefix=prefix)
+    logging.debug(output)
+    return output
+
+def node_to_text(outlines, outline, user, prefix="*", level=0):
+    output = "".join(["*" for x in range(level)])
+    output += "" if not outline['todostate'] else outline['todostate']
+    output += ' '
+    output += outline['text']
+
+    children_txt = [node_to_text(outlines, outlines[x], user,
+                                 prefix=prefix, level=level+1)
+                    for x in outline['children']]
+    total_txt = [output]
+    total_txt.extend(children_txt)
+    return "\r\n".join(total_txt)
+
 class PubHandler(tornadio.SocketConnection, AliasedUserHandler):
     mode = 'r'
     clients = {}
