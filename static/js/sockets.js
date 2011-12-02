@@ -70,7 +70,7 @@ $(function(){
 	window.active_doc.socket_subscriber.on('connect', function(){
 	    console.log('connected sockets');
 	    window.active_doc.socket_subscriber.send(JSON.stringify({'type':'registration', 'docid' : window.active_doc.id}));
-	    $('#connected').html('connected');
+	    $('#connected').html('CONNECTED: edits from others will appear instantly!');
 	});
 	window.active_doc.socket_subscriber.on('disconnect', function(){
 	    console.log('disconnected sockets');
