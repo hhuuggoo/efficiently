@@ -11,6 +11,7 @@ import tornadio
 import tornadio.router
 import tornadio.server
 import numpy as np
+import hashlib
 
 
 conn = pymongo.Connection()
@@ -21,6 +22,9 @@ import logging
 import hashlib
 import numpy as np
 logging.basicConfig(level=logging.DEBUG)
+
+def getid():
+    hashlib.sha1(str(pymongo.objectid.ObjectId())).hexdigest()
 
 hostname = "localhost"
 def doc_mongo_to_app(d, user):
@@ -81,8 +85,8 @@ def save_outline(d):
     db.outline.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
 def create_document(user, title):
-    docid =  str(pymongo.objectid.ObjectId())
-    rootid = docid + "-" + str(pymongo.objectid.ObjectId())
+    docid =  getid()
+    rootid = docid + "-" + getid()
     
     docid = db.document.insert(
         {'_id' : docid,
@@ -449,7 +453,7 @@ def update_db_from_txt(txt, user, docid, prefix="*"):
     
 def outlines_from_text(txt, user, docid, prefix="*"):
     def bare_outline(txt, user, docid):
-        return {'id' : str(pymongo.objectid.ObjectId()),
+        return {'id' : getid(),
                 'text' : txt, 
                 'username' : user,
                 'todostate' : '',
