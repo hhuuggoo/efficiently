@@ -15,6 +15,7 @@
 	  <image class="fakedot"> </image>	  
 	</div>
 	<div class="todostate" id="<%= id %>-todostate"><%= todostate %></div>
+	<span class="tag" id="<%= id %>-tag"></span>
 	<div class="hideindicator" id="<%= id %>-hideindicator"></div>
 	<div class="abox">
 	  <textarea id="<%= id %>-text" 
@@ -99,6 +100,10 @@
       <li>
 	double clicking the bullet point gives you a menu for topic
       </li>
+      <li>
+	adding #hashtags and @people will also highlight them in blue.
+      </li>
+
     </ul>
     <h5>Keyboard</h5>
     <ul class="square">

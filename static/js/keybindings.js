@@ -469,6 +469,7 @@ ItemSelector = function(root_node, collections){
 	    if (newval != obj.curr_node.get('text')){
 		obj.curr_node.set('text', newval);
 		obj.curr_node.save();
+		obj.curr_node.render();
 	    }
 	}
 	window.setTimeout(function(){

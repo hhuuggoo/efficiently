@@ -13,16 +13,18 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     width:100%;
 }
 
-.hideindicator{
+.hideindicator,
+.todostate,
+.tag{
     float: left;
     height: 100%;
     width: auto;
+    padding : 0px 10px 0px 0px;
 }
-.todostate{
-    float: left;
-    height: 100%;
-    width: auto;
+.tag{
+    color: blue;
 }
+
 .children{
     float: left;
     width : 100%
@@ -118,13 +120,6 @@ button{
     padding: 0px 0px 0px 0px;
     position: absolute;
     z-index:2;
-}
-
-.hideindicator{
-    padding : 0px 10px 0px 0px;
-}
-.todostate{
-    padding : 0px 10px 0px 0px;
 }
 
 .done {
@@ -240,9 +235,6 @@ button{
     padding: 10px 10px 10px 10px;
 
 }
-
-
-
 
 .nav ul
 {

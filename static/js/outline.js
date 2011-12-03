@@ -26,7 +26,7 @@ outline.Outline = function(id, documentid){
 outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
 				    'date', 'children', 'parent', 'documentid',
-				   'status']
+				    'status']
 outline.Outline.prototype.save = function(){
     window.collections.save(this.id, this, 'outline');
 }
@@ -85,6 +85,14 @@ outline.Outline.prototype.render_field = function(field){
 outline.Outline.prototype.render_text = function(){
     var node = this.field_el('text')
     node.val(this.get('text'));
+    var words = _.words(this.get('text'));
+    var tags = _.filter(words, function(x){
+	if (x){
+	    return _.startsWith(x, '#') || _.startsWith(x, '@')
+	}
+    });
+    console.log(tags);
+    this.field_el('tag').html(tags.join(' '));
     var obj = this;
     window.setTimeout(function(){
 	node.resizeNow.call(node);}, 100);
@@ -103,6 +111,7 @@ outline.Outline.prototype.render_todostate = function(){
     var obj = this;
 
 }
+
 outline.Outline.prototype.render_children = function(){
     var ids = this.get('children');
     var obj = this;
@@ -350,6 +359,7 @@ outline.Outline.prototype.hook_events = function(){
 	if (newval != obj.get('text')){
 	    obj.set('text', newval);
 	    obj.save();
+	    obj.render();
 	}
     }
     this.field_el('content').droppable(
