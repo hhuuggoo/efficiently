@@ -394,7 +394,11 @@ def check_mail():
         box.lock()
         while(1):
             _, msg = box.popitem()
-            logging.debug(str((msg['To'], msg['Subject'], msg.get_payload())))
+            if msg.is_multipart():
+                body = msg.get_payload()[0].get_payload()
+            else:
+                body = msg.get_payload()
+            logging.debug(str((msg['To'], msg['Subject'], body)))
             user = msg['To'].split('@')[0]
             title = msg['Subject']
             doc = db.document.find_one({'username':user,
@@ -403,7 +407,7 @@ def check_mail():
             if doc is None:
                 continue
             else:
-                outlines = update_db_from_txt(msg.get_payload(),
+                outlines = update_db_from_txt(body,
                                               user,
                                               doc['_id'],)
                 logging.debug(outlines)
