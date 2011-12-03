@@ -400,7 +400,7 @@ outline.Outline.prototype.hook_events = function(){
 	obj.unshade();
     });
     this.field_el('text').keydown(function(e){
-	if (e.keyCode == ENTER && !e.ctrlKey){
+	if (e.keyCode == ENTER && !window.modified(e)){
 	    obj.field_el('text').blur();
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0){
@@ -408,10 +408,10 @@ outline.Outline.prototype.hook_events = function(){
 		addsibling(obj);
 	    }
 	    return false;
-	}else if (e.keyCode == ENTER && e.ctrlKey){
+	}else if (e.keyCode == ENTER && window.modified(e)){
 	    add_new_child(obj, 0);
 	    return false;
-	}else if (e.keyCode == BACKSPACE && !e.ctrlKey){
+	}else if (e.keyCode == BACKSPACE && !window.modified(e)){
 	    var newval = obj.field_el('text').val();
 	    if (!newval && obj.get('children').length == 0
 		&& obj.last_backspace_txt==newval){

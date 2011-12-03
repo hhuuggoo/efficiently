@@ -15,6 +15,13 @@ var R_BRACKET = 221;
 var FADEOUT_DELAY = 4000;
 var ENTER = 13;
 var BACKSPACE = 8;
+window.modified = function(e){
+    return e.ctrlKey || e.shiftKey || e.altKey
+}
+
+window.nsmodified = function(e){
+    return e.ctrlKey || e.altKey
+}
 
 ItemSelector = function(root_node, collections){
     var obj = this;
@@ -23,31 +30,33 @@ ItemSelector = function(root_node, collections){
     this.curr_node = null;
     this.curr_idx = 0;
     this.get_keyfunction = function(e){
-        if (!e.ctrlKey && e.keyCode == UP){
+	var modified = window.modified(e);
+	var nsmodified = window.nsmodified(e);
+        if (!modified && e.keyCode == UP){
 	    return this.keyfunctions['cursor_up'];
-	}else if (!e.ctrlKey && e.keyCode == DOWN){
+	}else if (!modified && e.keyCode == DOWN){
             return this.keyfunctions['cursor_down'];
-        }else if (e.ctrlKey && e.keyCode == UP){
+        }else if (modified && e.keyCode == UP){
 	    return this.keyfunctions['move_up'];
-        }else if (e.ctrlKey && e.keyCode == DOWN){
+        }else if (modified && e.keyCode == DOWN){
 	    return this.keyfunctions['move_down'];
-	}else if (e.ctrlKey && e.keyCode == LEFT){
+	}else if (modified && e.keyCode == LEFT){
 	    return this.keyfunctions['move_left'];
-        }else if (e.ctrlKey && e.keyCode == RIGHT){
+        }else if (modified && e.keyCode == RIGHT){
 	    return this.keyfunctions['move_right'];
-	}else if (e.ctrlKey && e.keyCode == BACKSPACE){
+	}else if (modified && e.keyCode == BACKSPACE){
 	    return this.keyfunctions['delete'];
-	}else if (e.keyCode == GE && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == GE && nsmodified){
 	    return this.keyfunctions['toggle_outline'];
-	}else if (e.keyCode == SLASH && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == SLASH && nsmodified){
 	    return this.keyfunctions['toggle_all_outline'];
-	}else if (e.keyCode == LT && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == LT && nsmodified){
 	    return this.keyfunctions['toggle_todo'];
-	}else if (e.keyCode == P_KEY && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == P_KEY && nsmodified){
 	    return this.keyfunctions['focus_isearch']
-	}else if (e.keyCode == L_BRACKET && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == L_BRACKET && nsmodified){
 	    return this.keyfunctions['isearch_down'];
-	}else if (e.keyCode == R_BRACKET && e.altKey && !e.ctrlKey){
+	}else if (e.keyCode == R_BRACKET && nsmodified){
 	    return this.keyfunctions['isearch_up'];
 	}
 	else{
