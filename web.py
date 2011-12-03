@@ -24,7 +24,7 @@ import numpy as np
 logging.basicConfig(level=logging.DEBUG)
 
 def getid():
-    hashlib.sha1(str(pymongo.objectid.ObjectId())).hexdigest()
+    return hashlib.sha1(str(pymongo.objectid.ObjectId())).hexdigest()
 
 hostname = "localhost"
 def doc_mongo_to_app(d, user):
