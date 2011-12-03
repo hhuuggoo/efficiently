@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block main %}
 <p>Don't have an account?  <a href="/register">register here</a></p>
-<div>
+<div class="six columns clearfix alpha">
   <form action="/login" method="POST">
     <!-- Label and text input -->
     <label for="username">username</label>
@@ -10,5 +10,25 @@
     <input type="password" id="password" name="password"/>
     <input type="submit"></input>
   </form>
+</div>
+<div class="ten columns clearfix omega">
+  The goal of yata is to bring the power of emacs Org mode in a modern way.
+  <br>
+  <br>
+
+  <ul class="square">
+    <li>
+      You can share documents you create with a other yata users, or with the entire world, even people who don't have yata accounts
+    </li>
+    <li>
+      You can email items which will be automatically added to your outline
+    </li>
+    <li>
+      If multiple people are editing a yata document, changes will instantly appear on everyones copy of the document.  This is useful for working collaboratively.
+    </li>
+    <li>
+      simple keyboard interface allows you to search your document, compact parts of it, and mark items TODO, INPROGRESS, or DONE.
+    </li>
+  </ul>
 </div>
 {% end %}
