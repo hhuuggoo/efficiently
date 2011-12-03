@@ -35,9 +35,9 @@
 	      <li><a href="/export/{{ document_id }}">Export</a></li>
 	      {% end %}
 	      {% if user is not None %}
-	      <li><a href="/manage">Logged in as {{user}}</a></li>
+	      <li><a href="/manage">{{user}} Logged in</a></li>
 	      <li><a href="/manage">Management</a></li>
-	      <li><a href="/doclist">All Documents</a></li>
+	      <li><a href="/doclist">Documents</a></li>
 	      <li><a href="/logout">Logout</a></li>
 	      {% else %}
 	      <li><a href="/login">Login</a></li>
