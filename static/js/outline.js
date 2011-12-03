@@ -554,8 +554,9 @@ $(function(){
     var doc_id = $("#document_id").html()
     var root_id = $("#root_id").html()    
     var mode = $('#mode').html()
+    var client_id = $('#client_id').html()
     window.collections = new storage.Collections(
-	'id5', 
+	client_id, 
 	{'outline' : outline.Outline, 
 	 'document' : outline.Document}
     );
