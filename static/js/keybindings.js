@@ -107,56 +107,6 @@ ItemSelector = function(root_node, collections){
 	}
     }
 
-    this.keyhandle = function(e){
-        if (!e.ctrlKey && e.keyCode == UP){
-
-        }else if (!e.ctrlKey && e.keyCode == DOWN){
-            this.cursor_down();
-        }else if (e.ctrlKey && e.keyCode == UP){
-            this.move_up();
-        }else if (e.ctrlKey && e.keyCode == DOWN){
-            this.move_down();
-	}else if (e.ctrlKey && e.keyCode == LEFT){
-            this.move_left();
-        }else if (e.ctrlKey && e.keyCode == RIGHT){
-            this.move_right();
-	}else if (e.ctrlKey && e.keyCode == BACKSPACE){
-	    if (this.curr_node){
-		var parent = this.collections.get(this.curr_node.parent, 'outline')
-		var siblings = parent.visible_children()
-		var idx = _.indexOf(siblings, this.curr_node.id);
-		var next_current = null;
-		if (idx != 0){
-		    next_current = this.collections.get(siblings[idx - 1], 
-							'outline');
-		}else if (idx < siblings.length - 1){
-		    next_current = this.collections.get(siblings[idx + 1],
-							'outline');
-		}else{
-		    next_current = parent;
-		}
-		deletenode(this.curr_node);
-		this.curr_node = next_current;
-	    }
-	}else if (e.keyCode == GE && e.altKey && !e.ctrlKey){
-	    if (this.curr_node){
-		this.curr_node.toggle_outline_state();
-		this.curr_node.show_outline_state();
-	    }
-	}else if (e.keyCode == SLASH && e.altKey && !e.ctrlKey){
-	    if (this.curr_node){
-		this.root_node.toggle_child_outline_state();
-	    }
-	}else if (e.keyCode == LT && e.altKey && !e.ctrlKey){
-	    if (this.curr_node){
-		this.curr_node.toggle_todo_state();
-	    }
-	}else{
-	    return true
-	}
-	this.curr_node.select();
-	return false;
-    }
     this.cursor_up = function(){
 	if (!this.curr_node){
 	    this.curr_node = this.collections.get(

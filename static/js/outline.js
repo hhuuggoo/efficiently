@@ -620,6 +620,8 @@ $(function(){
 	    });
 	global_event_hooks();
 	window.register_sockets();
+	window.item_selector.cursor_down();
+	window.item_selector.curr_node.select();
     });
 });
 

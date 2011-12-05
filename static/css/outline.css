@@ -29,8 +29,6 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     float: left;
     width : 100%
 }
-.item-controls{
-}
 .fakedotcontainer{
     height:18px;
     width:20px;
@@ -62,7 +60,7 @@ textarea{
     overflow: hidden;
     resize: none;
     clear: none;
-    font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: inherit;
 }
 
@@ -84,7 +82,7 @@ textarea:focus{
     overflow: hidden;
     resize: none;
     clear: none;
-    font: 13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: inherit;
 
 }
