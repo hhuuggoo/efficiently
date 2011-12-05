@@ -133,7 +133,6 @@ storage.Collections.prototype.save_server_queue = function(){
 	       });
 	   });
     
-    console.log(['posting', window.active_doc.get('saveurl')]);
     var save_url = window.active_doc.get('saveurl');
     if (save_url == ''){
 	return null;

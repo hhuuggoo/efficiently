@@ -91,7 +91,6 @@ outline.Outline.prototype.render_text = function(){
 	    return _.startsWith(x, '#') || _.startsWith(x, '@')
 	}
     });
-    console.log(tags);
     this.field_el('tag').html(tags.join(' '));
     var obj = this;
     window.setTimeout(function(){
