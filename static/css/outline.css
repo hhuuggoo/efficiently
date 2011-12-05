@@ -21,6 +21,18 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     width: auto;
     padding : 0px 10px 0px 0px;
 }
+
+.manageform{
+    display:none;
+}
+.docconfig:hover .configuretag{
+    display: inline;
+}
+.configuretag{
+    display: none;
+    float: right;
+}
+
 .tag{
     color: blue;
 }

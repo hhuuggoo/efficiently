@@ -2,37 +2,45 @@
 {% block other_scripts%}
 {% end %}
 {% block main %}
-<div class="ten columns clearfix alpha">
-  When specifying users, entering 'all' will allow all users to edit or view your document
+<div class="eight columns clearfix alpha">
+
   <ul class="square">
-    <li><h5>New Document</h5>
+    <li>Create a New Document
       <form action="/create"
-	    class="manageform" method="post">
+	    class="" method="post">
 	<label for="create">
 	  Title
 	</label>
 	<input type="text" id="create" name="title"/>
-	<br>
 	<input type='submit'/>
       </form>
     </li>
     {% for doc in documents %}
-    <li>
+    <li class="docconfig">
+      <div>
+	<a href="/docview/rw/{{doc['id']}}">{{doc['title']}}</a>
+	<div class="configuretag">(click here to configure)</div>
+      </div>
       <form action="/manage/{{doc['id']}}" 
-	    class="manageform" method="post">
-	<h5>{{doc['title']}}</h5>
+	    class="hide manageform" method="post">
+	<br>
 	<input id="delete-{{doc['id']}}" type="checkbox" name="delete">
 	Delete this document (warning! cannot be undone!)
 	</input>
 	<br>
 	<br>
 	<label for="rw-{{doc['id']}}">
-	  users who can edit this document - enter their usernames separated by commas:
+	  Users who can edit this document:
+	  <br>
+	  Examples:  'all' will give access to everyone.  'hugo,wendy' will give access to users hugo and wendy.
 	</label>
 	<input type="text" 
 	       id="rw-{{doc['id']}}" name="rwuser"
 	       value="{{','.join(doc['rwuser'])}}"/>
-	<label for="r-{{doc['id']}}">users who can view, but cannot edit this document - enter their usernames separated by commas:
+	<label for="r-{{doc['id']}}">
+	  Users who can view, but cannot edit this document
+	  <br>
+	  Examples:  'all' will give access to everyone.  'hugo,wendy' will give access to users hugo and wendy.
 	</label>
 	<input type="text" 
 	       id="r-{{doc['id']}}" name="ruser"
@@ -43,25 +51,41 @@
 	</label>
 	<a class="managelinks" 
 	   id="rwlink-{{doc['id']}}" href="/docview/rw/{{doc['id']}}">
-	  {{root_url}}/docview/rw/{{doc['id']}}
+	  {{root_url}}docview/rw/{{doc['id']}}
 	</a><br>
 	<label for="rlink-{{doc['id']}}">
 	  this link will allow others to view but not edit this document<br>
 	</label>
 	<a class="managelinks" 
 	   id="rlink-{{doc['id']}}" href="/docview/r/{{doc['id']}}">
-	  {{root_url}}/docview/r/{{doc['id']}}
+	  {{root_url}}docview/r/{{doc['id']}}
 	</a>
 	<br>
 	{% end %}
 	<input type='submit'/>
-      </form>
+	</form>
     </li>
     {% end %}
   </ul>
 </div>
-<div class="six columns clearfix omega">
+<div class="eight columns clearfix omega">
 </div>
 </ul>
 </div>
+<script type="text/javascript">
+  $(function(){
+  $(".configuretag").click(function(e){
+  var targetform = $(e.target).parents('li').children('.manageform');
+  if(!targetform.is(":visible")){
+  $(".manageform").hide();
+  $(".configuretag").html("(click here to configure)");
+  targetform.show();
+  $(e.target).html("(click to hide configuration)");
+  }else{
+  $(".manageform").hide();
+  $(".configuretag").html("(click here to configure)");
+  }
+  });
+  });
+</script>
 {% end %}

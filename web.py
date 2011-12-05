@@ -158,7 +158,7 @@ class AuthHandler(tornado.web.RequestHandler):
 
 class SmartDocRedirector(AuthHandler):
     """
-    bypasses doclist if you only have one.
+    bypasses management screen if you only have one.
     """
     @tornado.web.authenticated
     def get(self):
@@ -173,7 +173,7 @@ class SmartDocRedirector(AuthHandler):
             document = doc_mongo_to_app(document, self.current_user)
             self.redirect("/docview/rw/" + document['id'])
         else:
-            self.redirect("/doclist")
+            self.redirect("/manage")
 
 class Register(SmartDocRedirector):
     def get(self):
@@ -217,17 +217,6 @@ class About(AuthHandler):
     def get(self):
         return self.render("templates/about.html", heading="About",
                            user=None)
-
-
-    
-
-class DocList(AuthHandler):
-    @tornado.web.authenticated
-    def get(self):
-        documents = db.document.find({'username':self.current_user, 'status' : 'ACTIVE'})
-        documents = [doc_mongo_to_app(x, self.current_user) for x in documents]
-        self.render("templates/doclist.html", documents=documents,
-                    user=self.current_user)
 
 class Manage(AuthHandler):
     @tornado.web.authenticated
@@ -586,7 +575,6 @@ application = tornado.web.Application([(r"/register", Register),
                                        
                                        (r"/", SmartDocRedirector),
 
-                                       (r"/doclist", DocList),
                                        (r"/manage/(.*)", Manage),
                                        (r"/manage", Manage),
                                        (r"/create", Create),
