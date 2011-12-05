@@ -104,6 +104,7 @@ def create_document(user, title):
         '_id' : rootid,
         'username':user,
         'documentid' : docid}, safe=True)
+    return docid
     
 def create_initial_data(user, passwd, email, title):
     salt = bcrypt.gensalt(log_rounds=7)
@@ -259,8 +260,8 @@ class Create(AuthHandler):
     @tornado.web.authenticated
     def post(self):
         title = self.get_argument('title')
-        create_document(self.current_user, title)
-        self.redirect('/manage')
+        docid = create_document(self.current_user, title)
+        self.redirect("/docview/rw/" + docid)
 
 class AliasedUserHandler(AuthHandler):
     """
