@@ -219,21 +219,27 @@ outline.Outline.prototype.visible_children = function(){
 outline.Outline.prototype.tree_search = function(txt){
     //searches but also returns
     this.show_all_descendants();
+    var tagsearch = _.includes(txt, '#') || _.includes(txt, '@') || _.include(window.active_doc.get('todostates'), txt);
+    console.log(['tagsearch', txt, tagsearch]);
     var f = function (x) {
 	var matched = false;
+	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
+	    matched = true;
+	    if (tagsearch){
+		return true;
+	    }
+	}
 	var children_matched = _.map(x.get('children'), function(cid){
 	    return f(window.collections.get(cid, 'outline'));
 	})
-	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
-	    matched = true;
-	}
 	if (!_.any(children_matched) && !matched){
 	    x.el.hide();
 	    return false;
 	}else{
+	    x.render_hidden();
 	    return true;
 	}
-	this.render_hidden();
+	
     }
     f(this);
 }
