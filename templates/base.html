@@ -28,16 +28,20 @@
 	<div class="right">
 	  <div class="nav">
 	    <ul>
+	      {% if user is not None %}
+	      <li><a href="/manage">Documents</a></li>
+	      {% end %}
 	      {% if 'document_id' in globals() and handler.mode == 'rw'%}
 	      <li><a href="/import/{{ document_id }}">Import</a></li>
 	      {% end %}
 	      {% if 'document_id' in globals() %}
 	      <li><a href="/export/{{ document_id }}">Export</a></li>
 	      {% end %}
+
 	      {% if user is not None %}
-	      <li><a href="/manage">{{user}} Logged in</a></li>
-	      <li><a href="/manage">Documents</a></li>
-	      <li><a href="/logout">Logout</a></li>
+	      <li>
+		<a href="/manage">Logged in as {{user}}</a> | <a href="/logout">Logout</a>
+	      </li>
 	      {% else %}
 	      <li><a href="/login">Login</a></li>
 	      <li><a href="/register">Register</a></li>
