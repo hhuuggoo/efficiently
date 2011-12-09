@@ -437,9 +437,17 @@ outline.Outline.prototype.hook_events = function(){
 	    obj.last_backspace_txt = newval;
 	}
     });
-    this.field_el('content').draggable({'revert':'invalid',
-					'stack': '*',
-				       });
+    this.field_el('content').draggable({
+	'revert':'invalid',
+	'stack': '*',
+	'helper': function(){
+	    var node =  $(obj.field_el('content')).clone();
+	    $('textarea', node).val(obj.get('text'));
+	    node.css({'background' : 'silver', 
+		      'width' : obj.field_el('content').width() + "px"})
+	    return node;
+	}
+    });
     this.field_el('content').data({'id':this.id});
     this.field_el('fakedotcontainer').dblclick(
 	function(e){
