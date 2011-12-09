@@ -398,7 +398,8 @@ def check_mail():
             user = msg['To'].split('@')[0]
             title = msg['Subject']
             doc = db.document.find_one({'username':user,
-                                        'title' : title})
+                                        'title' : title,
+                                        'status' : 'ACTIVE'})
 
             if doc is None:
                 continue
