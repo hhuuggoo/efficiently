@@ -68,3 +68,35 @@ model.Model.prototype.field_el = function(fld){
 	return $("#" + this.field_id(fld), this.el);
     }
 }
+
+model.Model.prototype.render_function = function(field){
+    var obj = this;
+    if ("render_"  + field in this){
+	return function(){obj["render_"  + field]()};
+    }else{
+	return function() {obj.render_field(field);};
+    }
+}
+
+model.Model.prototype.render_field = function(field){
+    $("#" + this.field_id(field), this.el).html(this.get(field));
+}
+
+model.Model.prototype.render = function(isroot){
+    if (!this.el){
+	this.el = $(this.template(this.to_dict()));
+	this.hook_events()
+    }
+    var obj = this;
+    _.each(this.fields, function(f){
+	if (obj.dirty[f]){
+	    obj.render_function(f).call(obj);
+	    delete obj.dirty[f];
+	}
+    });
+}
+
+model.Model.prototype.template = function(){
+}
+model.Model.prototype.hook_events = function(){
+}

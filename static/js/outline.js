@@ -78,9 +78,6 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 
 //view
 //render
-outline.Outline.prototype.render_field = function(field){
-    $("#" + this.field_id(field), this.el).html(this.get(field));
-}
 
 outline.Outline.prototype.render_text = function(){
     var node = this.field_el('text')
@@ -124,14 +121,6 @@ outline.Outline.prototype.render_children = function(){
 	    child.render();
 	    obj.field_el('children').append(child.el);
 	});
-    }
-}
-outline.Outline.prototype.render_function = function(field){
-    var obj = this;
-    if ("render_"  + field in this){
-	return function(){obj["render_"  + field]()};
-    }else{
-	return function() {obj.render_field(field);};
     }
 }
 
