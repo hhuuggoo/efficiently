@@ -78,9 +78,30 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 
 //view
 //render
-
 outline.Outline.prototype.render_text = function(){
-    var node = this.field_el('text')
+    if (this.field_el('textarea').is(":visible")){
+	this.render_textarea();
+    }else{
+	this.render_textdisplay();
+    }
+}
+outline.Outline.prototype.render_textdisplay = function(){
+    this.field_el('textarea').hide()
+    this.field_el('textdisplay').show()
+    var node = this.field_el('textdisplay')
+    node.html(this.get('text'));
+    var words = _.words(this.get('text'));
+    var tags = _.filter(words, function(x){
+	if (x){
+	    return _.startsWith(x, '#') || _.startsWith(x, '@')
+	}
+    });
+    this.field_el('tag').html(tags.join(' '));
+}
+outline.Outline.prototype.render_textarea = function(){
+    this.field_el('textarea').show()
+    this.field_el('textdisplay').hide()
+    var node = this.field_el('textarea')
     node.val(this.get('text'));
     var words = _.words(this.get('text'));
     var tags = _.filter(words, function(x){
@@ -92,8 +113,8 @@ outline.Outline.prototype.render_text = function(){
     var obj = this;
     window.setTimeout(function(){
 	node.resizeNow.call(node);}, 100);
-
 }
+
 outline.Outline.prototype.render_todostate = function(){
     var currstate = this.get('todostate');
     var todocolors = window.collections.get(this.documentid, 'document').get('todocolors');
@@ -142,7 +163,7 @@ outline.Outline.prototype.render = function(isroot){
 	    this.el = $(roottemplate(this.to_dict()));
 	    this.hook_events()
 	}
-	this.field_el('text').autoResize();
+	this.field_el('textarea').autoResize();
 	this.field_el('childcontainer').hide();
     }
     var obj = this;
@@ -170,11 +191,13 @@ outline.Outline.prototype.toggle_todo_state = function(){
 //view operations
 outline.Outline.prototype.select = function(){
     this.shade();
-    this.field_el('text').focus();
+    this.field_el('textarea').focus();
+    this.render_textarea();
 }
 outline.Outline.prototype.unselect = function(){
     this.unshade()
-    this.field_el('text').blur();
+    this.field_el('textarea').blur();
+    this.render_text();
 }
 outline.Outline.prototype.shade = function(){
     this.field_el('content').addClass('shade');
@@ -335,27 +358,27 @@ var addsibling = function(obj){
     var curr_index = _.indexOf(parent.get('children'), obj.get('id'))
     parent.add_child(newnode, curr_index + 1);
     parent.render();
-    newnode.field_el('text').delay(300).focus();
+    newnode.select();
 }
 var add_new_child = function(obj, index){
     var newnode = new outline.Outline(window.collections.new_id(),
 				      obj.get('documentid'))
     obj.add_child(newnode, index);
     obj.render();
-    newnode.field_el('text').delay(300).focus();
+    newnode.select();
 }
 
+outline.Outline.prototype.savetext = function(){
+    console.log('savetext')
+    var newval = this.field_el('textarea').val();
+    if (newval != this.get('text')){
+	this.set('text', newval);
+	this.save();
+    }
+}
 //event handling
 outline.Outline.prototype.hook_events = function(){
     var obj = this;
-    var savetext = function(){
-	var newval = obj.field_el('text').val();
-	if (newval != obj.get('text')){
-	    obj.set('text', newval);
-	    obj.save();
-	    obj.render();
-	}
-    }
     this.field_el('content').droppable(
         {'tolerance':'pointer',
 	 'hoverClass': "ui-state-hover",
@@ -395,18 +418,22 @@ outline.Outline.prototype.hook_events = function(){
 	 }
 	}
     );
-    this.field_el('text').focus(function(e){
-	window.item_selector.curr_node = obj;
-	obj.shade();
+    this.field_el('text').click(function(e){
+	obj.select();
     });
-    this.field_el('text').blur(function(e){
-	savetext(e);
+    this.field_el('textarea').focus(function(e){
+    	window.item_selector.curr_node = obj;
+    });
+    this.field_el('textarea').blur(function(e){
+	console.log('blurring');
+	obj.savetext();
+    	obj.render_text();
 	obj.unshade();
     });
-    this.field_el('text').keydown(function(e){
+    this.field_el('textarea').keydown(function(e){
 	if (e.keyCode == ENTER && !window.modified(e)){
-	    obj.field_el('text').blur();
-	    var newval = obj.field_el('text').val();
+	    obj.field_el('textarea').blur();
+	    var newval = obj.field_el('textarea').val();
 	    if (!newval && obj.get('children').length == 0){
 	    }else{
 		addsibling(obj);
@@ -416,10 +443,10 @@ outline.Outline.prototype.hook_events = function(){
 	    add_new_child(obj, 0);
 	    return false;
 	}else if (e.keyCode == BACKSPACE && !window.modified(e)){
-	    var newval = obj.field_el('text').val();
+	    var newval = obj.field_el('textarea').val();
 	    if (!newval && obj.get('children').length == 0
 		&& obj.last_backspace_txt==newval){
-		obj.field_el('text').blur();
+		obj.field_el('textarea').blur();
 		deletenode(obj);
 		return false;
 	    }
@@ -557,7 +584,7 @@ var global_event_hooks = function(){
     $('#debugbtn').click(function(e){
 	var node = get_matching_text('release')[0];
 	node.render_text();
-	var ht = node.field_el('text')[0].scrollHeight;
+	var ht = node.field_el('textarea')[0].scrollHeight;
 	$('#debug').html(ht);
     });
 }

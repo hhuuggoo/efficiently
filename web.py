@@ -12,6 +12,7 @@ import tornadio.router
 import tornadio.server
 import numpy as np
 import hashlib
+import sys
 
 
 conn = pymongo.Connection()
@@ -591,11 +592,16 @@ application = tornado.web.Application([(r"/register", Register),
                                       )
 PubHandler.application = application
 if __name__ == "__main__":
-    mail_listener = tornado.ioloop.PeriodicCallback(check_mail,
-                                                    10000)
-    mail_listener.start()
+    try:
+        process_mail = sys.argv[1].lower() == 'true'
+    except:
+        process_mail == True
+    if process_mail:
+        print 'checking mail'
+        mail_listener = tornado.ioloop.PeriodicCallback(check_mail,
+                                                        10000)
+    
+        mail_listener.start()
     server = tornadio.server.SocketServer(
         application,
-        ssl_options={'certfile' : "/etc/nginx/server.crt",
-                     'keyfile' : "/etc/nginx/server.key"}
         )

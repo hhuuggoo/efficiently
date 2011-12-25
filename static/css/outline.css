@@ -11,6 +11,11 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 }
 .outline{
     width:100%;
+    min-height:18px;
+}
+
+.outline-input{
+    min-height: 18px;
 }
 
 .hideindicator,

@@ -415,12 +415,7 @@ ItemSelector = function(root_node, collections){
     $('#searchbox').hide();
     var savetext = function(){
 	if (obj.curr_node){
-	    var newval = obj.curr_node.field_el('text').val();
-	    if (newval != obj.curr_node.get('text')){
-		obj.curr_node.set('text', newval);
-		obj.curr_node.save();
-		obj.curr_node.render();
-	    }
+	    obj.curr_node.savetext();
 	}
 	window.setTimeout(function(){
 	    savetext();
