@@ -427,6 +427,7 @@ outline.Outline.prototype.hook_events = function(){
     this.field_el('textarea').blur(function(e){
 	obj.savetext();
     });
+
     this.field_el('textarea').keydown(function(e){
 	if (e.keyCode == ENTER && !window.modified(e)){
 	    obj.field_el('textarea').blur();
