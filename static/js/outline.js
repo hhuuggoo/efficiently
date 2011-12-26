@@ -191,13 +191,13 @@ outline.Outline.prototype.toggle_todo_state = function(){
 //view operations
 outline.Outline.prototype.select = function(){
     this.shade();
-    this.field_el('textarea').focus();
     this.render_textarea();
+    this.field_el('textarea').focus();
 }
 outline.Outline.prototype.unselect = function(){
-    this.unshade()
     this.field_el('textarea').blur();
-    this.render_text();
+    this.unshade()
+    this.render_textdisplay();
 }
 outline.Outline.prototype.shade = function(){
     this.field_el('content').addClass('shade');
@@ -425,10 +425,7 @@ outline.Outline.prototype.hook_events = function(){
     	window.item_selector.curr_node = obj;
     });
     this.field_el('textarea').blur(function(e){
-	console.log('blurring');
 	obj.savetext();
-    	obj.render_text();
-	obj.unshade();
     });
     this.field_el('textarea').keydown(function(e){
 	if (e.keyCode == ENTER && !window.modified(e)){
