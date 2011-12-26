@@ -421,6 +421,6 @@ ItemSelector = function(root_node, collections){
 	    savetext();
 	}, 1000);
     }
-    savetext();
+    //savetext();
 }
 

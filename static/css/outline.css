@@ -1,3 +1,7 @@
+div {
+    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
+}
+
 ul ul, ul ol,
 ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 
@@ -20,6 +24,24 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
 
 .outline-textdisplay{
     white-space: pre-wrap;
+    border: 0;
+    padding: 0;
+    outline: none;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    font: inherit;
+    border-radius: 0;
+    color: #111;
+    margin: 0;
+    display: inline;
+    margin-bottom: 0;
+    min-height: 18px;
+    vertical-align: text-top;
+    overflow: hidden;
+    resize: none;
+    clear: none;
+    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: inherit;
 }
 
 .hideindicator,
@@ -63,6 +85,7 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     margin: 7px 10px 0px 0px 
 }
 textarea{
+    line-height : 18px;
     border: 0;
     padding: 0;
     outline: none;
@@ -86,6 +109,7 @@ textarea{
 }
 
 textarea:focus{
+    line-height : 20px;
     border: 0;
     padding: 0;
     outline: none;
@@ -106,6 +130,10 @@ textarea:focus{
     font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: inherit;
 
+}
+
+.testtext{
+    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
 }
 
 .edge{
