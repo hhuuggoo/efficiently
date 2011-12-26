@@ -418,20 +418,29 @@ ItemSelector = function(root_node, collections){
 	}, 1000);
     }
     //savetext();
-    this.select = function(node){
+    this._select = function(node){
 	if(node){
-	    this.unselect(this.curr_node);
+	    this._unselect(this.curr_node);
 	    this.curr_node = node;
 	    node.shade();
 	    node.render_textarea();
+	}
+    }
+    this._unselect = function(node){
+	if(node){
+	    node.savetext();
+	    node.unshade()
+	    node.render_textdisplay();
+	}
+    }
+    this.select = function(node){
+	if(node){
 	    node.field_el('textarea').focus();
 	}
     }
     this.unselect = function(node){
 	if(node){
 	    node.field_el('textarea').blur();
-	    node.unshade()
-	    node.render_textdisplay();
 	}
     }
 }

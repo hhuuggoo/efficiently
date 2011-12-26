@@ -412,13 +412,11 @@ outline.Outline.prototype.hook_events = function(){
 	window.item_selector.select(obj);
     });
     this.field_el('textarea').focus(function(e){
-    	window.item_selector.curr_node = obj;
-	obj.shade();
+	window.item_selector._select(obj);
     });
 
     this.field_el('textarea').blur(function(e){
-	obj.savetext	();
-	obj.unshade();
+	window.item_selector._unselect(obj);	
     });
 
     this.field_el('textarea').keydown(function(e){
