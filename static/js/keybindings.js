@@ -68,9 +68,6 @@ ItemSelector = function(root_node, collections){
 	    var func = obj.get_keyfunction(e);
 	    if (func){
 		func.call(obj);
-		if (!func.noselect){
-		    obj.curr_node.select();
-		}
 		return false;
 	    }else{
 		return true;
@@ -103,31 +100,30 @@ ItemSelector = function(root_node, collections){
 		next_current = parent;
 	    }
 	    deletenode(this.curr_node);
-	    this.curr_node = next_current;
+	    this.select(next_current);
 	}
     }
 
     this.cursor_up = function(){
 	if (!this.curr_node){
-	    this.curr_node = this.collections.get(
-		this.root_node.visible_children()[0], 'outline');
+	    this.select(this.collections.get(
+		this.root_node.visible_children()[0], 'outline'));
 	}else{
-	    this.curr_node.unselect();
 	    var upper = this.find_upper_node(this.curr_node);
 	    if (upper){
-		this.curr_node = upper
+		this.select(upper);
 	    }
 	}
     };
     this.cursor_down = function(){
 	if (!this.curr_node){
-	    this.curr_node = this.collections.get(
-		this.root_node.visible_children()[0], 'outline');
+	    this.select(this.collections.get(
+		this.root_node.visible_children()[0], 'outline'));
 	}else{
-	    this.curr_node.unselect();
+	    this.unselect(this.curr_node);
 	    var next_node = this.find_lower_visible_node(this.curr_node);
 	    if (next_node){
-		this.curr_node = next_node;
+		this.select(next_node);
 	    }
 	}
     };
@@ -289,7 +285,7 @@ ItemSelector = function(root_node, collections){
 	this.search_fade_in();
 	var new_idx;
 	var val = $('#searchtext').val();
-	var curr_point = this.curr_node.field_el('text')[0].selectionEnd;
+	var curr_point = this.curr_node.field_el('textarea')[0].selectionEnd;
 	var curr_text;
 	var temp;
 	var try_select_text = function (node, curr_point){
@@ -299,8 +295,8 @@ ItemSelector = function(root_node, collections){
 	    console.log(['searching', val, curr_txt]);
 	    new_idx = curr_txt.indexOf(val, curr_point);
 	    if (new_idx >= 0){
-		node.select()
-		node.field_el('text')[0].setSelectionRange(
+		obj.select(node);
+		node.field_el('textarea')[0].setSelectionRange(
 		    new_idx, new_idx + val.length);
 		return true;
 	    }else{
@@ -334,7 +330,7 @@ ItemSelector = function(root_node, collections){
 	this.search_fade_in();
 	var new_idx;
 	var val = $('#searchtext').val();
-	var curr_point = this.curr_node.field_el('text')[0].selectionStart - 1;
+	var curr_point = this.curr_node.field_el('textarea')[0].selectionStart - 1;
 	var curr_text;
 	var temp;
 	var try_select_text = function (node, curr_point){
@@ -347,8 +343,8 @@ ItemSelector = function(root_node, collections){
 	    console.log(['searching', val, curr_txt]);
 	    new_idx = curr_txt.lastIndexOf(val, curr_point);
 	    if (new_idx >= 0){
-		node.select()
-		node.field_el('text')[0].setSelectionRange(
+		obj.select(node);
+		node.field_el('textarea')[0].setSelectionRange(
 		    new_idx, new_idx + val.length);
 		return true;
 	    }else{
@@ -422,5 +418,21 @@ ItemSelector = function(root_node, collections){
 	}, 1000);
     }
     //savetext();
+    this.select = function(node){
+	if(node){
+	    this.unselect(this.curr_node);
+	    this.curr_node = node;
+	    node.shade();
+	    node.render_textarea();
+	    node.field_el('textarea').focus();
+	}
+    }
+    this.unselect = function(node){
+	if(node){
+	    node.field_el('textarea').blur();
+	    node.unshade()
+	    node.render_textdisplay();
+	}
+    }
 }
 

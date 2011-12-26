@@ -189,16 +189,6 @@ outline.Outline.prototype.toggle_todo_state = function(){
 }
 
 //view operations
-outline.Outline.prototype.select = function(){
-    this.shade();
-    this.render_textarea();
-    this.field_el('textarea').focus();
-}
-outline.Outline.prototype.unselect = function(){
-    this.field_el('textarea').blur();
-    this.unshade()
-    this.render_textdisplay();
-}
 outline.Outline.prototype.shade = function(){
     this.field_el('content').addClass('shade');
 }
@@ -358,14 +348,14 @@ var addsibling = function(obj){
     var curr_index = _.indexOf(parent.get('children'), obj.get('id'))
     parent.add_child(newnode, curr_index + 1);
     parent.render();
-    newnode.select();
+    window.item_selector.select(newnode);
 }
 var add_new_child = function(obj, index){
     var newnode = new outline.Outline(window.collections.new_id(),
 				      obj.get('documentid'))
     obj.add_child(newnode, index);
     obj.render();
-    newnode.select();
+    window.item_selector.select(newnode);
 }
 
 outline.Outline.prototype.savetext = function(){
@@ -419,13 +409,16 @@ outline.Outline.prototype.hook_events = function(){
 	}
     );
     this.field_el('text').click(function(e){
-	obj.select();
+	window.item_selector.select(obj);
     });
     this.field_el('textarea').focus(function(e){
     	window.item_selector.curr_node = obj;
+	obj.shade();
     });
+
     this.field_el('textarea').blur(function(e){
-	obj.savetext();
+	obj.savetext	();
+	obj.unshade();
     });
 
     this.field_el('textarea').keydown(function(e){
@@ -499,7 +492,7 @@ window.active_doc = null;
 var toggle_controls = function(e, obj){
     var activator = obj.field_el('fakedotcontainer');
     var show = function(e){
-	obj.select();
+	window.item_selector.select(obj);
 	window.activeobj = obj;
 	window.controls.show()
 	var x = e.pageX;
@@ -648,7 +641,7 @@ $(function(){
 	global_event_hooks();
 	window.register_sockets();
 	window.item_selector.cursor_down();
-	window.item_selector.curr_node.select();
+	//window.item_selector.select(curr_node);
     });
 });
 
