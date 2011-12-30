@@ -15,7 +15,6 @@ outline.Outline = function(id, documentid){
     this.set('date', null);
     this.set('parent', null);
     this.set('children', []);
-    this.set('todostate', null);
     this.set('status', 'ACTIVE');
     this.dirty = {};
     this.el = null;
@@ -25,7 +24,7 @@ outline.Outline = function(id, documentid){
 //data model
 outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['documentid', 'username', 'id', 
-				    'text', 'todostate', 
+				    'text',  
 				    'date', 'children', 'parent',
 				    'status']
 outline.Outline.prototype.save = function(){
@@ -90,19 +89,19 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 //     }
 // }
 
-outline.Outline.prototype.split_todo_state_from_text = function(txt){
-    var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
-    var currstate = _.filter(todostates, function(x){
-	//have to include x in there, so because every string matches startswith
-	//and null
-	return x && _.startsWith(txt, x)
-    });
-    if (currstate.length == 0){
-	return ['', txt];
-    }else{
-	return [currstate[0], txt.slice(currstate[0].length)];
-    }
-}
+// outline.Outline.prototype.split_todo_state_from_text = function(txt){
+//     var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
+//     var currstate = _.filter(todostates, function(x){
+// 	//have to include x in there, so because every string matches startswith
+// 	//and null
+// 	return x && _.startsWith(txt, x)
+//     });
+//     if (currstate.length == 0){
+// 	return ['', txt];
+//     }else{
+// 	return [currstate[0], txt.slice(currstate[0].length)];
+//     }
+// }
 
 //view
 //render
@@ -117,46 +116,36 @@ outline.Outline.prototype.render_text = function(){
 outline.Outline.prototype.render_textdisplay = function(){
     this.field_el('textarea').hide()
     this.field_el('textdisplay').show()
-    this.field_el('todostate').show()
     var node = this.field_el('textdisplay')
+    var doc = window.collections.get(this.get('documentid'), 'document');
     node.html(
-	outline.color_hashtags(this.get('text'))
+	doc.color(this.get('text'))
     );
     var words = _.words(this.get('text'));
 }
 outline.Outline.prototype.render_textarea = function(){
     this.field_el('textarea').show()
     this.field_el('textdisplay').hide()
-    this.field_el('todostate').hide()
     var node = this.field_el('textarea')
-    var todostate = this.get('todostate')
-    if (todostate){
-	if (!_.startsWith(this.get('text'), ' ')){
-	    node.val(todostate + ' ' + this.get('text'));
-	}else{
-	    node.val(todostate + this.get('text'));
-	}
-    }else{
-	node.val(this.get('text'));	
-    }
+    node.val(this.get('text'));	
     var obj = this;
     window.setTimeout(function(){
 	node.resizeNow.call(node);}, 100);
 }
 
-outline.Outline.prototype.render_todostate = function(){
-    var currstate = this.get('todostate');
-    var todocolors = window.collections.get(this.documentid, 'document').get('todocolors');
-    this.field_el('todostate').html(currstate);
-    if (currstate in todocolors){
-	this.field_el('todostate').css('color', todocolors[currstate]);
-    }else{
-	this.field_el('todostate').css('color', 'black');
-    }
-    //adjust width of text to match size;
-    var obj = this;
+// outline.Outline.prototype.render_todostate = function(){
+//     var currstate = this.get('todostate');
+//     var todocolors = window.collections.get(this.documentid, 'document').get('todocolors');
+//     this.field_el('todostate').html(currstate);
+//     if (currstate in todocolors){
+// 	this.field_el('todostate').css('color', todocolors[currstate]);
+//     }else{
+// 	this.field_el('todostate').css('color', 'black');
+//     }
+//     //adjust width of text to match size;
+//     var obj = this;
 
-}
+// }
 
 outline.Outline.prototype.render_children = function(){
     var ids = this.get('children');
@@ -204,15 +193,10 @@ outline.Outline.prototype.render = function(isroot){
     });
 }
 outline.Outline.prototype.toggle_todo_state = function(){
-    var currstate = this.get('todostate', null);	
-    var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
-    var curridx = _.indexOf(todostates, currstate);
-    if (curridx < 0 || curridx >= todostates.length-1){
-	curridx = 0;
-    }else{
-	curridx = curridx + 1;
-    }
-    this.set('todostate', todostates[curridx]);
+    var document = collections.get(this.get('documentid'), 'document')
+    var newtext = document.transition_todo(this.get('text'))
+    console.log(newtext);
+    this.set('text', newtext);
     this.save();
     this.render();
 }
@@ -251,10 +235,9 @@ outline.Outline.prototype.tree_search = function(txt){
     //searches but also returns
     this.show_all_descendants();
     var tagsearch = _.includes(txt, '#') || _.includes(txt, '@') || _.include(window.active_doc.get('todostates'), txt);
-    console.log(['tagsearch', txt, tagsearch]);
     var f = function (x) {
 	var matched = false;
-	if (_.includes(x.get('text'), txt) || x.get('todostate') == txt){
+	if (_.includes(x.get('text'), txt)){
 	    matched = true;
 	    if (tagsearch){
 		return true;
@@ -388,16 +371,9 @@ var add_new_child = function(obj, index){
 }
 
 outline.Outline.prototype.savetext = function(){
-    console.log('savetext')
-    var todostate;
     var newval = this.field_el('textarea').val();
-    var temp = this.split_todo_state_from_text(newval);
-    console.log(['split', temp]);
-    newval = temp[1];
-    todostate = temp[0];
-    if (newval != this.get('text') || todostate != this.get('todostate')){
+    if (newval != this.get('text')){
 	this.set('text', newval);
-	this.set('todostate', todostate);
 	this.save();
     }
 }
@@ -515,30 +491,34 @@ outline.Document.prototype.save = function(){
     window.collections.save(this.id, this, 'document');
 }
 
-outline.Outline.prototype.state_regex_map = function(states){
+outline.Document.prototype.make_state_regex_map = function(states){
     var state_regex_map = {}
     var r
-    if (!'state_regex_map' in this){
-	_.each(val, function(color, state){
+    if (!('state_regex_map' in this)){
+	_.each(states, function(state){
 	    r = new RegExp(_.sprintf("(^%s)", state));
 	    state_regex_map[state] = r;
 	});
+	this.state_regex_map = state_regex_map;
     }
-    this.state_regex_map = state_regex_map;
 }
-outline.Outline.prototype._todostates_setter = function(states){
+outline.Document.prototype._todostates_setter = function(states){
+    var that = this;
     this.todostates = states;
-    this.state_regex_map(states);
+    this.make_state_regex_map(states);
     var transition_function_map = {};
     _.each(states, 
 	   function(state, index){
 	       if (index == states.length - 1){
 		   transition_function_map[state] = function(txt){
-		       txt.replace(this.state_regex_map[state], '');
+		       txt = txt.replace(that.state_regex_map[state], '');
+		       return txt;
 		   }
 	       } else{
 		   transition_function_map[state] = function(txt){
-		       txt.replace(this.state_regex_map[state], states[index + 1]);
+		       txt = txt.replace(that.state_regex_map[state], 
+					 states[index + 1]);
+		       return txt;
 		   }
 	       }
 	   });
@@ -548,24 +528,26 @@ outline.Outline.prototype._todostates_setter = function(states){
 	}else{
 	    txt = states[0] + " " + txt;
 	}
+	return txt;
     }
     this.transition_function_map = transition_function_map;
 }
 
-outline.Outline.prototype._todocolors_setter = function(val){
-    this.state_regex_map(_.keys(val));
+outline.Document.prototype._todocolors_setter = function(val){
+    var that = this;
+    this.make_state_regex_map(_.keys(val));
     var color_function_map = {};
     _.each(val, 
 	   function(color, state){
 	       color_function_map[state] = function(txt){
-		   r = state_regex_map[state];
+		   r = that.state_regex_map[state];
 		   txt = txt.replace(
 		       r, 
-		       _sprintf("<span style='color:%s'>$1</span>" % color));
+		       _.sprintf("<span style='color:%s'>$1</span>", color));
 		   return txt
 	       }
 	   });
-    this.state_regex_map = state_regex_map;
+    color_function_map[''] = function(x){return x};
     this.color_function_map = color_function_map;
     this.todocolors = val;
 }
@@ -576,12 +558,16 @@ outline.Document.prototype.parse_todostate = function(txt){
 	//and null
 	return x && _.startsWith(txt, x)
     });
-    if (currstate.length == 0){currstate = ''};
-    return currstate
+    if (currstate.length == 0){
+	currstate = ''
+    }else{
+	currstate = currstate[0];
+    }
+    return currstate;
 }
 outline.Document.prototype.transition_todo = function(txt){
     var currstate = this.parse_todostate(txt);
-    txt = this.transition_function_map[currstate][txt];
+    txt = this.transition_function_map[currstate](txt);
     return txt;
 }
 outline.Document.prototype.color_todostate = function(txt){
