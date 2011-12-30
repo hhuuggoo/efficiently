@@ -76,33 +76,7 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
     func(this);
 }
 
-// outline.Outline.prototype._todostate_setter = function(val){
-//     var txt = this.get('text')
-//     var currstate = this.get('todostate');
-//     if (currstate){
-// 	txt = txt.slice(currstate.length);
-// 	if (!_.startsWith(txt, ' ')){
-// 	    txt = " " + txt;
-// 	}
-// 	txt = val + txt;
-// 	this.set('text', txt);
-//     }
-// }
-
-// outline.Outline.prototype.split_todo_state_from_text = function(txt){
-//     var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
-//     var currstate = _.filter(todostates, function(x){
-// 	//have to include x in there, so because every string matches startswith
-// 	//and null
-// 	return x && _.startsWith(txt, x)
-//     });
-//     if (currstate.length == 0){
-// 	return ['', txt];
-//     }else{
-// 	return [currstate[0], txt.slice(currstate[0].length)];
-//     }
-// }
-
+//
 //view
 //render
 outline.Outline.prototype.render_text = function(){
@@ -124,11 +98,11 @@ outline.Outline.prototype.render_textdisplay = function(){
     var words = _.words(this.get('text'));
 }
 outline.Outline.prototype.render_textarea = function(){
-    this.field_el('textarea').show()
-    this.field_el('textdisplay').hide()
     var node = this.field_el('textarea')
     node.val(this.get('text'));	
     var obj = this;
+    this.field_el('textarea').show()
+    this.field_el('textdisplay').hide()
     window.setTimeout(function(){
 	node.resizeNow.call(node);}, 100);
 }
@@ -193,12 +167,13 @@ outline.Outline.prototype.render = function(isroot){
     });
 }
 outline.Outline.prototype.toggle_todo_state = function(){
+    this.savetext();
     var document = collections.get(this.get('documentid'), 'document')
     var newtext = document.transition_todo(this.get('text'))
     console.log(newtext);
     this.set('text', newtext);
-    this.save();
     this.render();
+    this.save();
 }
 
 //view operations
