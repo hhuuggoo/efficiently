@@ -64,7 +64,6 @@ def outline_mongo_to_app(d, user):
     return {'id' : str(d['_id']),
             'text' : d.get('text', ''),
             'username' : user,
-            'todostate' : d.get('todostate',''),
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
@@ -75,7 +74,6 @@ def outline_app_to_mongo(d, user):
     return {'_id' : d['id'],
             'text' : d.get('text', ''),
             'username' : user,
-            'todostate' : d.get('todostate',''),
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
@@ -94,7 +92,7 @@ def create_document(user, title):
          'root_id' : rootid,
          'username':user,
          'title': title,
-         'todostates' : ["TODO", "INPROGRESS", "DONE", None],
+         'todostates' : ["TODO", "INPROGRESS", "DONE"],
          'todocolors': {'TODO' : 'red',
                         'INPROGRESS': 'red',
                         'DONE' : 'green'},
@@ -450,7 +448,6 @@ def outlines_from_text(txt, user, docid, prefix="*"):
         return {'id' : getid(),
                 'text' : txt, 
                 'username' : user,
-                'todostate' : '',
                 'children' : [],
                 'parent': None,
                 'documentid': docid,
@@ -522,7 +519,6 @@ def doc_to_text(document, user, prefix="*"):
 
 def node_to_text(outlines, outline, user, prefix="*", level=0):
     output = "".join(["*" for x in range(level)])
-    output += "" if not outline['todostate'] else outline['todostate']
     output += ' '
     output += outline['text']
 
