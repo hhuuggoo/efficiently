@@ -21,7 +21,7 @@ import hashlib
 import numpy as np
 logging.basicConfig(level=logging.DEBUG)
 
-db.document.update({}, {'$set' : {'todostates': ['TODO','INPROGRESS', 'DONE']}}, False, True)
+db.document.update({}, {'$set' : {'todostates': ['TODO','INPROGRESS', 'DONE']}}, multi=True)
 for outline in db.outline.find():
     try:
         txt = outline['text']
