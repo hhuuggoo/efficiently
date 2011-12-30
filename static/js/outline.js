@@ -404,7 +404,8 @@ outline.Outline.prototype.hook_events = function(){
     });
 
     this.field_el('textarea').blur(function(e){
-	window.item_selector._unselect(obj);	
+	obj.savetext();
+	obj.render_textdisplay();
     });
 
     this.field_el('textarea').keydown(function(e){
