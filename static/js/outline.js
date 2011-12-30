@@ -9,13 +9,13 @@ var outline = {}
 //outline_state, 0, show everything,
 
 outline.Outline = function(id, documentid){
-    this.set('id', id); 
+    this.set('id', id);
+    this.set('documentid', documentid);
     this.set('text', '');
-    this.set('todostate', null);
     this.set('date', null);
     this.set('parent', null);
     this.set('children', []);
-    this.set('documentid', documentid);
+    this.set('todostate', null);
     this.set('status', 'ACTIVE');
     this.dirty = {};
     this.el = null;
@@ -24,8 +24,9 @@ outline.Outline = function(id, documentid){
 
 //data model
 outline.Outline.prototype = new model.Model()
-outline.Outline.prototype.fields = ['username', 'id', 'text', 'todostate', 
-				    'date', 'children', 'parent', 'documentid',
+outline.Outline.prototype.fields = ['documentid', 'username', 'id', 
+				    'text', 'todostate', 
+				    'date', 'children', 'parent',
 				    'status']
 outline.Outline.prototype.save = function(){
     window.collections.save(this.id, this, 'outline');
@@ -76,6 +77,33 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
     func(this);
 }
 
+// outline.Outline.prototype._todostate_setter = function(val){
+//     var txt = this.get('text')
+//     var currstate = this.get('todostate');
+//     if (currstate){
+// 	txt = txt.slice(currstate.length);
+// 	if (!_.startsWith(txt, ' ')){
+// 	    txt = " " + txt;
+// 	}
+// 	txt = val + txt;
+// 	this.set('text', txt);
+//     }
+// }
+
+outline.Outline.prototype.split_todo_state_from_text = function(txt){
+    var todostates = collections.get(this.get('documentid'), 'document').get('todostates')
+    var currstate = _.filter(todostates, function(x){
+	//have to include x in there, so because every string matches startswith
+	//and null
+	return x && _.startsWith(txt, x)
+    });
+    if (currstate.length == 0){
+	return ['', txt];
+    }else{
+	return [currstate[0], txt.slice(currstate[0].length)];
+    }
+}
+
 //view
 //render
 outline.Outline.prototype.render_text = function(){
@@ -85,31 +113,32 @@ outline.Outline.prototype.render_text = function(){
 	this.render_textdisplay();
     }
 }
+
 outline.Outline.prototype.render_textdisplay = function(){
     this.field_el('textarea').hide()
     this.field_el('textdisplay').show()
+    this.field_el('todostate').show()
     var node = this.field_el('textdisplay')
-    node.html(this.get('text'));
+    node.html(
+	outline.color_hashtags(this.get('text'))
+    );
     var words = _.words(this.get('text'));
-    var tags = _.filter(words, function(x){
-	if (x){
-	    return _.startsWith(x, '#') || _.startsWith(x, '@')
-	}
-    });
-    this.field_el('tag').html(tags.join(' '));
 }
 outline.Outline.prototype.render_textarea = function(){
     this.field_el('textarea').show()
     this.field_el('textdisplay').hide()
+    this.field_el('todostate').hide()
     var node = this.field_el('textarea')
-    node.val(this.get('text'));
-    var words = _.words(this.get('text'));
-    var tags = _.filter(words, function(x){
-	if (x){
-	    return _.startsWith(x, '#') || _.startsWith(x, '@')
+    var todostate = this.get('todostate')
+    if (todostate){
+	if (!_.startsWith(this.get('text'), ' ')){
+	    node.val(todostate + ' ' + this.get('text'));
+	}else{
+	    node.val(todostate + this.get('text'));
 	}
-    });
-    this.field_el('tag').html(tags.join(' '));
+    }else{
+	node.val(this.get('text'));	
+    }
     var obj = this;
     window.setTimeout(function(){
 	node.resizeNow.call(node);}, 100);
@@ -360,9 +389,15 @@ var add_new_child = function(obj, index){
 
 outline.Outline.prototype.savetext = function(){
     console.log('savetext')
+    var todostate;
     var newval = this.field_el('textarea').val();
-    if (newval != this.get('text')){
+    var temp = this.split_todo_state_from_text(newval);
+    console.log(['split', temp]);
+    newval = temp[1];
+    todostate = temp[0];
+    if (newval != this.get('text') || todostate != this.get('todostate')){
 	this.set('text', newval);
+	this.set('todostate', todostate);
 	this.save();
     }
 }
@@ -465,7 +500,7 @@ outline.Document = function(){
     this.set('title', '');
     this.set('root_id', null);
     this.set('username', null);
-    this.set('todostates', ["TODO", "INPROGRESS", "DONE", null]);
+    this.set('todostates', ["TODO", "INPROGRESS", "DONE"]);
     this.set('todocolors', {'TODO' : 'red',
 			    'INPROGRESS': 'red',
 			    'DONE' : 'green'})
@@ -478,6 +513,86 @@ outline.Document.prototype.fields = ['id', 'title', 'root_id', 'username',
 				    'todostates', 'todocolors', 'status'];
 outline.Document.prototype.save = function(){
     window.collections.save(this.id, this, 'document');
+}
+
+outline.Outline.prototype.state_regex_map = function(states){
+    var state_regex_map = {}
+    var r
+    if (!'state_regex_map' in this){
+	_.each(val, function(color, state){
+	    r = new RegExp(_.sprintf("(^%s)", state));
+	    state_regex_map[state] = r;
+	});
+    }
+    this.state_regex_map = state_regex_map;
+}
+outline.Outline.prototype._todostates_setter = function(states){
+    this.todostates = states;
+    this.state_regex_map(states);
+    var transition_function_map = {};
+    _.each(states, 
+	   function(state, index){
+	       if (index == states.length - 1){
+		   transition_function_map[state] = function(txt){
+		       txt.replace(this.state_regex_map[state], '');
+		   }
+	       } else{
+		   transition_function_map[state] = function(txt){
+		       txt.replace(this.state_regex_map[state], states[index + 1]);
+		   }
+	       }
+	   });
+    transition_function_map[''] = function(txt){
+	if (_.startsWith(txt, ' ')){
+	    txt = states[0] + txt;
+	}else{
+	    txt = states[0] + " " + txt;
+	}
+    }
+    this.transition_function_map = transition_function_map;
+}
+
+outline.Outline.prototype._todocolors_setter = function(val){
+    this.state_regex_map(_.keys(val));
+    var color_function_map = {};
+    _.each(val, 
+	   function(color, state){
+	       color_function_map[state] = function(txt){
+		   r = state_regex_map[state];
+		   txt = txt.replace(
+		       r, 
+		       _sprintf("<span style='color:%s'>$1</span>" % color));
+		   return txt
+	       }
+	   });
+    this.state_regex_map = state_regex_map;
+    this.color_function_map = color_function_map;
+    this.todocolors = val;
+}
+outline.Document.prototype.parse_todostate = function(txt){
+    var todostates = this.get('todostates')
+    var currstate = _.filter(todostates, function(x){
+	//have to include x in there, so because every string matches startswith
+	//and null
+	return x && _.startsWith(txt, x)
+    });
+    if (currstate.length == 0){currstate = ''};
+    return currstate
+}
+outline.Document.prototype.transition_todo = function(txt){
+    var currstate = this.parse_todostate(txt);
+    txt = this.transition_function_map[currstate][txt];
+    return txt;
+}
+outline.Document.prototype.color_todostate = function(txt){
+    var currstate = this.parse_todostate(txt);
+    txt = this.color_function_map[currstate](txt);
+    return txt;
+}
+outline.Document.prototype.color = function(txt){
+    return this.color_todostate(
+	outline.color_hashtags(
+	    outline.color_atpeople(txt)));
 }
 
 //globals
@@ -654,4 +769,13 @@ function get_matching_text(data){
 	     }
 	  );
     return output
+}
+
+outline.color_hashtags = function(txt){
+    txt = txt.replace(/(^|\s)#(\w+)/g, "$1<span class='hashtag'>#$2</span>");
+    return txt
+}
+outline.color_atpeople = function(txt){
+    txt = txt.replace(/(^|\s)@(\w+)/g, "$1<span class='hashtag'>@$2</span>");
+    return txt
 }

@@ -8,13 +8,7 @@ model.Model.prototype.setter_name = function(field){
 model.Model.prototype.getter_name = function(field){
     return _.sprintf("_%s_getter", field);
 };
-model.Model.prototype.set = function(field, value){
-    if (field == 'text'){
-	console.log(['setting text', value]);
-	if (value == ''){
-	    console.log(['wiping out text']);
-	}
-    }
+model.Model.prototype.set = function(field, value, force_default){
     if (this.setter_name(field) in this){
 	this[this.setter_name(field)](value);
     }else{
