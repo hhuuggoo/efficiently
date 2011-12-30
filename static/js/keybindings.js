@@ -63,27 +63,6 @@ ItemSelector = function(root_node, collections){
 	    return null;
 	}
     }
-    $(document).keydown(
-	function(e){
-	    var func = obj.get_keyfunction(e);
-	    if (func){
-		func.call(obj);
-		return false;
-	    }else{
-		return true;
-	    }
-	}
-    );
-    $(document).keyup(
-	function(e){
-	    var func = obj.get_keyfunction(e);
-	    if (func){
-		return false;
-	    }else{
-		return true;
-	    }
-	}
-    );
     this.deletenode = function(){
 	if (this.curr_node){
 	    var parent = this.collections.get(this.curr_node.parent, 'outline')
@@ -443,5 +422,47 @@ ItemSelector = function(root_node, collections){
 	    node.field_el('textarea').blur();
 	}
     }
+    
+    //bind events
+    $(document).keydown(
+	function(e){
+	    var func = obj.get_keyfunction(e);
+	    if (func){
+		func.call(obj);
+		return false;
+	    }else{
+		return true;
+	    }
+	}
+    );
+    $(document).keyup(
+	function(e){
+	    var func = obj.get_keyfunction(e);
+	    if (func){
+		return false;
+	    }else{
+		return true;
+	    }
+	}
+    );
+    $('#left-button-ctrl').click(function(){
+	obj.move_left();
+    });
+    $('#right-button-ctrl').click(function(){
+	obj.move_right();
+    });
+    $('#up-button-ctrl').click(function(){
+	obj.move_up();
+    });
+    $('#down-button-ctrl').click(function(){
+	obj.move_down();
+    });
+    $('#hide-button-ctrl').click(function(){
+	obj.keyfunctions['toggle_outline'].call(obj);
+    });
+    $('#todo-button-ctrl').click(function(){
+	obj.keyfunctions['toggle_todo'].call(obj);
+    });
+
 }
 

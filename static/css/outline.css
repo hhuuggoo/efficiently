@@ -299,7 +299,18 @@ text-decoration: none;
 padding: .2em 1em;
 }
 
+.nav-button{
+    display : inline;
+    padding : 0;
+}
 
+.control{
+    position : fixed;
+    top : -0px;
+    left : 0px;
+    z-index : 1000;
+    background : white;
+}
 .managelinks{
     display: inline-block;
     margin: 4px 0 5px 0px; 
@@ -324,3 +335,4 @@ padding: .2em 1em;
 .hashtag{
     color : blue;
 }
+
