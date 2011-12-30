@@ -466,3 +466,13 @@ ItemSelector = function(root_node, collections){
 
 }
 
+$(
+    function(){
+	$(document).scroll(
+	    function(){
+		$('.control').css({'top' : window.pageYOffset});
+		$('.control').show();
+		console.log('scroll!')
+	    });
+    }
+)

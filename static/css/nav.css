@@ -23,12 +23,13 @@ padding: .2em 1em;
 }
 
 .control{
-    position : fixed;
     top : 0px;
     left : 0px;
     z-index : 1000;
     background : white;
     height : 20px;
+    display : none;
+    position : relative;
 }
 
 .arrow-up {
