@@ -167,7 +167,6 @@ outline.Outline.prototype.render = function(isroot){
     });
 }
 outline.Outline.prototype.toggle_todo_state = function(){
-    this.savetext();
     var document = collections.get(this.get('documentid'), 'document')
     var newtext = document.transition_todo(this.get('text'))
     console.log(newtext);
@@ -346,6 +345,9 @@ var add_new_child = function(obj, index){
 }
 
 outline.Outline.prototype.savetext = function(){
+    if (!this.field_el('textarea').is(":visible")){
+	return
+    }
     var newval = this.field_el('textarea').val();
     if (newval != this.get('text')){
 	this.set('text', newval);
