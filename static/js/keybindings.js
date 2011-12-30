@@ -396,7 +396,7 @@ ItemSelector = function(root_node, collections){
 	    savetext();
 	}, 1000);
     }
-    //savetext();
+    savetext();
     this._select = function(node){
 	if(node){
 	    this._unselect(this.curr_node);
