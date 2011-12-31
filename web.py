@@ -67,7 +67,8 @@ def outline_mongo_to_app(d, user):
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
-            'status' : d.get('status', 'ACTIVE')}
+            'status' : d.get('status', 'ACTIVE'),
+            'chidden' : d.get('chidden', False)}
 
 def outline_app_to_mongo(d, user):
     assert 'documentid' in d
@@ -77,7 +78,9 @@ def outline_app_to_mongo(d, user):
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
-            'status' : d.get('status', 'ACTIVE')}
+            'status' : d.get('status', 'ACTIVE'),
+            'chidden' : d.get('chidden', False),
+            }
 
 def save_outline(d):
     id_val = d.pop('_id')

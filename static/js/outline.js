@@ -16,6 +16,7 @@ outline.Outline = function(id, documentid){
     this.set('parent', null);
     this.set('children', []);
     this.set('status', 'ACTIVE');
+    this.set('chidden', false);
     this.dirty = {};
     this.el = null;
     this.outline_state = 0;
@@ -26,7 +27,7 @@ outline.Outline.prototype = new model.Model()
 outline.Outline.prototype.fields = ['documentid', 'username', 'id', 
 				    'text',  
 				    'date', 'children', 'parent',
-				    'status']
+				    'status', 'chidden']
 outline.Outline.prototype.save = function(){
     window.collections.save(this.id, this, 'outline');
 }
@@ -185,10 +186,10 @@ outline.Outline.prototype.unshade = function(){
 
 //view properties
 outline.Outline.prototype._child_hidden_getter = function(){
-    return !this.field_el('childcontainer').is(":visible");
+    return this.field_el('childcontainer').css("display") == 'none';
 }
 outline.Outline.prototype._hidden_getter = function(){
-    return !this.el.is(":visible");
+    return this.el.css("display") == 'none';
 }
 
 outline.Outline.prototype.visible_children = function(){
@@ -231,23 +232,29 @@ outline.Outline.prototype.tree_search = function(txt){
     }
     f(this);
 }
-
-
-outline.Outline.prototype.show_children = function(){
-    if (this.get('children').length > 0){
-	this.field_el('childcontainer').show();
-    }else{
+//chdden = child hidden
+outline.Outline.prototype.render_chidden = function(){
+    var chidden = this.get('chidden')
+    if (chidden || this.get('children').length == 0){
 	this.field_el('childcontainer').hide();
+    }else{
+	this.field_el('childcontainer').show();
+	_.each(this.get('children'), function(x){
+	    var child = window.collections.get(x, 'outline');
+	    child.el.show();
+	});
     }
-    _.each(this.get('children'), function(x){
-	var child = window.collections.get(x, 'outline');
-	child.el.show();
-    });
     this.render_hidden();
 }
+outline.Outline.prototype.show_children = function(){
+    this.set('chidden', false);
+    this.render();
+    this.save();
+}
 outline.Outline.prototype.hide_children = function(){
-    this.field_el('childcontainer').hide();
-    this.render_hidden();
+    this.set('chidden', true);
+    this.render();
+    this.save();
 }
 
 outline.Outline.prototype.show_all_descendants = function(){
