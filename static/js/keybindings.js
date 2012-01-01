@@ -190,6 +190,7 @@ ItemSelector = function(root_node, collections){
 	    parent.render();
 	    upper_sibling.render();
 	}
+	obj.select(node);
     }
     this.move_left = function(){
 	var node = this.curr_node
@@ -205,6 +206,7 @@ ItemSelector = function(root_node, collections){
 	grandparent.add_child(node, new_idx);
 	parent.render();
 	grandparent.render();
+	obj.select(node);
     }
     this.move_up = function(){
 	var node = this.curr_node;
@@ -219,6 +221,7 @@ ItemSelector = function(root_node, collections){
 	}
 	parent.render();
 	node.shade();
+	obj.select(node);
     }
     this.move_down = function(){
 	var node = this.curr_node;
@@ -233,6 +236,7 @@ ItemSelector = function(root_node, collections){
 	}
 	parent.render();
 	node.shade();
+	obj.select(node);
     }
     this.search_fade_out = function(){
 	var timestamp = storage.timestamp();
