@@ -81,7 +81,7 @@ outline.Outline.prototype.tree_apply_children_first = function(func, level){
 //view
 //render
 outline.Outline.prototype.render_text = function(){
-    if (this.field_el('textarea').is(":visible")){
+    if (this.field_el('textarea').css("display") != 'none'){
 	this.render_textarea();
     }else{
 	this.render_textdisplay();
@@ -371,9 +371,13 @@ outline.Outline.prototype.hook_events = function(){
 	     var dropping_id = ui.draggable.data()['id'];
 	     var droppingnode = window.collections.get(dropping_id, 'outline');
 	     var droppingparent = window.collections.get(droppingnode.parent, 'outline');
-	     droppingparent.remove_child(droppingnode);
+	     if (droppingparent){
+		 droppingparent.remove_child(droppingnode);
+		 droppingparent.render();
+	     }
+	     //hack to allow for undeleting
+	     obj.set('status', 'ACTIVE');
 	     obj.add_child(droppingnode, 0);
-	     droppingparent.render();
 	     obj.render();
 	     ui.draggable.css(
 		 {'top' : 0 + "px", 'left' : 0 + "px"}
