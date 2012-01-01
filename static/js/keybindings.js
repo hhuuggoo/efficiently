@@ -470,9 +470,9 @@ $(
     function(){
 	$(document).scroll(
 	    function(){
-		$('.control').css({'top' : window.pageYOffset,
+		$('#control').css({'top' : window.pageYOffset,
 				   'left' : window.pageXOffset});
-		$('.control').show();
+		$('#control').show();
 		console.log('scroll!')
 	    });
     }

@@ -14,22 +14,39 @@ text-decoration: none;
 padding: .2em 1em;
 }
 
-.nav-button{
-    display : inline;
-    padding : 0 0 0 0;
-    margin : 0 0 0 0;
-    width : 30px;
-    height : 20px;
-}
-
-.control{
-    top : 0px;
+.control-panel
+{   top : 0px;
     left : 0px;
     z-index : 1000;
-    background : white;
     height : 20px;
     position : relative;
+    width: auto;
+    overflow : hidden;
+    border: 1px black solid;
+    display: inline-block;
+    color : white;
+    background : #aaa;
 }
+.control-panel
+{
+    color : white;
+}
+.control-panel ul
+{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    text-align: center;
+}
+
+.control-panel ul li 
+{
+    display: inline; 
+    text-decoration: none;
+    padding: 10px 10px;
+}
+
+
 
 .arrow-up {
         width: 0;
