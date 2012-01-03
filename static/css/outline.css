@@ -1,5 +1,21 @@
-body{
+/* .title{ */
+/*     margin: 0px 0px 0px 0px; */
+/*     background : #ff3300; */
+/*     float : left; */
+/* } */
+.paper{
     background-color: #f7f7f7;
+    border-style : solid;
+    border-color : #f7f7f7;
+    border-top : 30px solid #f7f7f7;
+    border-bottom : 30px solid #f7f7f7;
+    border-left : 15px solid #f7f7f7;
+    border-right: 15px solid #f7f7f7;
+    box-shadow: 10px 10px 5px #888;   
+    border-radius : 10px;
+}
+body{
+    background-color: #ccccee;
 }
 div {
     font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
