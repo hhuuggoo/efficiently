@@ -26,6 +26,8 @@ padding: .2em 1em;
     display: inline-block;
     color : white;
     background : #aaa;
+    cursor : pointer;
+    box-shadow: 4px 4px 2px #888;
 }
 .control-panel
 {
@@ -43,7 +45,7 @@ padding: .2em 1em;
 {
     display: inline; 
     text-decoration: none;
-    padding: 10px 10px;
+    padding: 5px 5px;
 }
 
 
