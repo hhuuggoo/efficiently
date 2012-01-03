@@ -467,6 +467,16 @@ ItemSelector = function(root_node, collections){
     $('#todo-button-ctrl').click(function(){
 	obj.keyfunctions['toggle_todo'].call(obj);
     });
+    $('#add-button-ctrl').click(function(){
+	if (obj.curr_node){
+	    addsibling(obj.curr_node);
+	}
+    });
+    $('#del-button-ctrl').click(function(){
+	if (obj.curr_node){
+	    deletenode(obj.curr_node);
+	}
+    });
 
 }
 
