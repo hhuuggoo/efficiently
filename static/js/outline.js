@@ -169,6 +169,7 @@ outline.Outline.prototype.render = function(isroot){
 }
 outline.Outline.prototype.toggle_todo_state = function(){
     var document = collections.get(this.get('documentid'), 'document')
+    this.savetext();
     var newtext = document.transition_todo(this.get('text'))
     console.log(newtext);
     this.set('text', newtext);
