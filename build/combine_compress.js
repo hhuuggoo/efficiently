@@ -1,5 +1,5 @@
 [{"name" : "basejs",
-  "compressor" : "java -jar build/yuicompressor-2.4.7.jar",
+  "compressor" : "java -jar build/yuicompressor-2.4.7.jar --type=js",
   "inputs" : ["static/js/underscore.js",
 	      "static/js/jquery-1.6.4.min.js",
 	      "static/js/jquery.autoresize.js",
@@ -9,5 +9,19 @@
   "output" : "static/js/base.min.js",
   "output_link" : "/static/js/base.min.js",
   "html_dirs" : ["templates"],
-  "type" : "js"}]
+  "type" : "js"},
+ {"name" : "basecss",
+  "compressor" : "java -jar build/yuicompressor-2.4.7.jar --type=css",
+  "inputs" : ["static/themes/base/jquery.ui.all.css",
+	      "static/css/base.css",
+	      "static/css/skeleton.css",
+	      "static/css/layout.css",
+	      "static/css/outline.css",
+	      "static/css/nav.css"
+	     ],
+  "output" : "static/css/base.min.css",
+  "output_link" : "/static/css/base.min.js",
+  "html_dirs" : ["templates"],
+  "type" : "css"}
+]
 
