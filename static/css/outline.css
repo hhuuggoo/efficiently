@@ -1,3 +1,6 @@
+body{
+    background-color: #f7f7f7;
+}
 div {
     font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
 }
@@ -196,11 +199,14 @@ button{
     cursor: pointer;
 }
 .ui-state-hover{
-    background : #eee
+    background : #e7e7e7;
 }
-
+.dragging{
+    background : #e0e0e0;
+    box-shadow: 4px 4px 2px #888;   
+}
 .shade{
-    background: #eee
+    background: #e7e7e7;
 }
 .test{
     width:100%;

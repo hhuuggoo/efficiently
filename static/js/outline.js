@@ -344,6 +344,7 @@ var addsibling = function(obj){
     parent.render();
     window.item_selector.select(newnode);
 }
+
 var add_new_child = function(obj, index){
     var newnode = new outline.Outline(window.collections.new_id(),
 				      obj.get('documentid'))
@@ -449,8 +450,8 @@ outline.Outline.prototype.hook_events = function(){
 	'helper': function(){
 	    var node =  $(obj.field_el('content')).clone();
 	    $('textarea', node).val(obj.get('text'));
-	    node.css({'background' : 'silver', 
-		      'width' : obj.field_el('content').width() + "px"})
+	    node.addClass('dragging');
+	    node.css({'width' : obj.field_el('content').width() + "px"})
 	    return node;
 	}
     });
