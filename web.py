@@ -603,4 +603,6 @@ if __name__ == "__main__":
         mail_listener.start()
     server = tornadio.server.SocketServer(
         application,
+        ssl_options={'certfile' : "/etc/nginx/server.crt",
+                     'keyfile' : "/etc/nginx/server.key"}
         )
