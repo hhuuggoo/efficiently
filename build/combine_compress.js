@@ -12,7 +12,9 @@
   "type" : "js"},
  {"name" : "basecss",
   "compressor" : "java -jar build/yuicompressor-2.4.7.jar --type=css",
-  "inputs" : ["static/themes/base/jquery.ui.all.css",
+  "inputs" : ["static/themes/base/jquery.ui.base.css",
+	      "static/themes/base/jquery.ui.theme.css",
+	      "static/themes/base/jquery.ui.core.css",
 	      "static/css/base.css",
 	      "static/css/skeleton.css",
 	      "static/css/layout.css",
@@ -20,8 +22,20 @@
 	      "static/css/nav.css"
 	     ],
   "output" : "static/css/base.min.css",
-  "output_link" : "/static/css/base.min.js",
+  "output_link" : "/static/css/base.min.css",
   "html_dirs" : ["templates"],
-  "type" : "css"}
+  "type" : "css"},
+ {"name" : "outlinejs",
+  "compressor" : "java -jar build/yuicompressor-2.4.7.jar --type=js",
+  "inputs" : ["static/js/localstorage.js",
+	      "static/js/model.js",
+	      "static/js/outline.js",
+	      "static/js/keybindings.js",
+	      "static/js/sockets.js",
+	      "static/js/socket.io.js"],
+  "output" : "static/js/outline.min.js",
+  "output_link" : "/static/js/outline.min.js",
+  "html_dirs" : ["templates"],
+  "type" : "js"}
 ]
 
