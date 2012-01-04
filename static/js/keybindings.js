@@ -15,6 +15,8 @@ var R_BRACKET = 221;
 var FADEOUT_DELAY = 4000;
 var ENTER = 13;
 var BACKSPACE = 8;
+var O_KEY = 79;
+
 window.modified = function(e){
     return e.ctrlKey || e.shiftKey || e.altKey
 }
@@ -58,8 +60,9 @@ ItemSelector = function(root_node, collections){
 	    return this.keyfunctions['isearch_down'];
 	}else if (e.keyCode == L_BRACKET && nsmodified){
 	    return this.keyfunctions['isearch_up'];
-	}
-	else{
+	}else if (e.keyCode == O_KEY && nsmodified){
+	    return this.keyfunctions['focus_filter'];
+	}else{
 	    return null;
 	}
     }
@@ -389,7 +392,10 @@ ItemSelector = function(root_node, collections){
 	},
 	'isearch_up': this.isearch_up,
 	'isearch_down':this.isearch_down,
-    	'focus_isearch': this.focus_isearch
+    	'focus_isearch': this.focus_isearch,
+	'focus_filter' : function(){
+	    window.active_doc.field_el('search').focus();
+	}
     }
     $('#searchbox').hide();
     var savetext = function(){
