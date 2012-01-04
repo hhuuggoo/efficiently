@@ -594,7 +594,14 @@ if __name__ == "__main__":
     try:
         process_mail = sys.argv[1].lower() == 'true'
     except:
-        process_mail == True
+        process_mail == False
+    
+    try:
+        port = int(sys.argv[2])
+        settings.settings['socket_io_port'] = port
+    except:
+        pass
+    
     if process_mail:
         print 'checking mail'
         mail_listener = tornado.ioloop.PeriodicCallback(check_mail,
