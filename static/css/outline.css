@@ -18,6 +18,7 @@
 }
 body{
     background-color: #aaa;
+    background-image : url("light_honeycomb.png");
 }
 div {
     font: 14px arial,sans-serif;
