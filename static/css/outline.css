@@ -13,12 +13,14 @@
     border-right: 15px solid #f7f7f7;
     box-shadow: 10px 10px 5px #888;   
     border-radius : 10px;
+    margin-top : 30px;
+    margin-bottom: 60px;
 }
 body{
-    background-color: #ccccee;
+    background-color: #aaa;
 }
 div {
-    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font: 14px arial,sans-serif;
 }
 
 ul ul, ul ol,
@@ -59,7 +61,7 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     overflow: hidden;
     resize: none;
     clear: none;
-    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 14px arial,sans-serif;
     background: inherit;
 }
 
@@ -123,7 +125,7 @@ textarea{
     overflow: hidden;
     resize: none;
     clear: none;
-    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 14px arial,sans-serif;
     background: inherit;
 }
 
@@ -146,13 +148,13 @@ textarea:focus{
     overflow: hidden;
     resize: none;
     clear: none;
-    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 14px arial,sans-serif;
     background: inherit;
 
 }
 
 .testtext{
-    font: 14px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font: 14px arial,sans-serif;
 }
 
 .edge{
