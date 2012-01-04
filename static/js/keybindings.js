@@ -54,9 +54,9 @@ ItemSelector = function(root_node, collections){
 	    return this.keyfunctions['toggle_todo'];
 	}else if (e.keyCode == P_KEY && nsmodified){
 	    return this.keyfunctions['focus_isearch']
-	}else if (e.keyCode == L_BRACKET && nsmodified){
-	    return this.keyfunctions['isearch_down'];
 	}else if (e.keyCode == R_BRACKET && nsmodified){
+	    return this.keyfunctions['isearch_down'];
+	}else if (e.keyCode == L_BRACKET && nsmodified){
 	    return this.keyfunctions['isearch_up'];
 	}
 	else{
