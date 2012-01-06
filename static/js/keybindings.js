@@ -102,9 +102,9 @@ ItemSelector = function(root_node, collections){
 	    this.select(this.collections.get(
 		this.root_node.visible_children()[0], 'outline'));
 	}else{
-	    this.unselect(this.curr_node);
 	    var next_node = this.find_lower_visible_node(this.curr_node);
 	    if (next_node){
+		this.unselect(this.curr_node);
 		this.select(next_node);
 	    }
 	}
@@ -474,8 +474,10 @@ ItemSelector = function(root_node, collections){
 	obj.keyfunctions['toggle_todo'].call(obj);
     });
     $('#add-button-ctrl').click(function(){
-	if (obj.curr_node){
+	if (obj.curr_node && obj.curr_node.get('status') == 'ACTIVE'){
 	    addsibling(obj.curr_node);
+	}else{
+	    add_new_child(obj.root_node);
 	}
     });
     $('#del-button-ctrl').click(function(){

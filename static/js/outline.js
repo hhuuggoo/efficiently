@@ -730,7 +730,12 @@ $(function(){
 	    });
 	global_event_hooks();
 	window.register_sockets();
-	window.item_selector.cursor_down();
+	if (root.get('children').length == 0){
+	    add_new_child(root);
+	    root.render();
+	}else{
+	    window.item_selector.cursor_down();
+	}
 	//window.item_selector.select(curr_node);
     });
 });
