@@ -8,7 +8,7 @@ settings = {
     'login_url' : '/login',
     'ssl_options' : {'certfile' : "/etc/nginx/server.crt",
                      'keyfile' : "/etc/nginx/server.key"},
-    'enabled_protocols' : ['websocket', 'xhr-multipart', 'xhr-polling'],
+    'enabled_protocols' : ['xhr-multipart', 'xhr-polling'],
     'socket_io_port' : 9000
     }
 
