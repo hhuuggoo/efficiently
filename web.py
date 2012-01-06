@@ -13,7 +13,7 @@ import tornadio.server
 import numpy as np
 import hashlib
 import sys
-
+import numpy as np
 
 conn = pymongo.Connection()
 db = conn['task']
@@ -25,7 +25,9 @@ import numpy as np
 logging.basicConfig(level=logging.DEBUG)
 
 def getid():
-    return hashlib.sha1(str(pymongo.objectid.ObjectId())).hexdigest()
+    return hashlib.sha1(
+        str(pymongo.objectid.ObjectId()) + str(np.random.random())
+        ).hexdigest()
 
 hostname = "localhost"
 def doc_mongo_to_app(d, user):
