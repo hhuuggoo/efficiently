@@ -1,7 +1,7 @@
 $(function(){
     window.register_sockets = function(){
 	window.active_doc.socket_subscriber = new io.Socket(
-	    window.location.hostname, {'port': 443, 'secure' : true, 'rememberTransport':true}
+	    window.location.hostname, {'port': 443, 'secure' : true, 'rememberTransport':false}
 	)
 	window.active_doc.socket_subscriber.connect()
 	window.active_doc.socket_subscriber.render_queue = {}
