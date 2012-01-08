@@ -29,6 +29,7 @@
   "compressor" : "java -jar build/yuicompressor-2.4.7.jar --type=js",
   "inputs" : ["static/js/localstorage.js",
 	      "static/js/model.js",
+	      "static/js/parser.js",
 	      "static/js/outline.js",
 	      "static/js/keybindings.js",
 	      "static/js/socket.io.js",
