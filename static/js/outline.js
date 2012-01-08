@@ -210,28 +210,27 @@ outline.Outline.prototype.visible_children = function(){
 outline.Outline.prototype.tree_search = function(txt){
     //searches but also returns
     this.show_all_descendants();
-    var tagsearch = _.includes(txt, '#') || _.includes(txt, '@') || _.include(window.active_doc.get('todostates'), txt);
-    var f = function (x) {
-	var matched = false;
-	if (_.includes(x.get('text'), txt)){
-	    matched = true;
-	    if (tagsearch){
-		return true;
-	    }
-	}
-	var children_matched = _.map(x.get('children'), function(cid){
-	    return f(window.collections.get(cid, 'outline'));
+    var egraph = expression_graph(txt);
+    var regexes = [/(^|\s)@(\w+)/g, /(^|\s)#(\w+)/g]
+    var matched = false;
+    regexes = regexes.concat(_.values(window.active_doc.state_regex_map));
+    var f = function (node, tags_found) {
+	//tags_found, is a dict, value true for tags we have found
+	_.extend(tags_found,  get_tags(node.get('text'), regexes));
+	matched = eval_expression_graph(egraph, node.get('text'), tags_found);
+	var children_matched = _.map(node.get('children'), function(cid){
+	    return f(window.collections.get(cid, 'outline'), _.clone(tags_found));
 	})
 	if (!_.any(children_matched) && !matched){
-	    x.el.hide();
+	    node.el.hide();
 	    return false;
 	}else{
-	    x.render_hidden();
+	    node.render_hidden();
 	    return true;
 	}
 	
     }
-    f(this);
+    f(this, {});
 }
 //chdden = child hidden
 outline.Outline.prototype.render_chidden = function(){
