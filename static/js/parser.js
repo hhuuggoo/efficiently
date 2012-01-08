@@ -15,7 +15,7 @@ function parentheses_words(input_string){
 	    matching_parens -= 1;
 	    if (matching_parens == 0){
 		token = input_string.slice(start, i + 1);
-		words.push(token)
+		words.push(token);
 		start = i+1;
 	    }
 	}
@@ -45,7 +45,7 @@ function expression_graph(input_string){
 	    curr_op = new_op;
 	    global_op = new_op;
 	}else if ('right' in curr_op){
-	    console.log(['ERROR', input_string, currword])
+	    console.log(['ERROR', input_string, currword]);
 	}else{
 	    curr_op['right'] = new_op;
 	    curr_op = new_op;
@@ -84,9 +84,9 @@ function eval_match(arg, txt, tags){
 
 function eval_expression_graph(op, txt, tags){
     if (op['op'] == 'and'){
-	return eval_expression_graph(op['left'], txt, tags) && eval_expression_graph(op['right'], txt, tags)
+	return eval_expression_graph(op['left'], txt, tags) && eval_expression_graph(op['right'], txt, tags);
     }else if (op['op'] == 'or'){
-	return eval_expression_graph(op['left'], txt, tags) || eval_expression_graph(op['right'], txt, tags)
+	return eval_expression_graph(op['left'], txt, tags) || eval_expression_graph(op['right'], txt, tags);
     }else if (op['op'] == 'not'){
 	return !eval_expression_graph(op['right'], txt, tags);
     }else{
@@ -107,6 +107,6 @@ function get_tags(txt, regexes){
 	    tags[match] = true;
 	});
     });
-    return tags
+    return tags;
 }
     

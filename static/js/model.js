@@ -80,7 +80,7 @@ model.Model.prototype.render_function = function(field){
 
 model.Model.prototype.render_field = function(field){
     $("#" + this.field_id(field), this.el).html(this.get(field));
-}
+};
 
 model.Model.prototype.render = function(isroot){
     if (!this.el){
@@ -94,9 +94,9 @@ model.Model.prototype.render = function(isroot){
 	    delete obj.dirty[f];
 	}
     });
-}
+};
 
 model.Model.prototype.template = function(){
-}
+};
 model.Model.prototype.hook_events = function(){
-}
+};
