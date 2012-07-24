@@ -306,7 +306,7 @@ class DocView(AliasedUserHandler):
         DocView.top_id += 1
         document = db.document.find_one({'username':self.current_user,
                                          '_id' : self.docid})
-        self.render("templates/outline.html", root_id=document['root_id'],
+        self.render("templates/newoutline.html", root_id=document['root_id'],
                     document_id=document['_id'], mode=self.mode,
                     user=self.real_user, title=document['title'],
                     owner=self.current_user, client_id=DocView.top_id)

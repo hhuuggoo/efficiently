@@ -1,0 +1,49 @@
+{% extends "newbase.html" %}
+{% block other_scripts%}
+<!-- start outlinejs -->
+<script src="/static/js/localstorage.js"></script>
+<script src="/static/js/parser.js"></script>
+<!-- end outlinejs -->
+<script type="text/template" id="outline-template">
+  <div id="<%= id %>" class="outline clearfix ">
+    <div class="clearfix ">
+      <div id="<%= id%>-content" class="content ">
+	<div class="fakedotcontainer" id="<%= id%>-fakedotcontainer">
+	  <image class="fakedot"> </image>	  
+	</div>
+	<div class="hideindicator" id="<%= id %>-hideindicator"></div>
+	<div class="abox outline-input" id="<%= id %>-text">
+	  <textarea id="<%= id %>-textarea" 
+		    class="outline-input" style="display:none"></textarea>
+	  <div id="<%= id %>-textdisplay" class="outline-textdisplay"></div>
+	</div>
+      </div>
+      <div class="clearfix">
+	<div id="<%= id%>-childcontainer" class="clearfix">
+	  <div class="edge" id="<%= id %>-topedge"></div>
+	  <div class="fakedotcontainer" id="<%= id%>-childspacer"></div>
+	  <div class="abox">
+	    <div id="<%= id %>-children" class="children"></div>
+	  </div>
+	</div>
+	<div class="edge" id="<%= id %>-bottomedge"></div>
+      </div>
+    </div>
+</script>
+<script type="text/template" id="root-template">
+  <div id="<%= id %>" class="outline clearfix ">
+    <div id="<%= id%>-childcontainer" class="clearfix">
+      <div id="<%= id %>-children" class=" clearfix">
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/template" id="doc-template">
+</script>
+
+
+{% end %}
+
+{% block main %}
+
+{% end %}
