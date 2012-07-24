@@ -9,7 +9,7 @@ settings = {
     'ssl_options' : {'certfile' : "/etc/nginx/server.crt",
                      'keyfile' : "/etc/nginx/server.key"},
     'enabled_protocols' : ['xhr-multipart', 'xhr-polling'],
-    'socket_io_port' : 9000
+    'socket_io_port' : 9010
     }
 
 

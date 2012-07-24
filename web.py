@@ -16,7 +16,7 @@ import sys
 import numpy as np
 
 conn = pymongo.Connection()
-db = conn['task']
+db = conn['taskdev']
 db.user.ensure_index([('username',1)], unique=True)
 import logging
 #import mail
@@ -612,6 +612,6 @@ if __name__ == "__main__":
         mail_listener.start()
     server = tornadio.server.SocketServer(
         application,
-        ssl_options={'certfile' : "/etc/nginx/server.crt",
-                     'keyfile' : "/etc/nginx/server.key"}
+        # ssl_options={'certfile' : "/etc/nginx/server.crt",
+        #              'keyfile' : "/etc/nginx/server.key"}
         )
