@@ -2,30 +2,30 @@
 {% block other_scripts%}
 {% end %}
 {% block main %}
-<div class="eight columns clearfix alpha">
-
-  <ul class="square">
-    <li>Create a New Document
-      <form action="/create"
-	    class="" method="post">
-	<label for="create">
-	  Title
-	</label>
-	<input type="text" id="create" name="title"/>
-	<input type='submit'/>
-      </form>
-    </li>
-    {% for doc in documents %}
-    <li class="docconfig">
-      <div>
-	<a href="/docview/rw/{{doc['id']}}">{{doc['title']}}</a>
-	<div class="configuretag">(click here to configure)</div>
-      </div>
-      <form action="/manage/{{doc['id']}}" 
-	    class="hide manageform" method="post">
-	<br>
-	<input id="delete-{{doc['id']}}" type="checkbox" name="delete">
-	Delete this document (warning! cannot be undone!)
+<div class="row-fluid">
+  <div class="span8">
+    <ul class="square">
+      <li>Create a New Document
+	<form action="/create"
+	      class="" method="post">
+	  <label for="create">
+	    Title
+	  </label>
+	  <input type="text" id="create" name="title"/>
+	  <input type='submit'/>
+	</form>
+      </li>
+      {% for doc in documents %}
+      <li class="docconfig">
+	<div>
+	  <a href="/docview/rw/{{doc['id']}}">{{doc['title']}}</a>
+	  <div class="pull-right configuretag">(click here to configure)</div>
+	</div>
+	<form action="/manage/{{doc['id']}}" 
+	      class="hide manageform" method="post">
+	  <br>
+	  <input id="delete-{{doc['id']}}" type="checkbox" name="delete">
+	  Delete this document (warning! cannot be undone!)
 	</input>
 	<br>
 	<br>
@@ -60,16 +60,14 @@
 	   id="rlink-{{doc['id']}}" href="/docview/r/{{doc['id']}}">
 	  {{root_url}}docview/r/{{doc['id']}}
 	</a>
-	<br>
 	{% end %}
+	<br>
 	<input type='submit'/>
 	</form>
-    </li>
-    {% end %}
-  </ul>
-</div>
-<div class="eight columns clearfix omega">
-</div>
+      </li>
+      {% end %}
+    </ul>
+  </div>
 </ul>
 </div>
 <script type="text/javascript">

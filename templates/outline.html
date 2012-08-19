@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block other_scripts%}
+<link rel="stylesheet" type="text/css" 
+      href="/static/css/outline.css"/>
+
 <div class="item-controls hide">
   <button class="ctrl-button" id="add-button">add</button>
   <button class="ctrl-button"  id="state-button">todo</button>
@@ -92,8 +95,8 @@
   <textarea class="searchtext" id="searchtext"></textarea>
   <div>Incremental Search Alt + [ and alt + ] to search forward and backwards</div> 
 </div>
-<div>
-  <div class="ten columns clearfix alpha">
+<div class="row-fluid">
+  <div class="span8">
     <div id="connected"></div>
     <h4>{{ title }}: by {{ owner }}</h4>
     {% if mode == 'r' %}
@@ -117,7 +120,7 @@
       </div>
     </div>
   </div>
-  <div class="six columns clearfix omega">
+  <div class="span4">
     <h4>Instructions</h4>
     <ul class="square">
       <li>
