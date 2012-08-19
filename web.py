@@ -198,7 +198,7 @@ class Register(SmartDocRedirector):
 
 class Login(SmartDocRedirector):
     def get(self):
-        self.render("templates/login.html", user=None);
+        self.render("templates/splash.html", user=None);
         
     def post(self):
         username = self.get_argument('username')
@@ -575,9 +575,7 @@ application = tornado.web.Application([(r"/register", Register),
                                        (r"/login", Login),
                                        (r"/about", About),
                                        (r"/logout", Logout),
-                                       
                                        (r"/", SmartDocRedirector),
-
                                        (r"/manage/(.*)", Manage),
                                        (r"/manage", Manage),
                                        (r"/create", Create),

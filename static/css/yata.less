@@ -1,35 +1,49 @@
-.subnav {
-  width: 100%;
-  height: 36px;
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 ); /* IE6-9 */
-  border: 1px solid #e5e5e5;
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
+.subnav{
+  background-color : @dark;
+  border-radius : 5px;  
+  margin-top : 15px;
+  margin-left : 0px;  
 }
 .subnav .nav {
   margin-bottom: 0;
 }
+.subnav .nav > li{
+  float : right;
+}
 .subnav .nav > li > a {
   margin: 0;
-  padding-top:    11px;
-  padding-bottom: 11px;
+  border-radius: 0;
   -webkit-border-radius: 0;
      -moz-border-radius: 0;
-          border-radius: 0;
 }
 
-@background : #FFFFF;
+@background : #fff;
 @ultralight : #CDE8FF;
 @light : #64B5FF;
 @mid : #1671D4;
-@dark : #1E2322;
-@ultradark : #0D0D0D;
+@dark : #485451;
+@ultradark : #1E2322;
+
 body {
   background-color : @background;
+  margin-top : 10px;
+  background-image:url('bg.png');  
 }
-.mynav {
+.myactive{
   background-color : @dark;
+}
+.logo{
+  fill : @light;
+}
+.bgrect {
+  fill : none;
+}
+.splitter {
+  fill : #ccc;
+  overflow : hidden;
+}
+
+.mynav {
 }
 .subnav .nav > li > a {
   color : @background;
@@ -59,4 +73,36 @@ html, body{
 
 .wrap{
   min-height : 100%	
+}
+
+.header{
+  margin: 0;
+  border-radius : 15px;
+}
+
+.logofg{
+  fill : white;
+}
+
+.logobg{
+  fill : @mid;
+}
+
+.bigstart{
+  font-family : Open Sans Condensed;
+  font-size : 400%;
+}
+.bigend{
+  font-family : Open Sans Condensed;
+  font-size : 150%;
+}
+.heading{
+  font-family : Open Sans Condensed;
+  text-align : center;
+}
+
+.mainsep{
+  margin: 20px 0;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid white;
 }

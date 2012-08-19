@@ -7,7 +7,7 @@
 	  href="/static/themes/base/jquery.ui.all.css">
     <link rel="stylesheet/less" 
 	  href="/static/vendor/bootstrap/less/bootstrap.less" type="text/css" >
-    <link href='http://fonts.googleapis.com/css?family=Lobster|Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lobster Two|Open+Sans|Open+Sans+Condensed:300|Courgette|Boogaloo rel='stylesheet' type='text/css'>    
     <link rel="stylesheet/less" type="text/css" href="/static/css/yata.less"/>    
     <!-- end basecss -->
 
@@ -26,48 +26,42 @@
     {% end %}
     <script src="/static/vendor/less/less-1.3.0.min.js" type="text/javascript"></script>        
     <body>
-      <div class="wrap">
-	<br>
-	<div class="container">
-	  <div class="row">	
-	    <div class="span3">
-	      {% include narrowlogo.html %}
-	    </div>
+      <div class="container-fluid wrap">
+	<div class="row-fluid titlerow">
+	  <div class="span4 header">	
+	    {% include narrowlogo.html %}
 	  </div>
-	  <div class="row-fluid">		
-	    <div class="span12">
-	      <div class="subnav mynav">
-		<ul class="nav nav-pills">
-		  {% if user is not None %}
-		  <li><a href="/manage">Documents</a></li>
-		  {% end %}
-		  {% if 'document_id' in globals() and handler.mode == 'rw'%}
-		  <li><a href="/import/{{ document_id }}">Import</a></li>
-		  {% end %}
-		  {% if 'document_id' in globals() %}
-		  <li><a href="/export/{{ document_id }}">Export</a></li>
-		  {% end %}
-		</ul>
-		<ul class="nav nav-pills">
-		  {% if user is not None %}		  
-		  <li>
-		    <a href="/manage">Logged in as <strong> {{user}} </strong> </a>
-		  </li>
-
-		  <li>
-		    <a href="/logout">Logout</a>
-		  </li>
-		  {% else %}
-		  <li><a href="/login">Login</a></li>
-		  <li><a href="/register">Register</a></li>
-		  {% end %}	      
-		</ul>
-	      </div>
-	      
-	    </div>
-	  </div>      
+	  <div class="span8 subnav">
+	    <ul class="nav nav-pills" style="">
+	      {% if user is not None %}
+	      <li><a href="/manage">Documents</a></li>
+	      {% end %}
+	      {% if 'document_id' in globals() and handler.mode == 'rw'%}
+	      <li><a href="/import/{{ document_id }}">Import</a></li>
+	      {% end %}
+	      {% if 'document_id' in globals() %}
+	      <li><a href="/export/{{ document_id }}">Export</a></li>
+	      {% end %}
+	      {% if user is not None %}		  
+	      <li>
+		<a href="/manage">Logged in as <strong> {{user}} </strong> </a>
+	      </li>
+	      <li>
+		<a href="/logout">Logout</a>
+	      </li>
+	      {% else %}
+	      <li><a href="/login">Login</a></li>
+	      <li class="myactive"><a href="/register">Register</a></li>
+	      {% end %}	      
+	    </ul>
+	  </div>
+	  <!-- <div class="row-fluid">	   -->
+	  <!--   <div class="span12 splitter"> -->
+	  <!--   {% include splitter.html %} -->
+	  <!--   </div> -->
+	  <!-- </div> -->
+	  <br>
 	</div>
-	<br>
 	{% block main %}
 	
 	{% end %}
