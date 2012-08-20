@@ -128,7 +128,7 @@ textarea{
 }
 
 textarea:focus{
-    line-height : 20px;
+    line-height : 18px; 
     border: 0;
     padding: 0;
     outline: none;
@@ -220,7 +220,7 @@ button{
     box-shadow: 4px 4px 2px #888;   
 }
 .shade{
-    background: #e7e7e7;
+    background: #CDE8FF;
 }
 .test{
     width:100%;
@@ -268,14 +268,14 @@ button{
     margin: 0px 0px 0px 7px;
     height: 18px;
     padding: 0px 0px 0px 0px;
-    border: 3px solid #ccc;    
+    border: 3px solid #64B5FF;    
 }
 .search:focus{
     width: 70%;
     margin: 0px 0px 0px 7px;
     height: 18px;
     padding: 0px 0px 0px 0px;
-    border: 3px solid #ccc;    
+    border: 3px solid #1671D4;    
 }
 
 .debug{
@@ -287,19 +287,23 @@ button{
     width:90%;
     height:18px;
     margin: 0px 0px 0px 0px;
-    padding: 0px 7px 0px 7px;
-    border: 3px solid #aaa;    
+    padding: 3px 7px 3px 7px;
+    color: white;
+    background-color:#485451;
+    border: 3px solid #1E2322;
+
 }
 .searchbox{
     position: fixed;
     bottom:0px;
     right:0px;
     opacity:1.0;
-    background-color:#ddd;
-    border: 3px solid #aaa;
     z-index:100;
     margin: 10px 10px 10px 10px;
     padding: 10px 10px 10px 10px;
+    color: white;
+    background-color:#485451;
+    border: 3px solid #1E2322;
 
 }
 
