@@ -147,7 +147,7 @@ textarea:focus{
     resize: none;
     clear: none;
     background: inherit;
-
+    width: 100%;
 }
 
 .testtext{
