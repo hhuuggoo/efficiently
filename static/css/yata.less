@@ -1,3 +1,27 @@
+.splashmiddle{
+  padding-top : 30px;
+  color : white;
+  background-color: @dark;
+  background-image: -moz-linear-gradient(top, @splashmiddlestart, @splashmiddleend);
+  background-image: -ms-linear-gradient(top, @splashmiddlestart, @splashmiddleend);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@splashmiddlestart), to(@splashmiddleend));
+  background-image: -webkit-linear-gradient(top, @splashmiddlestart, @splashmiddleend);
+  background-image: -o-linear-gradient(top, @splashmiddlestart, @splashmiddleend);
+  background-image: linear-gradient(top, @splashmiddlestart, @splashmiddleend);
+}
+.titlerow{
+  background-color: @dark;
+  background-image: -moz-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -ms-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@navbarstart), to(@navbarend));
+  background-image: -webkit-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -o-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: linear-gradient(top, @navbarstart, @navbarend);
+  margin : 0px;
+}
+.navbar {
+  margin : 0px;
+}
 .subnav{
   background-color : @dark;
   border-radius : 5px;  
@@ -23,10 +47,13 @@
 @mid : #1671D4;
 @dark : #485451;
 @ultradark : #1E2322;
+@navbarstart : @ultradark;
+@navbarend : @dark;
+@splashmiddlestart : @mid;
+@splashmiddleend : @light;
 
 body {
   background-color : @background;
-  margin-top : 10px;
   background-image:url('bg.png');  
 }
 .myactive{
@@ -45,24 +72,27 @@ body {
 
 .mynav {
 }
-.subnav .nav > li > a {
-  color : @background;
-}
 
-.nav > li > a:hover {
+.navbar .nav > li > a:hover {
   text-decoration: none;
   background-color: @ultralight;
   color : @dark;
 }
-.nav > li > a {
+.navbar .nav > li > a {
   text-decoration: none;
-  color: @ultralight;
+  color: white;
 }
 
 footer{
   background-color : @dark;
   color : white;
   padding : 10px;
+  background-image: -moz-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -ms-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@navbarstart), to(@navbarend));
+  background-image: -webkit-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: -o-linear-gradient(top, @navbarstart, @navbarend);
+  background-image: linear-gradient(top, @navbarstart, @navbarend);
 }
 footer  a {
   color: @light;
@@ -107,4 +137,14 @@ li{
   margin: 20px 0;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid white;
+}
+
+.wrap{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+}
+
+html,body{
+  height : 100%;
 }
