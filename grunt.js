@@ -56,12 +56,22 @@ module.exports = function(grunt) {
                 dest: 'static/js',
                 bare: false,
             },
+	    yatatest : {
+                dir: 'static/coffee/test',
+                dest: 'static/js/test',
+                bare: false,
+	    }
         },
         watch: {
             yata: {
                 files: 'static/coffee/*.coffee',
                 tasks: 'coffee ok'
             },
+            yata: {
+                files: 'static/coffee/test/*.coffee',
+                tasks: 'coffee ok'
+            },
+	    
         }
     });
     grunt.registerTask('default', 'coffee ok');
