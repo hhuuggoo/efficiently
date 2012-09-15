@@ -43,9 +43,10 @@
       'a': 1,
       'b': 1
     });
-    model.register_property('c', ['a', 'b'], function() {
+    model.register_property('c', function() {
       return this.get('a') + this.get('b');
-    });
+    }, null, false);
+    model.add_dependencies('c', ['a', 'b']);
     temp = model.get('c');
     return ok(temp === 2);
   });
@@ -57,9 +58,10 @@
       'a': 1,
       'b': 1
     });
-    model.register_property('c', ['a', 'b'], function() {
+    model.register_property('c', function() {
       return this.get('a') + this.get('b');
-    }, true);
+    });
+    model.add_dependencies('c', ['a', 'b']);
     temp = model.get('c');
     ok(temp === 2);
     temp = model.get_cache('c');
@@ -142,7 +144,8 @@
       });
       return this.set('b', val / 2);
     };
-    model.register_property('c', ['a', 'b'], prop, true, setter);
+    model.register_property('c', prop, setter);
+    model.add_dependencies('c', ['a', 'b']);
     model.set('c', 100);
     ok(model.get('a') === 50);
     return ok(model.get('b') === 50);

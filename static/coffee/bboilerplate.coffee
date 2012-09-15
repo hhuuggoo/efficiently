@@ -184,8 +184,18 @@ class BBoilerplate.HasProperties extends Backbone.Model
       deps = other_deps
     return deps
 
+  add_dependencies:  (prop_name, dependencies) ->
+    prop_spec = @properties[prop_name]
+    prop_spec.dependencies = prop_spec.dependencies.concat(dependencies)
+    dependencies = @structure_dependencies(dependencies)
+      # bind depdencies to change dep callback
+    for dep in dependencies
+      obj = @resolve_ref(dep['ref'])
+      for fld in dep['fields']
+        safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep'])
+
   register_property : \
-    (prop_name, dependencies, getter, use_cache, setter) ->
+    (prop_name, getter, setter, use_cache) ->
       # ###method : HasProperties::register_property
       # register a computed property
       # ####Parameters
@@ -202,41 +212,34 @@ class BBoilerplate.HasProperties extends Backbone.Model
       # #### Returns
       # * prop_spec : specification of the property, with the getter,
       # setter, dependenices, and callbacks associated with the prop
+      if _.isUndefined(use_cache)
+        use_cache = true
       if _.has(@properties, prop_name)
         @remove_property(prop_name)
-      dependencies = @structure_dependencies(dependencies)
-
       # we store a prop_spec, which has the getter, setter, dependencies
       # we also store the callbacks used to implement the computed property,
       # we do this so we can remove them later if the property is removed
-
+      changedep = () =>
+        @trigger('changedep:' + prop_name)
+      propchange = () =>
+        firechange = true
+        if prop_spec['use_cache']
+          old_val = @get_cache(prop_name)
+          @clear_cache(prop_name)
+          new_val = @get(prop_name)
+          firechange = new_val != old_val
+        if firechange
+          @trigger('change:' + prop_name, this, @get(prop_name))
+          @trigger('change', this)
       prop_spec=
         'getter' : getter,
-        'dependencies' : dependencies,
+        'dependencies' : [],
         'use_cache' : use_cache
         'setter' : setter
         'callbacks':
-          # we call this changedep call back when any of our dependecies
-          # are changed
-          'changedep' : =>
-            @trigger('changedep:' + prop_name)
-          # we call propchange when we receive a changedep event for this prop
-          'propchange' : =>
-            firechange = true
-            if prop_spec['use_cache']
-              old_val = @get_cache(prop_name)
-              @clear_cache(prop_name)
-              new_val = @get(prop_name)
-              firechange = new_val != old_val
-            if firechange
-              @trigger('change:' + prop_name, this, @get(prop_name))
-              @trigger('change', this)
+          changedep : changedep
+          propchange : propchange
       @properties[prop_name] = prop_spec
-      # bind depdencies to change dep callback
-      for dep in dependencies
-        obj = @resolve_ref(dep['ref'])
-        for fld in dep['fields']
-          safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep'])
       # bind propchange callback to change dep event
       safebind(this, this, "changedep:" + prop_name,
         prop_spec['callbacks']['propchange'])

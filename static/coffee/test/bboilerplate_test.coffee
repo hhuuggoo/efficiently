@@ -9,8 +9,11 @@ class TestObjects extends Backbone.Collection
 test('computed_properties', ->
   window.testobjects = new TestObjects()
   model = window.testobjects.create({'a' : 1, 'b': 1})
-  model.register_property('c', ['a', 'b'],
-    () -> @get('a') + @get('b'))
+  model.register_property('c',
+    () -> @get('a') + @get('b'),
+    null, false
+  )
+  model.add_dependencies('c', ['a', 'b'])
   temp =  model.get('c')
   ok(temp == 2)
 )
@@ -18,9 +21,10 @@ test('computed_properties', ->
 test('cached_properties_react_changes', ->
   window.testobjects = new TestObjects()
   model = window.testobjects.create({'a' : 1, 'b': 1})
-  model.register_property('c', ['a', 'b'],
+  model.register_property('c',
     () -> @get('a') + @get('b'),
-    true)
+  )
+  model.add_dependencies('c', ['a', 'b'])
   temp =  model.get('c')
   ok(temp == 2)
   temp = model.get_cache('c')
@@ -68,7 +72,8 @@ test('property_setters', ->
   setter = (val) ->
     @set('a', val/2, {silent:true})
     @set('b', val/2)
-  model.register_property('c', ['a', 'b'], prop, true, setter)
+  model.register_property('c', prop, setter)
+  model.add_dependencies('c', ['a', 'b'])
   model.set('c', 100)
   ok(model.get('a') == 50)
   ok(model.get('b') == 50)

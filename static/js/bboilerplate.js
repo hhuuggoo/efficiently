@@ -177,48 +177,66 @@
       return deps;
     };
 
-    HasProperties.prototype.register_property = function(prop_name, dependencies, getter, use_cache, setter) {
-      var dep, fld, obj, prop_spec, _i, _j, _len, _len1, _ref,
-        _this = this;
-      if (_.has(this.properties, prop_name)) {
-        this.remove_property(prop_name);
-      }
+    HasProperties.prototype.add_dependencies = function(prop_name, dependencies) {
+      var dep, fld, obj, prop_spec, _i, _len, _results;
+      prop_spec = this.properties[prop_name];
+      prop_spec.dependencies = prop_spec.dependencies.concat(dependencies);
       dependencies = this.structure_dependencies(dependencies);
-      prop_spec = {
-        'getter': getter,
-        'dependencies': dependencies,
-        'use_cache': use_cache,
-        'setter': setter,
-        'callbacks': {
-          'changedep': function() {
-            return _this.trigger('changedep:' + prop_name);
-          },
-          'propchange': function() {
-            var firechange, new_val, old_val;
-            firechange = true;
-            if (prop_spec['use_cache']) {
-              old_val = _this.get_cache(prop_name);
-              _this.clear_cache(prop_name);
-              new_val = _this.get(prop_name);
-              firechange = new_val !== old_val;
-            }
-            if (firechange) {
-              _this.trigger('change:' + prop_name, _this, _this.get(prop_name));
-              return _this.trigger('change', _this);
-            }
-          }
-        }
-      };
-      this.properties[prop_name] = prop_spec;
+      _results = [];
       for (_i = 0, _len = dependencies.length; _i < _len; _i++) {
         dep = dependencies[_i];
         obj = this.resolve_ref(dep['ref']);
-        _ref = dep['fields'];
-        for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-          fld = _ref[_j];
-          safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep']);
-        }
+        _results.push((function() {
+          var _j, _len1, _ref, _results1;
+          _ref = dep['fields'];
+          _results1 = [];
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            fld = _ref[_j];
+            _results1.push(safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep']));
+          }
+          return _results1;
+        }).call(this));
       }
+      return _results;
+    };
+
+    HasProperties.prototype.register_property = function(prop_name, getter, setter, use_cache) {
+      var changedep, prop_spec, propchange,
+        _this = this;
+      if (_.isUndefined(use_cache)) {
+        use_cache = true;
+      }
+      if (_.has(this.properties, prop_name)) {
+        this.remove_property(prop_name);
+      }
+      changedep = function() {
+        return _this.trigger('changedep:' + prop_name);
+      };
+      propchange = function() {
+        var firechange, new_val, old_val;
+        firechange = true;
+        if (prop_spec['use_cache']) {
+          old_val = _this.get_cache(prop_name);
+          _this.clear_cache(prop_name);
+          new_val = _this.get(prop_name);
+          firechange = new_val !== old_val;
+        }
+        if (firechange) {
+          _this.trigger('change:' + prop_name, _this, _this.get(prop_name));
+          return _this.trigger('change', _this);
+        }
+      };
+      prop_spec = {
+        'getter': getter,
+        'dependencies': [],
+        'use_cache': use_cache,
+        'setter': setter,
+        'callbacks': {
+          changedep: changedep,
+          propchange: propchange
+        }
+      };
+      this.properties[prop_name] = prop_spec;
       safebind(this, this, "changedep:" + prop_name, prop_spec['callbacks']['propchange']);
       return prop_spec;
     };
