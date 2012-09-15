@@ -69,6 +69,22 @@
       return child;
     };
 
+    OutlineNode.prototype.get_child = function(index) {
+      return this.collection.get(this.get('children')[index]);
+    };
+
+    OutlineNode.prototype.remove_child = function(child) {
+      var children;
+      child.set('parent', null);
+      child.save();
+      children = this.get('children');
+      children = _.filter(children, (function(x) {
+        return x !== child.id;
+      }));
+      this.set('children', children);
+      return this.save();
+    };
+
     return OutlineNode;
 
   })(Efficiently.EfficientlyModel);

@@ -38,6 +38,17 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     child.save()
     return child
 
+  get_child : (index) ->
+    return @collection.get(@get('children')[index])
+
+  remove_child : (child) ->
+    child.set('parent', null);
+    child.save();
+    children = @get('children')
+    children = _.filter(children, ((x) -> return x != child.id))
+    @set('children', children);
+    @save()
+
 class Efficiently.OutlineNodes extends Backbone.Collection
   model : Efficiently.OutlineNode
   url : ''
