@@ -85,6 +85,25 @@
       return this.save();
     };
 
+    OutlineNode.prototype.tree_apply = function(func, level) {
+      var child, childid, children, newlevel, _i, _len;
+      func(this);
+      if (level > 0) {
+        newlevel = level - 1;
+      } else if (_.isNull(level)) {
+        newlevel = null;
+      } else {
+        return null;
+      }
+      children = this.get('children');
+      for (_i = 0, _len = children.length; _i < _len; _i++) {
+        childid = children[_i];
+        child = this.collection.get(childid);
+        child.tree_apply(func, newlevel);
+      }
+      return null;
+    };
+
     return OutlineNode;
 
   })(Efficiently.EfficientlyModel);

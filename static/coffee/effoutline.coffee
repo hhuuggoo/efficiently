@@ -31,7 +31,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     if not index
       children.push(child.id)
     else
-    	children.splice(index, 0, child.id)
+      children.splice(index, 0, child.id)
     @set('children', children)
     child.set('parent', @id)
     this.save()
@@ -48,6 +48,19 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     children = _.filter(children, ((x) -> return x != child.id))
     @set('children', children);
     @save()
+  tree_apply : (func, level) ->
+    func(this);
+    if level > 0
+      newlevel = level - 1
+    else if _.isNull(level)
+      newlevel = null
+    else
+      return null
+    children = @get('children')
+    for childid in children
+      child = @collection.get(childid)
+      child.tree_apply(func, newlevel)
+    return null
 
 class Efficiently.OutlineNodes extends Backbone.Collection
   model : Efficiently.OutlineNode
