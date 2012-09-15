@@ -29,7 +29,7 @@
 
     return EfficientlyModel;
 
-  })(HasProperties.HasProperties);
+  })(BBoilerplate.HasProperties);
 
   Efficiently.OutlineNode = (function(_super) {
 
@@ -41,19 +41,41 @@
 
     OutlineNode.prototype.collection_ref = ['Efficiently', 'outlinenodes'];
 
+    OutlineNode.prototype.initialize = function(attrs, options) {
+      OutlineNode.__super__.initialize.call(this, attrs, options);
+      if (_.isNull(attrs.children)) {
+        this.set('children', []);
+      }
+      if (_.isNull(attrs.date)) {
+        return this.set('children', []);
+      }
+    };
+
     OutlineNode.prototype.defaults = {
       documentids: null,
       text: '',
-      date: null,
       parent: null,
       children: null
     };
 
-    OutlineNode.prototype.add_child = function(child, index) {};
+    OutlineNode.prototype.add_child = function(child, index) {
+      var children;
+      children = this.get('children');
+      if (!index) {
+        children.push(child.id);
+      } else {
+        children.splice(index, 0, child.id);
+      }
+      this.set('children', children);
+      child.set('parent', this.id);
+      this.save();
+      child.save();
+      return child;
+    };
 
     return OutlineNode;
 
-  })(Efficiently.EfficientlyModell);
+  })(Efficiently.EfficientlyModel);
 
   Efficiently.OutlineNodes = (function(_super) {
 
