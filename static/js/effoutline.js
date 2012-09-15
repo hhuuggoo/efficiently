@@ -23,10 +23,6 @@
       return EfficientlyModel.__super__.url.call(this);
     };
 
-    EfficientlyModel.prototype.sync = function(method, model, options) {
-      return options.success(model);
-    };
-
     return EfficientlyModel;
 
   })(BBoilerplate.HasProperties);

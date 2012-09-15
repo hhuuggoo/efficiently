@@ -9,13 +9,6 @@ class Efficiently.EfficientlyModel extends BBoilerplate.HasProperties
   url : () ->
     return super()
 
-  sync : (method, model, options) ->
-    # this should be fixed via monkey patching when extended by an
-    # environment that implements the model backend,
-    # to enable normal beaviour, add this line
-    #
-    # HasProperties.prototype.sync = Backbone.sync
-    return options.success(model)
 
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel

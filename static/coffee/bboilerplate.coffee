@@ -4,6 +4,19 @@ else
   BBoilerplate = {}
   this.BBoilerplate = BBoilerplate
 
+uniqueId = (prefix) ->
+    #from ipython project
+    #http://www.ietf.org/rfc/rfc4122.txt
+    s = []
+    hexDigits = "0123456789ABCDEF";
+    for i in _.range(32)
+      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    s[12] = "4"
+    s[16] = hexDigits.substr((s[16] & 0x3) | 0x8, 1)
+    uuid = s.join("");
+    return prefix + "-" + uuid;
+
+BBoilerplate.uniqueId = uniqueId
 safebind = (binder, target, event, callback) ->
   # ##function : safebind
   # safebind, binder binds to an event on target, which triggers callback.
@@ -112,7 +125,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
     @properties = {}
     @property_cache = {}
     if not _.has(attrs, 'id')
-      this.id = _.uniqueId(this.type)
+      this.id = uniqueId(this.type)
       this.attributes['id'] = this.id
     _.defer(() =>
       if not @inited
@@ -316,6 +329,14 @@ class BBoilerplate.HasProperties extends Backbone.Model
     ref = @get(ref_name)
     if ref
       return @resolve_ref(ref)
+
+  sync : (method, model, options) ->
+    # this should be fixed via monkey patching when extended by an
+    # environment that implements the model backend,
+    # to enable normal beaviour, add this line
+    #
+    # HasProperties.prototype.sync = Backbone.sync
+    return options.success(model)
 
 class BBoilerplate.BasicView extends Backbone.View
   initialize : (options) ->
