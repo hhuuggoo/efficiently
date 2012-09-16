@@ -27,6 +27,42 @@
 
   })(BBoilerplate.HasProperties);
 
+  Efficiently.BasicNodeView = (function(_super) {
+
+    __extends(BasicNodeView, _super);
+
+    function BasicNodeView() {
+      return BasicNodeView.__super__.constructor.apply(this, arguments);
+    }
+
+    BasicNodeView.prototype.initialize = function(options) {
+      BasicNodeView.__super__.initialize.call(this, options);
+      BBoilerplate.safebind(this, this.model, "destroy", this.destroy);
+      options.parentview = this;
+      this.mainview = new Efficiently.BasicNodeMainView(options);
+      this.childrenview = new Efficiently.BasicChildrenView(options);
+      return this.render();
+    };
+
+    BasicNodeView.prototype.render = function() {
+      this.mainview.$el.detach();
+      this.childrenview.$el.detach();
+      this.$el.addClass('outline');
+      this.$el.addClass('clearfix');
+      this.$el.append(this.mainview.$el);
+      return this.$el.append(this.childrenview.$el);
+    };
+
+    BasicNodeView.prototype.remove = function() {
+      this.mainview.remove();
+      this.childrenview.remove();
+      return BasicNodeView.__super__.remove.call(this);
+    };
+
+    return BasicNodeView;
+
+  })(BBoilerplate.BasicView);
+
   Efficiently.OutlineNode = (function(_super) {
 
     __extends(OutlineNode, _super);
@@ -34,6 +70,8 @@
     function OutlineNode() {
       return OutlineNode.__super__.constructor.apply(this, arguments);
     }
+
+    OutlineNode.prototype.default_view = Efficiently.BasicNodeView;
 
     OutlineNode.prototype.collection_ref = ['Efficiently', 'outlinenodes'];
 
@@ -51,7 +89,8 @@
       documentids: null,
       text: '',
       parent: null,
-      children: null
+      children: null,
+      chidden: null
     };
 
     OutlineNode.prototype.add_child = function(child, index) {
@@ -71,6 +110,20 @@
 
     OutlineNode.prototype.get_child = function(index) {
       return this.collection.get(this.get('children')[index]);
+    };
+
+    OutlineNode.prototype.get_all_children = function() {
+      var x;
+      return (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.get('children');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          x = _ref[_i];
+          _results.push(this.collection.get(x));
+        }
+        return _results;
+      }).call(this);
     };
 
     OutlineNode.prototype.remove_child = function(child) {
@@ -125,5 +178,92 @@
   })(Backbone.Collection);
 
   Efficiently.outlinenodes = new Efficiently.OutlineNodes();
+
+  $(function() {
+    Efficiently.main_node_template = _.template($('#main-template').html());
+    return Efficiently.children_node_template = _.template($('#children-template').html());
+  });
+
+  Efficiently.BasicNodeMainView = (function(_super) {
+
+    __extends(BasicNodeMainView, _super);
+
+    function BasicNodeMainView() {
+      return BasicNodeMainView.__super__.constructor.apply(this, arguments);
+    }
+
+    BasicNodeMainView.prototype.initialize = function(options) {
+      BasicNodeMainView.__super__.initialize.call(this, options);
+      BBoilerplate.safebind(this, this.model, "change", this.render);
+      this.parentview = options.parentview;
+      return this.render();
+    };
+
+    BasicNodeMainView.prototype.render = function(options) {
+      return this.$el.html(Efficiently.main_node_template({
+        text: this.mget('text'),
+        chidden: false
+      }));
+    };
+
+    return BasicNodeMainView;
+
+  })(BBoilerplate.BasicView);
+
+  Efficiently.BasicChildrenView = (function(_super) {
+
+    __extends(BasicChildrenView, _super);
+
+    function BasicChildrenView() {
+      return BasicChildrenView.__super__.constructor.apply(this, arguments);
+    }
+
+    BasicChildrenView.prototype.initialize = function(options) {
+      BasicChildrenView.__super__.initialize.call(this, options);
+      this.parentview = options.parentview;
+      BBoilerplate.safebind(this, this.model, "change:children", this.render);
+      this.views = {};
+      return this.render();
+    };
+
+    BasicChildrenView.prototype.build_views = function(options) {
+      var child_refs, children, model;
+      children = this.model.get_all_children();
+      child_refs = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = children.length; _i < _len; _i++) {
+          model = children[_i];
+          _results.push(model.ref());
+        }
+        return _results;
+      })();
+      return BBoilerplate.build_views(this.model, this.views, child_refs);
+    };
+
+    BasicChildrenView.prototype.render = function() {
+      var child_container, childid, key, view, _i, _len, _ref, _ref1, _results;
+      this.build_views();
+      _ref = this.views;
+      for (key in _ref) {
+        if (!__hasProp.call(_ref, key)) continue;
+        view = _ref[key];
+        view.$el.detach();
+      }
+      this.$el.html('');
+      this.$el.html(Efficiently.children_node_template({}));
+      child_container = this.$el.find('.children');
+      _ref1 = this.mget('children');
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        childid = _ref1[_i];
+        _results.push(child_container.append(this.views[childid].$el));
+      }
+      return _results;
+    };
+
+    return BasicChildrenView;
+
+  })(BBoilerplate.BasicView);
 
 }).call(this);
