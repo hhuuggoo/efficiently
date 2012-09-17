@@ -393,30 +393,28 @@
 
   })(Backbone.View);
 
-  build_views = function(mainmodel, view_storage, view_specs, options, view_options) {
-    var created_views, idx, key, model, spec, temp, valid_viewmodels, value, view_specific_option, _i, _j, _len, _len1;
+  build_views = function(view_storage, model_refs, view_generator) {
+    var created_views, generator, generator_is_array, idx, key, newview, spec, valid_viewmodels, value, _i, _j, _len, _len1;
     created_views = [];
     valid_viewmodels = {};
-    for (_i = 0, _len = view_specs.length; _i < _len; _i++) {
-      spec = view_specs[_i];
+    for (_i = 0, _len = model_refs.length; _i < _len; _i++) {
+      spec = model_refs[_i];
       valid_viewmodels[spec.id] = true;
     }
-    for (idx = _j = 0, _len1 = view_specs.length; _j < _len1; idx = ++_j) {
-      spec = view_specs[idx];
+    generator_is_array = _.isArray(view_generator);
+    for (idx = _j = 0, _len1 = model_refs.length; _j < _len1; idx = ++_j) {
+      spec = model_refs[idx];
       if (view_storage[spec.id]) {
         continue;
       }
-      model = mainmodel.resolve_ref(spec);
-      if (view_options) {
-        view_specific_option = view_options[idx];
+      if (generator_is_array) {
+        generator = view_generator[idx];
       } else {
-        view_specific_option = {};
+        generator = view_generator;
       }
-      temp = _.extend({}, view_specific_option, spec.options, options, {
-        'model': model
-      });
-      view_storage[model.id] = new model.default_view(temp);
-      created_views.push(view_storage[model.id]);
+      newview = generator(spec);
+      view_storage[spec.id] = newview;
+      created_views.push(view_storage[spec.id]);
     }
     for (key in view_storage) {
       if (!__hasProp.call(view_storage, key)) continue;

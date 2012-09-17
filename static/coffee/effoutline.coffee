@@ -19,6 +19,13 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
 
+  make_view : (model) =>
+    view_model = new Efficiently.OutlineViewModel({'model' : model})
+    return new Efficiently.BasicNodeView(
+      model : model
+      view_model : view_model
+    )
+
   render : () ->
     @mainview.$el.detach()
     @childrenview.$el.detach()
@@ -32,8 +39,19 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @childrenview.remove()
     super()
 
+  hide : () ->
+    @hide = true
+    @$el.hide()
+
+  show : () ->
+    @hide = false
+    @$el.show()
+
+class Efficiently.OutlineViewModel extends Efficiently.EfficientlyModel
+  defaults :
+    hide : false
+
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
-  default_view : Efficiently.BasicNodeView
   collection_ref : ['Efficiently', 'outlinenodes']
   initialize : (attrs, options) ->
     super(attrs, options)
@@ -47,7 +65,6 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     text : ''
     parent : null
     children : null
-    chidden : null
 
   add_child : (child, index) ->
     children = @get('children')
@@ -67,6 +84,10 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   get_all_children : () ->
     return (@collection.get(x) for x in @get('children'))
 
+  visible_children : () ->
+    children = @get_all_children()
+
+
   remove_child : (child) ->
     child.set('parent', null);
     child.save();
@@ -74,6 +95,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     children = _.filter(children, ((x) -> return x != child.id))
     @set('children', children);
     @save()
+
   tree_apply : (func, level) ->
     func(this);
     if level > 0
@@ -106,6 +128,7 @@ class Efficiently.BasicNodeMainView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @model, "change", @render)
     @parentview = options.parentview
     @render()
+
   render : (options) ->
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
@@ -123,13 +146,17 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   build_views : (options) ->
     children = @model.get_all_children()
     child_refs = (model.ref() for model in children)
-    BBoilerplate.build_views(@model, @views, child_refs)
+    BBoilerplate.build_views(@views, child_refs, (ref) =>
+      return @parentview.make_view(@model.resolve_ref(ref))
+    )
 
   render : () ->
     @build_views()
     for own key, view of @views
       view.$el.detach()
     @$el.html('')
+
+
     @$el.html(Efficiently.children_node_template({}))
     child_container = @$el.find('.children')
     for childid in @mget('children')

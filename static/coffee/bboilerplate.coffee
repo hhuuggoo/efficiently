@@ -368,36 +368,33 @@ class BBoilerplate.BasicView extends Backbone.View
     return @model.get_ref(fld)
 
 
-build_views = (mainmodel, view_storage, view_specs, options, view_options) ->
+build_views = (view_storage, model_refs, view_generator) ->
   # ## function : build_views
   # convenience function for creating a bunch of views from a spec
   # and storing them in a dictionary keyed off of model id.
   # views are automatically passed the model that they represent
 
   # ####Parameters
-  # * mainmodel : model which is constructing the views, this is used to resolve
-  #   specs into other model objects
   # * view_storage : where you want the new views stored.  this is a dictionary
   #   views will be keyed by the id of the underlying model
-  # * view_specs : list of view specs.  view specs are bboilerplate references to models
-  #   the views constructor here, as an 'options' field in the dict
-  # * options : any additional option to be used in the construction of views
-  # * view_option : array, optional view specific options passed in to the construction of the view
+  # * model_refs : array of references to underlying models
+  # * view_generator : function for generating views, either that, or an array of functions
+
   created_views = []
   valid_viewmodels = {}
-  for spec in view_specs
+  for spec in model_refs
     valid_viewmodels[spec.id] = true
-  for spec, idx in view_specs
+  generator_is_array = _.isArray(view_generator)
+  for spec, idx in model_refs
     if view_storage[spec.id]
       continue
-    model = mainmodel.resolve_ref(spec)
-    if view_options
-      view_specific_option = view_options[idx]
+    if generator_is_array
+      generator = view_generator[idx]
     else
-      view_specific_option = {}
-    temp = _.extend({}, view_specific_option, spec.options, options, {'model' : model})
-    view_storage[model.id] = new model.default_view(temp)
-    created_views.push(view_storage[model.id])
+      generator = view_generator
+    newview = generator(spec)
+    view_storage[spec.id] = newview
+    created_views.push(view_storage[spec.id])
   for own key, value of view_storage
     if not valid_viewmodels[key]
       value.remove()
