@@ -19,7 +19,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
 
-  make_view : (model) =>
+  make_view : (model) ->
     view_model = new Efficiently.OutlineViewModel({'model' : model})
     return new Efficiently.BasicNodeView(
       model : model

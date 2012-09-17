@@ -14,7 +14,7 @@ test('basicview', ()->
   node2 = nodes[1]
   node3 = nodes[2]
   node4 = nodes[3]
-  view = new Efficiently.BasicNodeView({'model' : node})
+  view = Efficiently.BasicNodeView::make_view(node)
   $('#test1').append(view.$el)
   childnode = $('#test1').find(".children:first")
   ok($($('#test1').find('.outline')[0]).find('.children:first').children().length == 1)
