@@ -14,8 +14,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
-    options.parentview = this
-    @mainview = new Efficiently.BasicNodeMainView(options)
+    @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
 
@@ -47,6 +46,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
   show : () ->
     @hide = false
     @$el.show()
+class Efficiently.RootNodeView extends Efficiently.BasicNodeView
 
 class Efficiently.OutlineViewModel extends Efficiently.EfficientlyModel
   defaults :
@@ -123,11 +123,10 @@ $(() ->
   Efficiently.children_node_template = _.template($('#children-template').html())
 )
 
-class Efficiently.BasicNodeMainView extends BBoilerplate.BasicView
+class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
     BBoilerplate.safebind(this, @model, "change", @render)
-    @parentview = options.parentview
     @render()
 
   render : (options) ->
@@ -140,7 +139,6 @@ class Efficiently.BasicNodeMainView extends BBoilerplate.BasicView
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
-    @parentview = options.parentview
     BBoilerplate.safebind(this, @model, "change:children", @render)
     @views = {}
     @render()
@@ -149,7 +147,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     children = @model.get_all_children()
     child_refs = (model.ref() for model in children)
     BBoilerplate.build_views(@views, child_refs, (ref) =>
-      return @parentview.make_view(@model.resolve_ref(ref))
+      return Efficiently.BasicNodeView::make_view(@model.resolve_ref(ref))
     )
 
   render : () ->
@@ -157,7 +155,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     for own key, view of @views
       view.$el.detach()
     @$el.html('')
-    @$el.addClass("children clearfix")
+    @$el.addClass("childrenview clearfix")
     @$el.html(Efficiently.children_node_template({}))
     child_container = @$el.find('.children')
     for childid in @mget('children')
