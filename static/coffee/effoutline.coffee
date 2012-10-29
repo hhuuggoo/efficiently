@@ -32,7 +32,8 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @$el.addClass('outline')
     @$el.addClass('clearfix')
     @$el.append(@mainview.$el)
-    @$el.append(@childrenview.$el)
+    if @mget('children').length != 0
+      @$el.append(@childrenview.$el)
 
   remove : () ->
     @mainview.remove()
