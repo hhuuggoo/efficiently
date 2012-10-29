@@ -13,7 +13,9 @@
       outlines = document['outline'];
       Efficiently.outlinenodes.add(outlines);
       root = Efficiently.outlinenodes.get(root_id);
-      view = Efficiently.BasicNodeView.prototype.make_view(root);
+      view = new Efficiently.BasicChildrenView({
+        model: root
+      });
       return $(".rootnode").append(view.$el);
     });
   });

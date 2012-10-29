@@ -8,7 +8,7 @@ $(() ->
         outlines = document['outline']
         Efficiently.outlinenodes.add(outlines)
         root = Efficiently.outlinenodes.get(root_id)
-        view = Efficiently.BasicNodeView::make_view(root)
+        view = new Efficiently.BasicChildrenView(model : root)
         $(".rootnode").append(view.$el)
     )
 )
