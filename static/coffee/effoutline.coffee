@@ -134,6 +134,7 @@ class Efficiently.BasicNodeMainView extends BBoilerplate.BasicView
       text : @mget('text'),
       chidden : false
     ))
+    @$el.addClass("content clearfix")
 
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
@@ -155,8 +156,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     for own key, view of @views
       view.$el.detach()
     @$el.html('')
-
-
+    @$el.addClass("children clearfix")
     @$el.html(Efficiently.children_node_template({}))
     child_container = @$el.find('.children')
     for childid in @mget('children')

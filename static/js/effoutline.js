@@ -239,10 +239,11 @@
     };
 
     BasicNodeMainView.prototype.render = function(options) {
-      return this.$el.html(Efficiently.main_node_template({
+      this.$el.html(Efficiently.main_node_template({
         text: this.mget('text'),
         chidden: false
       }));
+      return this.$el.addClass("content clearfix");
     };
 
     return BasicNodeMainView;
@@ -293,6 +294,7 @@
         view.$el.detach();
       }
       this.$el.html('');
+      this.$el.addClass("children clearfix");
       this.$el.html(Efficiently.children_node_template({}));
       child_container = this.$el.find('.children');
       _ref1 = this.mget('children');

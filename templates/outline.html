@@ -37,32 +37,26 @@
     </li>
 </div>
 <script type="text/template" id="main-template">
-  <div class="clearfix">
-    <div class="content ">
-      <div class="fakedotcontainer">
-        <image class="fakedot"> </image>	  
-      </div>
-      <div class="hideindicator <%= chidden ? '' : 'hide' %>">+</div>
-      <div class="abox outline-input">
-        <textarea class="outline-input" style="display:none" 
-                  value="<%= text %>"></textarea>
-        <div class="outline-textdisplay"><%= text %></div>
-      </div>
-    </div>
+  <div class="fakedotcontainer">
+    <image class="fakedot"> </image>	  
+  </div>
+  <div class="hideindicator <%= chidden ? '' : 'hide' %>">+</div>
+  <div class="abox outline-input">
+    <textarea class="outline-input" style="display:none" 
+              value="<%= text %>"></textarea>
+    <div class="outline-textdisplay"><%= text %></div>
   </div>
 </script>
 
 <script type="text/template" id="children-template">
   <div class="clearfix">
-	<div class="clearfix">
-	  <div class="edge topedge"></div>
-	  <div class="fakedotcontainer"></div>
-	  <div class="abox">
-	    <div id="" class="children"></div>
-	  </div>
+	<div class="edge topedge"></div>
+	<div class="fakedotcontainer"></div>
+	<div class="abox">
+	  <div id="" class="children"></div>
 	</div>
-	<div class="edge bottomedge"></div>
   </div>
+  <div class="edge bottomedge"></div>
 </script>
 
 <script type="text/template" id="outline-template">
@@ -103,12 +97,16 @@
 
 </script>
 <!-- start outlinejs -->
-<script src="/static/js/localstorage.js"></script>
-<script src="/static/js/model.js"></script>
-<script src="/static/js/parser.js"></script>
-<script src="/static/js/outline.js"></script>
-<script src="/static/js/keybindings.js"></script>
-<script src="/static/js/socket.io.js"></script>
+<script type="text/javascript" src="/static/vendor/backbone/backbone.js"></script>
+<script type="text/javascript" src="/static/js/bboilerplate.js"></script>
+<script type="text/javascript" src="/static/js/effoutline.js"></script>
+<script type="text/javascript" src="/static/js/main.js"></script>  
+<!-- <script src="/static/js/localstorage.js"></script> -->
+<!-- g<script src="/static/js/model.js"></script> -->
+<!-- <script src="/static/js/parser.js"></script> -->
+<!-- <script src="/static/js/outline.js"></script> -->
+<!-- <script src="/static/js/keybindings.js"></script> -->
+<!-- <script src="/static/js/socket.io.js"></script> -->
 <!-- end outlinejs -->
 {% end %}
 {% block main %}
@@ -139,7 +137,7 @@
 	</div>
       </div>
       <hr class="mainsep"/>    
-      <div id="{{document_id}}-outline" class="">
+      <div id="{{document_id}}-outline" class="rootnode">
       </div>
       <hr>
       <div id="trash" class="">
