@@ -51,6 +51,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
 class Efficiently.OutlineViewModel extends Efficiently.EfficientlyModel
   defaults :
     hide : false
+    edit : false
 
   set_child_view_models : (child_view_models) ->
     if _.has(@properties, 'hide_children')
@@ -136,16 +137,30 @@ $(() ->
 )
 
 class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
+  events :
+    'click'  : 'edit'
+    'focusout' : 'save'
+
+  edit : () ->
+    @view_model.set('edit', true)
+    @$el.find('.outline-input').focus()
+
+  save : () ->
+    @model.set('text', @$el.find('.outline-input').val())
+    @view_model.set('edit', false)
+
   initialize : (options) ->
     super(options)
     @view_model = options.view_model
     BBoilerplate.safebind(this, @model, "change", @render)
+    BBoilerplate.safebind(this, @view_model, "change", @render)
     @render()
 
   render : (options) ->
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
       chidden : false
+      edit : @view_model.get('edit')
     ))
     @$el.addClass("content clearfix")
 
@@ -167,7 +182,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   render : () ->
     @build_views()
     @view_model.set_child_view_models(
-      _.map(_.values(@views), ((x) -> return x.view_model))
+      _.map(@views, ((x) -> return x.view_model))
     )
     for own key, view of @views
       view.$el.detach()

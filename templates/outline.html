@@ -41,10 +41,9 @@
     <image class="fakedot"> </image>	  
   </div>
   <div class="hideindicator <%= chidden ? '' : 'hide' %>">+</div>
-  <div class="abox outline-input">
-    <textarea class="outline-input" style="display:none" 
-              value="<%= text %>"></textarea>
-    <div class="outline-textdisplay"><%= text %></div>
+  <div class="abox">
+    <textarea class="outline-input <%= edit ? '' : 'hide'%>"> <%= text %></textarea>
+    <div class="outline-textdisplay <%= edit ? 'hide' : ''%>"><%= text %></div>
   </div>
 </script>
 
