@@ -22,3 +22,19 @@ test('basicview', ()->
   ok($($('#test1').find('.outline')[2]).find('.children:first').children().length == 0)
   ok($($('#test1').find('.outline')[3]).find('.children:first').children().length == 0)
 )
+
+test('hide_children_test', ()->
+  nodes = deepmultinode_setup()
+  node = nodes[0]
+  node2 = nodes[1]
+  node3 = nodes[2]
+  node4 = nodes[3]
+  view = Efficiently.BasicNodeView::make_view(node)
+  view2 = view.childrenview.views[node2.id]
+  view3 = view2.childrenview.views[node3.id]
+  view4 = view2.childrenview.views[node4.id]
+  ok(view2.view_model.get('hide_children') == false)
+  view3.view_model.set('hide', true)
+  view4.view_model.set('hide', true)
+  ok(view2.view_model.get('hide_children') == true)
+)

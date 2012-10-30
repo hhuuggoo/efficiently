@@ -13,6 +13,7 @@ class Efficiently.EfficientlyModel extends BBoilerplate.HasProperties
 class Efficiently.BasicNodeView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
+    @view_model = options.view_model
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
@@ -46,11 +47,22 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
   show : () ->
     @hide = false
     @$el.show()
-class Efficiently.RootNodeView extends Efficiently.BasicNodeView
 
 class Efficiently.OutlineViewModel extends Efficiently.EfficientlyModel
   defaults :
     hide : false
+
+  set_child_view_models : (child_view_models) ->
+    if _.has(@properties, 'hide_children')
+      @remove_property("hide_children")
+    @register_property('hide_children', () ->
+        return _.all(child_view_models, ((model) -> model.get('hide')))
+      , null, false
+    )
+
+class Efficiently.OutlineViewModels extends Backbone.Collection
+  model : Efficiently.OutlineViewModel
+  url : ''
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   collection_ref : ['Efficiently', 'outlinenodes']
@@ -126,6 +138,7 @@ $(() ->
 class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
+    @view_model = options.view_model
     BBoilerplate.safebind(this, @model, "change", @render)
     @render()
 
@@ -139,6 +152,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
+    @view_model = options.view_model
     BBoilerplate.safebind(this, @model, "change:children", @render)
     @views = {}
     @render()
@@ -152,6 +166,9 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
 
   render : () ->
     @build_views()
+    @view_model.set_child_view_models(
+      _.map(_.values(@views), ((x) -> return x.view_model))
+    )
     for own key, view of @views
       view.$el.detach()
     @$el.html('')
