@@ -39,6 +39,30 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     min-height:18px;
 }
 
+.outline-input{
+    min-height: 18px;
+}
+
+.outline-textdisplay{
+    white-space: pre-wrap;
+    border: 0;
+    padding: 0;
+    outline: none;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    font: inherit;
+    border-radius: 0;
+    color: #111;
+    margin: 0;
+    display: inline;
+    margin-bottom: 0;
+    min-height: 18px;
+    vertical-align: text-top;
+    overflow: hidden;
+    resize: none;
+    clear: none;
+    background: inherit;
+}
 
 .hideindicator,
 .todostate,
@@ -148,31 +172,6 @@ button{
     border: 1px solid #aaa;
     color: #444;
     	  cursor: pointer;
-}
-.outline-textdisplay{
-    white-space: pre-wrap;
-    border: 0;
-    padding: 0;
-    outline: none;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    font: inherit;
-    border-radius: 0;
-    color: #111;
-    margin: 0;
-    display: inline;
-    margin-bottom: 0;
-    min-height: 18px;
-    vertical-align: text-top;
-    overflow: hidden;
-    resize: none;
-    clear: none;
-    background: inherit;
-}
-
-.outline-input{
-    min-height: 18px;
-    overflow : hidden;
 }
 
 .hide{
@@ -351,11 +350,11 @@ padding: .2em 1em;
     width : 60%;
     height : 500px;
 }
-/* .import:focus{ */
-/*     border: 1px solid #000; */
-/*     width : 60%; */
-/*     height : 500px; */
-/* } */
+.import:focus{
+    border: 1px solid #000;
+    width : 60%;
+    height : 500px;
+}
 
 .hashtag{
     color : blue;

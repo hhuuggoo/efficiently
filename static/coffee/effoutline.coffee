@@ -163,6 +163,16 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       edit : @view_model.get('edit')
     ))
     @$el.addClass("content clearfix")
+    node = @$el.find('textarea')
+    node.height(0)
+    node.autoResize()
+    node.val(@mget('text'))
+    if @view_model.get('edit')
+      _.defer((()->node.resizeNow.call(node)))
+      window.setTimeout(() =>
+          node.resizeNow.call(node)
+        , 100
+      )
 
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
