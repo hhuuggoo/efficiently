@@ -141,8 +141,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     else
       nodeiter = node
       while (true)
-        if nodeiter.id == @root.id
-          return null
         lower_sibling = @lower_visible_sibling(nodeiter)
         if !lower_sibling and nodeiter.id != @root.id
           nodeiter = nodeiter.get_parent()

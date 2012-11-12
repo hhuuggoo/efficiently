@@ -73,7 +73,11 @@
     result = docview.lower_visible_node(node3);
     ok(result === node4);
     result = docview.lower_visible_node(node4);
-    return ok(result === null);
+    ok(result === null);
+    result = docview.lower_visible_node(node2);
+    ok(result === node3);
+    result = docview.lower_visible_node(node);
+    return ok(result === node2);
   });
 
 }).call(this);
