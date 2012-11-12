@@ -33,8 +33,28 @@ test('hide_children_test', ()->
   view2 = view.childrenview.views[node2.id]
   view3 = view2.childrenview.views[node3.id]
   view4 = view2.childrenview.views[node4.id]
-  ok(view2.view_model.get('hide_children') == false)
-  view3.view_model.set('hide', true)
-  view4.view_model.set('hide', true)
-  ok(view2.view_model.get('hide_children') == true)
+  ok(view2.viewstate.get('hide_children') == false)
+  view3.viewstate.set('hide', true)
+  view4.viewstate.set('hide', true)
+  ok(view2.viewstate.get('hide_children') == true)
+)
+
+test('doc_view', ()->
+  nodes = deepmultinode_setup()
+  node = nodes[0]
+  node2 = nodes[1]
+  node3 = nodes[2]
+  node4 = nodes[3]
+  root = node
+  docview = new Efficiently.DocView(
+    root : root
+    el : $('#test2')
+  )
+  ok($($('#test2').find('.outline')[0]).find('.children:first').children().length == 2)
+  ok($($('#test2').find('.outline')[1]).find('.children:first').children().length == 0)
+  ok($($('#test2').find('.outline')[2]).find('.children:first').children().length == 0)
+  result = docview.lower_visible_node(node3)
+  ok(result == node4)
+  result = docview.lower_visible_node(node4)
+  ok(result == null)
 )

@@ -220,9 +220,6 @@ button{
     background : #e0e0e0;
     box-shadow: 4px 4px 2px #888;   
 }
-.shade{
-    background: #CDE8FF;
-}
 .test{
     width:100%;
     min-height:18px;

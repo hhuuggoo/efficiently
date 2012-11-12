@@ -11,20 +11,26 @@ class Efficiently.EfficientlyModel extends BBoilerplate.HasProperties
 
 
 class Efficiently.BasicNodeView extends BBoilerplate.BasicView
+  remove : () ->
+    @docview.remove(this, @viewstate)
+    return super()
+
   initialize : (options) ->
     super(options)
-    @view_model = options.view_model
+    @viewstate = options.viewstate
+    @docview = options.docview
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
 
-  make_view : (model) ->
-    view_model = new Efficiently.OutlineViewModel({'model' : model})
-    return new Efficiently.BasicNodeView(
-      model : model
-      view_model : view_model
-    )
+  make_view : (model, options) ->
+    options = options || {}
+    options = _.extend({}, options)
+    viewstate = new Efficiently.OutlineViewState({'model' : model})
+    options.model = model
+    options.viewstate = viewstate
+    return new Efficiently.BasicNodeView(options)
 
   render : () ->
     @mainview.$el.detach()
@@ -48,21 +54,105 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @hide = false
     @$el.show()
 
-class Efficiently.OutlineViewModel extends Efficiently.EfficientlyModel
+class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
   defaults :
     hide : false
     edit : false
 
-  set_child_view_models : (child_view_models) ->
+  set_child_viewstates : (child_viewstates) ->
     if _.has(@properties, 'hide_children')
       @remove_property("hide_children")
     @register_property('hide_children', () ->
-        return _.all(child_view_models, ((model) -> model.get('hide')))
+        return _.all(child_viewstates, ((model) -> model.get('hide')))
       , null, false
     )
+class Efficiently.DocView extends Efficiently.BasicNodeView
+  initialize : (options) ->
+    @nodeviews = {}
+    @viewstates = {}
+    @root = options.root
+    @model = options.root
+    BBoilerplate.safebind(this, @model, "destroy", @destroy)
+    viewstate = new Efficiently.OutlineViewState({
+      model : @root
+    })
+    view = new Efficiently.BasicChildrenView(
+          model : @root
+          viewstate : viewstate
+          docview : this
+        )
+    @register(@root.id, this, viewstate)
+    @childrenview = view
+    @render()
+    return this
 
-class Efficiently.OutlineViewModels extends Backbone.Collection
-  model : Efficiently.OutlineViewModel
+  render : () ->
+    @$el.html('')
+    @$el.append(@childrenview.$el)
+
+  remove : (id, view, viewstate) ->
+    delete @nodeviews[id]
+    delete @viewstates[id]
+    return
+
+  register : (id, view, viewstate) ->
+    @nodeviews[id] = view
+    @viewstates[id] = viewstate
+    return
+
+  make_view : (model, options) ->
+    options = options || {}
+    options = _.extend({}, options)
+    options.docview = this
+    view = Efficiently.BasicNodeView::make_view(model, options)
+    viewstate = view.viewstate
+    @register(model.id, view, viewstate)
+    return view
+
+  visible_children : (node) ->
+    viewstate = @viewstates[node.id]
+    if not viewstate
+      debugger
+    if viewstate.get('hide_children')
+      return []
+    else
+      children = node.get_all_children()
+      children = _.filter(children, (child) =>
+        return not @viewstates[child.id].get('hide')
+      )
+      return children
+
+  lower_visible_sibling : (node) ->
+    parent = node.get_parent()
+    if not parent
+      return null
+    siblings = @visible_children(parent)
+    siblingids = _.map(siblings, (x) -> x.get('id'))
+    curridx = _.indexOf(siblingids, node.id)
+    if curridx < (siblings.length - 1)
+      return siblings[curridx + 1]
+    else
+      return null
+
+  lower_visible_node : (node) ->
+    children = @visible_children(node)
+    if children.length > 0
+      return children[0]
+    else
+      nodeiter = node
+      while (true)
+        if nodeiter.id == @root.id
+          return null
+        lower_sibling = @lower_visible_sibling(nodeiter)
+        if !lower_sibling and nodeiter.id != @root.id
+          nodeiter = nodeiter.get_parent()
+        else if !lower_sibling and nodeiter.id == @root.id
+          return null
+        else if lower_sibling
+          return lower_sibling
+
+class Efficiently.OutlineViewStates extends Backbone.Collection
+  model : Efficiently.OutlineViewState
   url : ''
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
@@ -95,12 +185,11 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   get_child : (index) ->
     return @collection.get(@get('children')[index])
 
+  get_parent : () ->
+    return @collection.get(@get('parent'))
+
   get_all_children : () ->
     return (@collection.get(x) for x in @get('children'))
-
-  visible_children : () ->
-    children = @get_all_children()
-
 
   remove_child : (child) ->
     child.set('parent', null);
@@ -124,6 +213,8 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       child.tree_apply(func, newlevel)
     return null
 
+
+
 class Efficiently.OutlineNodes extends Backbone.Collection
   model : Efficiently.OutlineNode
   url : ''
@@ -142,32 +233,33 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     'focusout' : 'save'
 
   edit : () ->
-    @view_model.set('edit', true)
+    @viewstate.set('edit', true)
     @$el.find('.outline-input').focus()
 
   save : () ->
     @model.set('text', @$el.find('.outline-input').val())
-    @view_model.set('edit', false)
+    @viewstate.set('edit', false)
 
   initialize : (options) ->
     super(options)
-    @view_model = options.view_model
+    @viewstate = options.viewstate
+    @docview = options.docview
     BBoilerplate.safebind(this, @model, "change", @render)
-    BBoilerplate.safebind(this, @view_model, "change", @render)
+    BBoilerplate.safebind(this, @viewstate, "change", @render)
     @render()
 
   render : (options) ->
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
       chidden : false
-      edit : @view_model.get('edit')
+      edit : @viewstate.get('edit')
     ))
     @$el.addClass("content clearfix")
     node = @$el.find('textarea')
     node.height(0)
     node.autoResize()
     node.val(@mget('text'))
-    if @view_model.get('edit')
+    if @viewstate.get('edit')
       _.defer((()->node.resizeNow.call(node)))
       window.setTimeout(() =>
           node.resizeNow.call(node)
@@ -177,7 +269,8 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
-    @view_model = options.view_model
+    @viewstate = options.viewstate
+    @docview = options.docview
     BBoilerplate.safebind(this, @model, "change:children", @render)
     @views = {}
     @render()
@@ -186,13 +279,16 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     children = @model.get_all_children()
     child_refs = (model.ref() for model in children)
     BBoilerplate.build_views(@views, child_refs, (ref) =>
-      return Efficiently.BasicNodeView::make_view(@model.resolve_ref(ref))
+      if @docview
+        return @docview.make_view(@model.resolve_ref(ref))
+      else
+        return Efficiently.BasicNodeView::make_view(@model.resolve_ref(ref))
     )
 
   render : () ->
     @build_views()
-    @view_model.set_child_view_models(
-      _.map(@views, ((x) -> return x.view_model))
+    @viewstate.set_child_viewstates(
+      _.map(@views, ((x) -> return x.viewstate))
     )
     for own key, view of @views
       view.$el.detach()
