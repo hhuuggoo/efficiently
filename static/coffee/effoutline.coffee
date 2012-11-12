@@ -109,10 +109,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @register(model.id, view, viewstate)
     return view
 
-  visible_children : (node) ->
+  children : (node, visible) ->
+    if not visible
+      return node.get_all_children()
     viewstate = @viewstates[node.id]
-    if not viewstate
-      debugger
     if viewstate.get('hide_children')
       return []
     else
@@ -122,11 +122,11 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       )
       return children
 
-  lower_visible_sibling : (node) ->
+  lower_sibling : (node, visible) ->
     parent = node.get_parent()
     if not parent
       return null
-    siblings = @visible_children(parent)
+    siblings = @children(parent, visible)
     siblingids = _.map(siblings, (x) -> x.get('id'))
     curridx = _.indexOf(siblingids, node.id)
     if curridx < (siblings.length - 1)
@@ -134,14 +134,14 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     else
       return null
 
-  lower_visible_node : (node) ->
-    children = @visible_children(node)
+  lower_node : (node, visible) ->
+    children = @children(node, visible)
     if children.length > 0
       return children[0]
     else
       nodeiter = node
       while (true)
-        lower_sibling = @lower_visible_sibling(nodeiter)
+        lower_sibling = @lower_sibling(nodeiter, visible)
         if !lower_sibling and nodeiter.id != @root.id
           nodeiter = nodeiter.get_parent()
         else if !lower_sibling and nodeiter.id == @root.id
