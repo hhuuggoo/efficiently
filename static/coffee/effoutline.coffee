@@ -149,6 +149,37 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
         else if lower_sibling
           return lower_sibling
 
+  upper_sibling : (node, visible) ->
+    parent = node.get_parent()
+    if !parent
+      return null
+    siblings = @children(parent, visible)
+    siblingids = _.map(siblings, (x) -> x.get('id'))
+    curridx = _.indexOf(siblingids, node.id)
+    if curridx != 0
+      return siblings[curridx - 1]
+    else
+      return null
+
+  bottom_most_descendant: (node, visible) ->
+    nodeiter = node
+    while true
+      children = @children(nodeiter, visible)
+      if children.length == 0
+        return nodeiter
+      else
+        nodeiter = _.last(children)
+    return null
+
+  upper_node : (node, visible) ->
+    parent = node.get_parent()
+    upper_sibling = @upper_sibling(node, visible)
+    if !upper_sibling
+      return parent
+    else
+      return @bottom_most_descendant(upper_sibling, visible)
+    return null
+
 class Efficiently.OutlineViewStates extends Backbone.Collection
   model : Efficiently.OutlineViewState
   url : ''

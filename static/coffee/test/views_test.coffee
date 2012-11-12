@@ -61,7 +61,11 @@ test('doc_view', ()->
   ok(result == node3)
   result = docview.lower_node(node)
   ok(result == node2)
-  # result = docview.upper_visible_node(node3)
-  # ok(result == node2)
+  result = docview.upper_node(node3)
+  ok(result == node2)
+  result = docview.upper_node(node4)
+  ok(result == node3)
+  result = docview.upper_node(node2)
+  ok(result == node)
 
 )

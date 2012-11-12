@@ -77,7 +77,13 @@
     result = docview.lower_node(node2);
     ok(result === node3);
     result = docview.lower_node(node);
-    return ok(result === node2);
+    ok(result === node2);
+    result = docview.upper_node(node3);
+    ok(result === node2);
+    result = docview.upper_node(node4);
+    ok(result === node3);
+    result = docview.upper_node(node2);
+    return ok(result === node);
   });
 
 }).call(this);
