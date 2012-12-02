@@ -58,6 +58,7 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
   defaults :
     hide : false
     edit : false
+    select : false
 
   set_child_viewstates : (child_viewstates) ->
     if _.has(@properties, 'hide_children')
@@ -69,9 +70,15 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
 
 
 class Efficiently.KeyEventer extends BBoilerplate.BasicView
+  keycodes :
+    UP : 38
+    DOWN : 40
+
   initialize : (options) ->
     super(options)
     @docview = options.docview
+    @keycodes = Efficiently.KeyEventer::keycodes
+    @currnode = null
 
   delegateEvents : (events) ->
     super(events)
@@ -81,6 +88,12 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     super(events)
     $(document).unbind('keydown.keyeventer')
 
+  modified : (e) =>
+    return e.ctrlKey || e.shiftKey || e.altKey
+
+  nsmodified : (e) =>
+    return e.ctrlKey || e.altKey
+
   keydown : (e) =>
     func = @get_keyfunction(e)
     if (func)
@@ -88,6 +101,33 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return false
     else
       return true
+
+  get_keyfunction : (e) =>
+    modified = @modified(e)
+    nsmodified = @nsmodified(e)
+    if not modified and e.keyCode == @keycodes.DOWN
+      return @cursor_down
+    if not modified and e.keyCode == @keycodes.UP
+      return @cursor_up
+
+  select_first_node : () =>
+    @currnode = @docview.children(@docview.root, true)[0]
+    @docview.select(@currnode)
+
+  cursor_down : () =>
+    if not @currnode or @docview.viewstates[@currnode.id].get('hide')
+      @select_first_node()
+    else
+      @docview.unselect(@currnode)
+      @currnode = @docview.lower_node(@currnode, true)
+      @docview.select(@currnode)
+  cursor_up : () =>
+    if not @currnode or @docview.viewstates[@currnode.id].get('hide')
+      @select_first_node()
+    else
+      @docview.unselect(@currnode)
+      @currnode = @docview.upper_node(@currnode, true)
+      @docview.select(@currnode)
 
 class Efficiently.DocView extends Efficiently.BasicNodeView
   initialize : (options) ->
@@ -109,6 +149,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @render()
 
     return this
+  unselect : (node) ->
+    @viewstates[node.id].set('select', false)
+  select : (node) ->
+    @viewstates[node.id].set('select', true)
 
   render : () ->
     @$el.html('')
@@ -307,6 +351,10 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       chidden : false
       edit : @viewstate.get('edit')
     ))
+    if @viewstate.get('select')
+      @$el.addClass("shade")
+    else
+      @$el.removeClass("shade")
     @$el.addClass("content clearfix")
     node = @$el.find('textarea')
     node.height(0)
