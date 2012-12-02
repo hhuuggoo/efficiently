@@ -12,5 +12,8 @@ $(() ->
           root : root
           el : $('.rootnode')
         )
+        keyeventer = new Efficiently.KeyEventer(
+          docview : docview
+        )
     )
 )

@@ -47,7 +47,6 @@
         var minHeight = 0;
         //scrollTop = frame.scrollTop(),
         var scrollHeight = target.height(0).prop('scrollHeight');
-        console.log("scrollHeight", scrollHeight);
         target.height(scrollHeight);
         //frame.scrollTop(scrollTop);
 

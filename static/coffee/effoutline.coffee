@@ -66,6 +66,29 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
         return _.all(child_viewstates, ((model) -> model.get('hide')))
       , null, false
     )
+
+
+class Efficiently.KeyEventer extends BBoilerplate.BasicView
+  initialize : (options) ->
+    super(options)
+    @docview = options.docview
+
+  delegateEvents : (events) ->
+    super(events)
+    $(document).bind('keydown.keyeventer', @keydown)
+
+  undelegateEvents : (events) ->
+    super(events)
+    $(document).unbind('keydown.keyeventer')
+
+  keydown : (e) =>
+    func = @get_keyfunction(e)
+    if (func)
+      func()
+      return false
+    else
+      return true
+
 class Efficiently.DocView extends Efficiently.BasicNodeView
   initialize : (options) ->
     @nodeviews = {}
@@ -84,6 +107,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @register(@root.id, this, viewstate)
     @childrenview = view
     @render()
+
     return this
 
   render : () ->
