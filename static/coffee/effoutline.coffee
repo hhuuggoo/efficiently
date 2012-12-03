@@ -5,7 +5,6 @@ else
   this.Efficiently = Efficiently
 
 class Efficiently.EfficientlyModel extends BBoilerplate.HasProperties
-
   url : () ->
     return super()
 
@@ -20,6 +19,8 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @viewstate = options.viewstate
     @docview = options.docview
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
+    BBoilerplate.safebind(this, @model, "change", @render)
+    BBoilerplate.safebind(this, @viewstate, "change", @render)
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
@@ -73,6 +74,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   keycodes :
     UP : 38
     DOWN : 40
+    ENTER : 13
 
   initialize : (options) ->
     super(options)
@@ -97,7 +99,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   keydown : (e) =>
     func = @get_keyfunction(e)
     if (func)
-      func()
+      func(e)
       return false
     else
       return true
@@ -109,6 +111,10 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @cursor_down
     if not modified and e.keyCode == @keycodes.UP
       return @cursor_up
+    if not modified and e.keyCode == @keycodes.ENTER
+      return @enter
+    if modified and e.keyCode == @keycodes.ENTER
+      return @modenter
 
   select_first_node : () =>
     @currnode = @docview.children(@docview.root, true)[0]
@@ -130,6 +136,22 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       @currnode = @docview.upper_node(@currnode, true)
       @docview.select(@currnode, true)
 
+  enter : (e) =>
+    @docview.unselect(@currnode)
+    newnode = Efficiently.outlinenodes.create()
+    newnode = @currnode.add_sibling(newnode)
+    e.preventDefault()
+    @docview.select(newnode)
+    @currnode = newnode
+
+  modenter : (e) =>
+    @docview.unselect(@currnode)
+    newnode = Efficiently.outlinenodes.create()
+    newnode = @currnode.add_child(newnode)
+    e.preventDefault()
+    @docview.select(newnode)
+    @currnode = newnode
+
 class Efficiently.DocView extends Efficiently.BasicNodeView
   initialize : (options) ->
     @nodeviews = {}
@@ -137,19 +159,19 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @root = options.root
     @model = options.root
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
-    viewstate = new Efficiently.OutlineViewState({
+    viewstate = new Efficiently.OutlineViewState(
       model : @root
-    })
+    )
     view = new Efficiently.BasicChildrenView(
-          model : @root
-          viewstate : viewstate
-          docview : this
-        )
+      model : @root
+      viewstate : viewstate
+      docview : this
+    )
     @register(@root.id, this, viewstate)
     @childrenview = view
     @render()
-
     return this
+
   unselect : (node) ->
     @viewstates[node.id].set(
       select: false
@@ -159,6 +181,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   select : (node, toedit) ->
     if _.isUndefined(toedit)
       toedit = true
+
     @viewstates[node.id].set(
       select: true
       edit : toedit
@@ -204,11 +227,9 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     parent = node.get_parent()
     if not parent
       return null
-    siblings = @children(parent, visible)
-    siblingids = _.map(siblings, (x) -> x.get('id'))
-    curridx = _.indexOf(siblingids, node.id)
-    if curridx < (siblings.length - 1)
-      return siblings[curridx + 1]
+    curridx = parent.get_child_index(node)
+    if curridx < (parent.num_children() - 1)
+      return parent.get_child(curridx + 1)
     else
       return null
 
@@ -231,11 +252,9 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     parent = node.get_parent()
     if !parent
       return null
-    siblings = @children(parent, visible)
-    siblingids = _.map(siblings, (x) -> x.get('id'))
-    curridx = _.indexOf(siblingids, node.id)
+    curridx = parent.get_child_index(node)
     if curridx != 0
-      return siblings[curridx - 1]
+      parent.get_child(curridx - 1)
     else
       return null
 
@@ -258,10 +277,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       return @bottom_most_descendant(upper_sibling, visible)
     return null
 
-class Efficiently.OutlineViewStates extends Backbone.Collection
-  model : Efficiently.OutlineViewState
-  url : ''
-
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   collection_ref : ['Efficiently', 'outlinenodes']
   initialize : (attrs, options) ->
@@ -277,17 +292,27 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     parent : null
     children : null
 
+  add_sibling : (child, index) ->
+    return @get_parent().add_child(child, index)
+
   add_child : (child, index) ->
-    children = @get('children')
+    newchildren = @get('children').slice(0)
     if not index
-      children.push(child.id)
+      newchildren.push(child.id)
     else
-      children.splice(index, 0, child.id)
-    @set('children', children)
+      newchildren.splice(index, 0, child.id)
+    #need new array to trigger backbone change events.. not ideal
+    @set('children', newchildren)
     child.set('parent', @id)
     this.save()
     child.save()
     return child
+
+  num_children : () ->
+    return @get('children').length
+
+  get_child_index : (child) ->
+    return _.indexOf(@get('children'), child.id)
 
   get_child : (index) ->
     return @collection.get(@get('children')[index])
@@ -335,6 +360,14 @@ $(() ->
 )
 
 class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
+  initialize : (options) ->
+    super(options)
+    @viewstate = options.viewstate
+    @docview = options.docview
+    BBoilerplate.safebind(this, @model, "change", @render)
+    BBoilerplate.safebind(this, @viewstate, "change", @render)
+    @render()
+
   events :
     'click'  : 'select'
     'focusout' : 'save'
@@ -348,13 +381,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     @model.set('text', @$el.find('.outline-input').val())
     @viewstate.set('edit', false)
 
-  initialize : (options) ->
-    super(options)
-    @viewstate = options.viewstate
-    @docview = options.docview
-    BBoilerplate.safebind(this, @model, "change", @render)
-    BBoilerplate.safebind(this, @viewstate, "change", @render)
-    @render()
 
   render : (options) ->
     @$el.html(Efficiently.main_node_template(

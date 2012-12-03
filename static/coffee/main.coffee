@@ -15,5 +15,7 @@ $(() ->
         keyeventer = new Efficiently.KeyEventer(
           docview : docview
         )
+        window.keyeventer = keyeventer
+        window.docview = docview
     )
 )
