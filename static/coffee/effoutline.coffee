@@ -112,7 +112,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
 
   select_first_node : () =>
     @currnode = @docview.children(@docview.root, true)[0]
-    @docview.select(@currnode)
+    @docview.select(@currnode, true)
 
   cursor_down : () =>
     if not @currnode or @docview.viewstates[@currnode.id].get('hide')
@@ -120,14 +120,15 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     else
       @docview.unselect(@currnode)
       @currnode = @docview.lower_node(@currnode, true)
-      @docview.select(@currnode)
+      @docview.select(@currnode, true)
+
   cursor_up : () =>
     if not @currnode or @docview.viewstates[@currnode.id].get('hide')
       @select_first_node()
     else
       @docview.unselect(@currnode)
       @currnode = @docview.upper_node(@currnode, true)
-      @docview.select(@currnode)
+      @docview.select(@currnode, true)
 
 class Efficiently.DocView extends Efficiently.BasicNodeView
   initialize : (options) ->
@@ -150,9 +151,18 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
     return this
   unselect : (node) ->
-    @viewstates[node.id].set('select', false)
-  select : (node) ->
-    @viewstates[node.id].set('select', true)
+    @viewstates[node.id].set(
+      select: false
+      edit : false
+    )
+
+  select : (node, toedit) ->
+    if _.isUndefined(toedit)
+      toedit = true
+    @viewstates[node.id].set(
+      select: true
+      edit : toedit
+    )
 
   render : () ->
     @$el.html('')
@@ -326,12 +336,13 @@ $(() ->
 
 class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   events :
-    'click'  : 'edit'
+    'click'  : 'select'
     'focusout' : 'save'
 
-  edit : () ->
-    @viewstate.set('edit', true)
-    @$el.find('.outline-input').focus()
+  select : (toedit) ->
+    if _.isUndefined(toedit)
+      toedit = true
+    @docview.select(@model, true)
 
   save : () ->
     @model.set('text', @$el.find('.outline-input').val())
@@ -360,6 +371,8 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     node.height(0)
     node.autoResize()
     node.val(@mget('text'))
+    if @viewstate.get('edit')
+      @$el.find('.outline-input').focus()
     if @viewstate.get('edit')
       _.defer((()->node.resizeNow.call(node)))
       window.setTimeout(() =>
