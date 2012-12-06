@@ -143,6 +143,55 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @deletekey
     if e.keyCode == @keycodes.DELETE
       return @deletenode
+    if modified and e.keyCode == @keycodes.RIGHT
+      return @moveright
+    if modified and e.keyCode == @keycodes.LEFT
+      return @moveleft
+    if modified and e.keyCode == @keycodes.UP
+      return @moveup
+    if modified and e.keyCode == @keycodes.DOWN
+      return @movedown
+
+  moveup : (e) =>
+    parent = @docview.currnode.parent()
+    curridx = parent.child_index(@docview.currnode)
+    if curridx == 0
+      return false
+    else
+      parent.reorder_child(@docview.currnode, curridx - 1)
+      return false
+
+  movedown : (e) =>
+    parent = @docview.currnode.parent()
+    curridx = parent.child_index(@docview.currnode)
+    if curridx == parent.num_children()
+      return false
+    else
+      parent.reorder_child(@docview.currnode, curridx + 1)
+      return false
+  moveright : (e) =>
+    parent = @docview.currnode.parent()
+    upper_sibling = @docview.upper_sibling(@docview.currnode, true)
+    if upper_sibling != parent
+      @docview.currview().mainview.save() #save cause view is going away
+      parent.remove_child(@docview.currnode)
+      upper_sibling.add_child(@docview.currnode)
+    @docview.select(@docview.currnode)
+    return false
+
+  moveleft : (e) =>
+    parent = @docview.currnode.parent()
+    if not parent
+      return false
+    grandparent = parent.parent()
+    if not grandparent
+      return false
+    @docview.currview().mainview.save()
+    curridx = grandparent.child_index(parent)
+    parent.remove_child(@docview.currnode)
+    grandparent.add_child(@docview.currnode, curridx + 1)
+    @docview.select(@docview.currnode)
+    return false
 
   deletekey : (e) =>
     if not @docview.nodeviews[@docview.currnode.id].nodetext()
@@ -337,8 +386,6 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     super(attrs, options)
     if _.isNull(attrs.children)
       this.set('children', [])
-    if _.isNull(attrs.date)
-      this.set('children', [])
 
   defaults:
     documentids : null
@@ -348,6 +395,13 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
 
   add_sibling : (child, index) ->
     return @parent().add_child(child, index)
+
+  reorder_child : (child, index) ->
+    children = @get('children')
+    children = _.filter(children, ((x) -> return x != child.id))
+    children.splice(index, 0, child.id)
+    @set('children', children)
+    @save()
 
   add_child : (child, index) ->
     newchildren = @get('children').slice(0)
