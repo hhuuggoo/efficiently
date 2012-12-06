@@ -137,9 +137,11 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       @docview.select(@currnode, true)
 
   enter : (e) =>
+    parent = @currnode.get_parent()
+    curridx = parent.get_child_index(@currnode)
     @docview.unselect(@currnode)
     newnode = Efficiently.outlinenodes.create()
-    newnode = @currnode.add_sibling(newnode)
+    newnode = @currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
     @currnode = newnode
