@@ -55,12 +55,19 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @hide = false
     @$el.show()
 
+  nodetext : () ->
+    if @viewstate.get('edit')
+      @mainview.save()
+    return @mget('text')
+
+
 class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
   defaults :
     hide : false
     edit : false
     select : false
 
+  #this seems overly complex
   set_child_viewstates : (child_viewstates) ->
     if _.has(@properties, 'hide_children')
       @remove_property("hide_children")
@@ -134,6 +141,10 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if not modified and e.keyCode == @keycodes.BACKSPACE
       return @deletekey
 
+  deletekey : (e) =>
+    if not @docview.nodeviews[@docview.currnode.id].nodetext()
+      return @deletenode(e)
+
   deletenode : (e) =>
     nextnode = @docview.upper_node(@docview.currnode, true)
     if not nextnode
@@ -143,14 +154,14 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     @docview.unselect()
     if nextnode
       @docview.select(nextnode, true)
+    return false
 
   select_first_node : () =>
     @docview.select(@docview.children(@docview.root, true)[0],
       true)
 
   cursor_down : () =>
-    if not @docview.currnode or \
-        @docview.viewstates[@docview.currnode.id].get('hide')
+    if not @docview.currnode or @docview.currviewstate().get('hide')
       @select_first_node()
     else
       newnode = @docview.lower_node(@docview.currnode, true)
@@ -158,8 +169,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return false
 
   cursor_up : () =>
-    if not @docview.currnode or \
-        @docview.viewstates[@docview.currnode.id].get('hide')
+    if not @docview.currnode or @docview.currviewstate().get('hide')
       @select_first_node()
     else
       newnode = @docview.upper_node(@docview.currnode, true)
@@ -203,6 +213,12 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @render()
     @currnode = null
     return this
+
+  currview : () ->
+    return @nodeviews[@currnode.id]
+
+  currviewstate : () ->
+    return @viewstates[@currnode.id]
 
   unselect : () ->
     if @currnode
