@@ -74,13 +74,26 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   keycodes :
     UP : 38
     DOWN : 40
+    LEFT : 37
+    RIGHT : 39
     ENTER : 13
+    TAB : 9
+    GE : 190
+    LT : 188
+    SLASH : 191
+    S_KEY : 83
+    F_KEY : 70
+    R_KEY : 82
+    P_KEY : 80
+    L_BRACKET : 219
+    R_BRACKET : 221
+    BACKSPACE : 8
+    O_KEY : 79
 
   initialize : (options) ->
     super(options)
     @docview = options.docview
     @keycodes = Efficiently.KeyEventer::keycodes
-    @currnode = null
 
   delegateEvents : (events) ->
     super(events)
@@ -99,8 +112,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   keydown : (e) =>
     func = @get_keyfunction(e)
     if (func)
-      func(e)
-      return false
+      return func(e)
     else
       return true
 
@@ -115,44 +127,53 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @enter
     if modified and e.keyCode == @keycodes.ENTER
       return @modenter
+    if modified and e.keyCode == @keycodes.ENTER
+      return @modenter
+    if modified and e.keyCode == @keycodes.DELETE
+      return @deletenode
+    if modified and e.keyCode == @keycodes.DELETE
+      return @deletekey
+
+  deletekey : (e) =>
 
   select_first_node : () =>
-    @currnode = @docview.children(@docview.root, true)[0]
-    @docview.select(@currnode, true)
+    @docview.select(@docview.children(@docview.root, true)[0],
+      true)
 
   cursor_down : () =>
-    if not @currnode or @docview.viewstates[@currnode.id].get('hide')
+    if not @docview.currnode or \
+        @docview.viewstates[@docview.currnode.id].get('hide')
       @select_first_node()
     else
-      @docview.unselect(@currnode)
-      @currnode = @docview.lower_node(@currnode, true)
-      @docview.select(@currnode, true)
+      newnode = @docview.lower_node(@docview.currnode, true)
+      @docview.select(newnode, true)
+    return false
 
   cursor_up : () =>
-    if not @currnode or @docview.viewstates[@currnode.id].get('hide')
+    if not @docview.currnode or \
+        @docview.viewstates[@docview.currnode.id].get('hide')
       @select_first_node()
     else
-      @docview.unselect(@currnode)
-      @currnode = @docview.upper_node(@currnode, true)
-      @docview.select(@currnode, true)
+      newnode = @docview.upper_node(@docview.currnode, true)
+      @docview.select(newnode, true)
+    return false
 
   enter : (e) =>
-    parent = @currnode.get_parent()
-    curridx = parent.get_child_index(@currnode)
-    @docview.unselect(@currnode)
+    parent = @docview.currnode.get_parent()
+    curridx = parent.get_child_index(@docview.currnode)
     newnode = Efficiently.outlinenodes.create()
-    newnode = @currnode.add_sibling(newnode, curridx + 1)
+    newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
-    @currnode = newnode
+    return false
 
   modenter : (e) =>
-    @docview.unselect(@currnode)
     newnode = Efficiently.outlinenodes.create()
-    newnode = @currnode.add_child(newnode)
+    newnode = @docview.currnode.add_child(newnode)
     e.preventDefault()
     @docview.select(newnode)
-    @currnode = newnode
+    @docview.currnode = newnode
+    return false
 
 class Efficiently.DocView extends Efficiently.BasicNodeView
   initialize : (options) ->
@@ -172,18 +193,22 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @register(@root.id, this, viewstate)
     @childrenview = view
     @render()
+    @currnode = null
     return this
 
-  unselect : (node) ->
-    @viewstates[node.id].set(
-      select: false
-      edit : false
-    )
+  unselect : () ->
+    if @currnode
+      @viewstates[@currnode.id].set(
+        select: false
+        edit : false
+      )
+      @currnode = null
 
   select : (node, toedit) ->
+    @unselect()
+    @currnode = node
     if _.isUndefined(toedit)
       toedit = true
-
     @viewstates[node.id].set(
       select: true
       edit : toedit
@@ -326,8 +351,8 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     return (@collection.get(x) for x in @get('children'))
 
   remove_child : (child) ->
-    child.set('parent', null);
-    child.save();
+    child.set('parent', null)
+    child.save()
     children = @get('children')
     children = _.filter(children, ((x) -> return x != child.id))
     @set('children', children);
