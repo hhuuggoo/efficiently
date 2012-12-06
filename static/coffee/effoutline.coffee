@@ -129,12 +129,20 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @modenter
     if modified and e.keyCode == @keycodes.ENTER
       return @modenter
-    if modified and e.keyCode == @keycodes.DELETE
+    if modified and e.keyCode == @keycodes.BACKSPACE
       return @deletenode
-    if modified and e.keyCode == @keycodes.DELETE
+    if not modified and e.keyCode == @keycodes.BACKSPACE
       return @deletekey
 
-  deletekey : (e) =>
+  deletenode : (e) =>
+    nextnode = @docview.upper_node(@docview.currnode, true)
+    if not nextnode
+      nextnode = @docview.lower_node(@docview.currnode, true)
+    parent = @docview.currnode.parent()
+    parent.remove_child(@docview.currnode)
+    @docview.unselect()
+    if nextnode
+      @docview.select(nextnode, true)
 
   select_first_node : () =>
     @docview.select(@docview.children(@docview.root, true)[0],
@@ -159,8 +167,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return false
 
   enter : (e) =>
-    parent = @docview.currnode.get_parent()
-    curridx = parent.get_child_index(@docview.currnode)
+    parent = @docview.currnode.parent()
+    curridx = parent.child_index(@docview.currnode)
     newnode = Efficiently.outlinenodes.create()
     newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
@@ -239,24 +247,24 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
   children : (node, visible) ->
     if not visible
-      return node.get_all_children()
+      return node.children()
     viewstate = @viewstates[node.id]
     if viewstate.get('hide_children')
       return []
     else
-      children = node.get_all_children()
+      children = node.children()
       children = _.filter(children, (child) =>
         return not @viewstates[child.id].get('hide')
       )
       return children
 
   lower_sibling : (node, visible) ->
-    parent = node.get_parent()
+    parent = node.parent()
     if not parent
       return null
-    curridx = parent.get_child_index(node)
+    curridx = parent.child_index(node)
     if curridx < (parent.num_children() - 1)
-      return parent.get_child(curridx + 1)
+      return parent.child(curridx + 1)
     else
       return null
 
@@ -269,19 +277,19 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       while (true)
         lower_sibling = @lower_sibling(nodeiter, visible)
         if !lower_sibling and nodeiter.id != @root.id
-          nodeiter = nodeiter.get_parent()
+          nodeiter = nodeiter.parent()
         else if !lower_sibling and nodeiter.id == @root.id
           return null
         else if lower_sibling
           return lower_sibling
 
   upper_sibling : (node, visible) ->
-    parent = node.get_parent()
+    parent = node.parent()
     if !parent
       return null
-    curridx = parent.get_child_index(node)
+    curridx = parent.child_index(node)
     if curridx != 0
-      parent.get_child(curridx - 1)
+      parent.child(curridx - 1)
     else
       return null
 
@@ -296,7 +304,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return null
 
   upper_node : (node, visible) ->
-    parent = node.get_parent()
+    parent = node.parent()
     upper_sibling = @upper_sibling(node, visible)
     if !upper_sibling
       return parent
@@ -320,7 +328,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     children : null
 
   add_sibling : (child, index) ->
-    return @get_parent().add_child(child, index)
+    return @parent().add_child(child, index)
 
   add_child : (child, index) ->
     newchildren = @get('children').slice(0)
@@ -338,16 +346,16 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   num_children : () ->
     return @get('children').length
 
-  get_child_index : (child) ->
+  child_index : (child) ->
     return _.indexOf(@get('children'), child.id)
 
-  get_child : (index) ->
+  child : (index) ->
     return @collection.get(@get('children')[index])
 
-  get_parent : () ->
+  parent : () ->
     return @collection.get(@get('parent'))
 
-  get_all_children : () ->
+  children : () ->
     return (@collection.get(x) for x in @get('children'))
 
   remove_child : (child) ->
@@ -443,7 +451,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     @render()
 
   build_views : (options) ->
-    children = @model.get_all_children()
+    children = @model.children()
     child_refs = (model.ref() for model in children)
     BBoilerplate.build_views(@views, child_refs, (ref) =>
       if @docview
