@@ -95,6 +95,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     L_BRACKET : 219
     R_BRACKET : 221
     BACKSPACE : 8
+    DELETE : 46
     O_KEY : 79
 
   initialize : (options) ->
@@ -140,6 +141,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @deletenode
     if not modified and e.keyCode == @keycodes.BACKSPACE
       return @deletekey
+    if e.keyCode == @keycodes.DELETE
+      return @deletenode
 
   deletekey : (e) =>
     if not @docview.nodeviews[@docview.currnode.id].nodetext()
