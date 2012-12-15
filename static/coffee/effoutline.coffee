@@ -18,11 +18,13 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     super(options)
     @viewstate = options.viewstate
     @docview = options.docview
-    BBoilerplate.safebind(this, @model, "destroy", @destroy)
-    BBoilerplate.safebind(this, @model, "change:children", @render)
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
+
+  delegateEvents : (events) ->
+    BBoilerplate.safebind(this, @model, "destroy", @destroy)
+    BBoilerplate.safebind(this, @model, "change:children", @render)
 
   make_view : (model, options) ->
     options = options || {}
@@ -33,7 +35,6 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     return new Efficiently.BasicNodeView(options)
 
   render : () ->
-    console.log('basicrender')
     @mainview.$el.detach()
     @childrenview.$el.detach()
     @$el.addClass('outline')
@@ -67,14 +68,24 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
     edit : false
     select : false
 
+  initialize : (attrs, options) ->
+    super(attrs, options)
+    @register_property('all_hidden',
+      () -> _.all(@get('children_hide_status'), (x) -> return x),
+      true)
+    @register_property('any_hidden',
+      () -> _.any(@get('children_hide_status'), (x) -> return x),
+      true)
+
   #this seems overly complex
   set_child_viewstates : (child_viewstates) ->
-    if _.has(@properties, 'hide_children')
-      @remove_property("hide_children")
-    @register_property('hide_children', () ->
-        return _.all(child_viewstates, ((model) -> model.get('hide')))
-      , null, false
+    @register_property('children_hide_status', () ->
+        return _.map(child_viewstates, ((model) -> model.get('hide')))
+      , null, true
     )
+    @trigger("change:children_hide_status")
+    @trigger("change")
+
 
 
 class Efficiently.KeyEventer extends BBoilerplate.BasicView
@@ -268,6 +279,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @render()
     @currnode = null
     return this
+
+  delegateEvents : (events) ->
+    super(events)
+    BBoilerplate.safebind(this, @model, "destroy", @destroy)
 
   currview : () ->
     return @nodeviews[@currnode.id]
@@ -480,6 +495,11 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @viewstate, "change", @render)
     @render()
 
+  delegateEvents : (events) ->
+    super(events)
+    BBoilerplate.safebind(this, @model, "change", @render)
+    BBoilerplate.safebind(this, @viewstate, "change", @render)
+
   events :
     'click'  : 'select'
     'focusout' : 'unfocus'
@@ -529,9 +549,12 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     super(options)
     @viewstate = options.viewstate
     @docview = options.docview
-    BBoilerplate.safebind(this, @model, "change:children", @render)
     @views = {}
     @render()
+
+  delegateEvents : (events) ->
+    super(events)
+    BBoilerplate.safebind(this, @model, "change:children", @render)
 
   build_views : (options) ->
     children = @model.children()
