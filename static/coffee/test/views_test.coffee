@@ -33,10 +33,18 @@ test('hide_children_test', ()->
   view2 = view.childrenview.views[node2.id]
   view3 = view2.childrenview.views[node3.id]
   view4 = view2.childrenview.views[node4.id]
-  ok(view2.viewstate.get('hide_children') == false)
+  ok(not view2.viewstate.get('all_hidden'))
+  ok(not view2.viewstate.get('any_hidden'))
   view3.viewstate.set('hide', true)
+  ok(_.any(view2.viewstate.get('any_hidden')))
+  ok(not _.any(view2.viewstate.get('all_hidden')))
   view4.viewstate.set('hide', true)
-  ok(view2.viewstate.get('hide_children') == true)
+  ok(_.any(view2.viewstate.get('all_hidden')))
+  node5 = Efficiently.outlinenodes.create({'text' : 'foo'})
+  view2.model.add_child(node5)
+  ok(not _.any(view2.viewstate.get('all_hidden')))
+  view2.childrenview.views[node5.id].viewstate.set('hide', true)
+  ok(_.any(view2.viewstate.get('all_hidden')))
 )
 
 test('doc_view', ()->

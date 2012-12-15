@@ -45,8 +45,8 @@
     });
     model.register_property('c', function() {
       return this.get('a') + this.get('b');
-    }, null, false);
-    model.add_dependencies('c', ['a', 'b']);
+    });
+    model.add_dependencies('c', model, ['a', 'b']);
     temp = model.get('c');
     return ok(temp === 2);
   });
@@ -60,8 +60,8 @@
     });
     model.register_property('c', function() {
       return this.get('a') + this.get('b');
-    });
-    model.add_dependencies('c', ['a', 'b']);
+    }, true);
+    model.add_dependencies('c', model, ['a', 'b']);
     temp = model.get('c');
     ok(temp === 2);
     temp = model.get_cache('c');
@@ -131,6 +131,7 @@
 
   test('property_setters', function() {
     var model, prop, setter;
+    window.testobjects = new TestObjects();
     model = window.testobjects.create({
       'a': 1,
       'b': 1
@@ -144,8 +145,9 @@
       });
       return this.set('b', val / 2);
     };
-    model.register_property('c', prop, setter);
-    model.add_dependencies('c', ['a', 'b']);
+    model.register_property('c', prop, true);
+    model.add_dependencies('c', model, ['a', 'b']);
+    model.register_setter('c', setter);
     model.set('c', 100);
     ok(model.get('a') === 50);
     return ok(model.get('b') === 50);

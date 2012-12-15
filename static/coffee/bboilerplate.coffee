@@ -89,12 +89,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
 #   we also support caching of these properties, and notifications of property
 #   changes
 #
-#   @register_property(name, dependencies, use_cache)
-
-  # array of strings which tell you how to go from the global namespace
-  # to the collection  that stores this model. we need this becuase this gets
-  # passed and stored in json as part of the reference system
-
+#   @register_property(name, dependencies, getter, use_cache, setter)
   collection_ref : null
 
   get_collection_ref : () ->
@@ -125,7 +120,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
     @properties = {}
     @property_cache = {}
     if not _.has(attrs, 'id')
-      this.id = uniqueId(this.type)
+      this.id = _.uniqueId(this.type)
       this.attributes['id'] = this.id
     _.defer(() =>
       if not @inited
@@ -164,60 +159,33 @@ class BBoilerplate.HasProperties extends Backbone.Model
     if not _.isEmpty(attrs)
       super(attrs, options)
 
-  structure_dependencies : (dependencies) ->
-    # ### method : HasProperties::structure_dependencies
-    # ####Parameters
-    # * dependencies : our structure for specing out
-    #   dependencies of properties look like this
-    #   `[{'ref' : {'type' : type, 'id' : id}, 'fields : ['a', 'b', 'c']}]`
-    #   for convenience, we allow people to refer to this objects attributes
-    #   as strings, only using the formal structure for other objets attributes.
-    #   this function converts everything into that formal structure.
-    #   SO this :
-
-    #       ['myprop1, 'myprop2',
-    #       {'ref' : {'type' : 'otherobj', 'id' : 'otherobj'},
-    #        'fields' : 'otherfield'}]
-
-    #   is equivalent to :
-
-    #       [{'ref' : {'type' : 'mytype', 'id' : 'myid'},
-    #       'fields' : ['myprop1, 'myprop2'],
-    #       {'ref' : {'type' : 'otherobj', 'id' : 'otherobj'}
-    #       'fields' : 'otherfield'}]
-    # ####Returns
-    # * deps : the verbose form of dependencies where references are explicitly
-    # identified
-    other_deps = (x for x in dependencies when _.isObject(x))
-    local_deps = (x for x in dependencies when not _.isObject(x))
-    if local_deps.length > 0
-      deps = [{'ref' : this.ref(), 'fields' : local_deps}]
-      deps = deps.concat(other_deps)
-    else
-      deps = other_deps
-    return deps
-
-  add_dependencies:  (prop_name, dependencies) ->
+  add_dependencies:  (prop_name, object, fields) ->
+    # prop_name - name of property
+    # object - object on which dependencies reside
+    # fields - attributes on that object
+    # at some future date, we should support a third arg, events
+    if not _.isArray(fields)
+      fields = [fields]
     prop_spec = @properties[prop_name]
-    prop_spec.dependencies = prop_spec.dependencies.concat(dependencies)
-    dependencies = @structure_dependencies(dependencies)
-      # bind depdencies to change dep callback
-    for dep in dependencies
-      obj = @resolve_ref(dep['ref'])
-      for fld in dep['fields']
-        safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep'])
+    prop_spec.dependencies = prop_spec.dependencies.concat(
+      obj : object
+      fields : fields
+    )
+    # bind depdencies to change dep callback
+    for fld in fields
+      safebind(this, object, "change:" + fld,
+          prop_spec['callbacks']['changedep'])
+
+  register_setter : (prop_name, setter) ->
+    prop_spec = @properties[prop_name]
+    prop_spec.setter = setter
 
   register_property : \
-    (prop_name, getter, setter, use_cache) ->
+    (prop_name, getter, use_cache) ->
       # ###method : HasProperties::register_property
       # register a computed property
       # ####Parameters
-
       # * prop_name : name of property
-      # * dependencies : something like this
-      #   ['myprop1, 'myprop2',
-      #     {'ref' : {'type' : 'otherobj', 'id' : 'otherobj'}
-      #     'fields' : 'otherfield'}]
       # * getter : function, calculates computed value, takes no arguments
       # * use_cache : whether to cache or not
       # * setter : function, takes new value as parametercalled on set.
@@ -248,7 +216,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
         'getter' : getter,
         'dependencies' : [],
         'use_cache' : use_cache
-        'setter' : setter
+        'setter' : null
         'callbacks':
           changedep : changedep
           propchange : propchange
@@ -259,11 +227,12 @@ class BBoilerplate.HasProperties extends Backbone.Model
       return prop_spec
 
   remove_property : (prop_name) ->
-    #removes the property, unbinding all associated callbacks that implemented it
+    # removes the property,
+    # unbinding all associated callbacks that implemented it
     prop_spec = @properties[prop_name]
     dependencies = prop_spec.dependencies
     for dep in dependencies
-      obj = @resolve_ref(dep['ref'])
+      obj = dep.obj
       for fld in dep['fields']
         obj.off('change:' + fld, prop_spec['callbacks']['changedep'], this)
     @off("changedep:" + dep)
@@ -304,10 +273,8 @@ class BBoilerplate.HasProperties extends Backbone.Model
   ref : ->
     # ### method : HasProperties::ref
     #generates a reference to this model
-    ref =
-      id : @id
-      collection : @get_collection_ref()
-    return ref
+    'type' : this.type
+    'id' : this.id
 
   resolve_ref : (ref) ->
     # ### method : HasProperties::resolve_ref
@@ -330,6 +297,16 @@ class BBoilerplate.HasProperties extends Backbone.Model
     if ref
       return @resolve_ref(ref)
 
+  url : () ->
+    # ### method HasProperties::url
+    #model where our API processes this model
+
+    base = "/cdx/bb/" + Continuum.docid + "/" + @type + "/"
+    if (@isNew())
+      return base
+    return base + @get('id')
+
+
   sync : (method, model, options) ->
     # this should be fixed via monkey patching when extended by an
     # environment that implements the model backend,
@@ -337,6 +314,8 @@ class BBoilerplate.HasProperties extends Backbone.Model
     #
     # HasProperties.prototype.sync = Backbone.sync
     return options.success(model)
+
+  defaults : {}
 
 class BBoilerplate.BasicView extends Backbone.View
   initialize : (options) ->

@@ -115,7 +115,7 @@
       this.properties = {};
       this.property_cache = {};
       if (!_.has(attrs, 'id')) {
-        this.id = uniqueId(this.type);
+        this.id = _.uniqueId(this.type);
         this.attributes['id'] = this.id;
       }
       return _.defer(function() {
@@ -156,68 +156,31 @@
       }
     };
 
-    HasProperties.prototype.structure_dependencies = function(dependencies) {
-      var deps, local_deps, other_deps, x;
-      other_deps = (function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = dependencies.length; _i < _len; _i++) {
-          x = dependencies[_i];
-          if (_.isObject(x)) {
-            _results.push(x);
-          }
-        }
-        return _results;
-      })();
-      local_deps = (function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = dependencies.length; _i < _len; _i++) {
-          x = dependencies[_i];
-          if (!_.isObject(x)) {
-            _results.push(x);
-          }
-        }
-        return _results;
-      })();
-      if (local_deps.length > 0) {
-        deps = [
-          {
-            'ref': this.ref(),
-            'fields': local_deps
-          }
-        ];
-        deps = deps.concat(other_deps);
-      } else {
-        deps = other_deps;
+    HasProperties.prototype.add_dependencies = function(prop_name, object, fields) {
+      var fld, prop_spec, _i, _len, _results;
+      if (!_.isArray(fields)) {
+        fields = [fields];
       }
-      return deps;
-    };
-
-    HasProperties.prototype.add_dependencies = function(prop_name, dependencies) {
-      var dep, fld, obj, prop_spec, _i, _len, _results;
       prop_spec = this.properties[prop_name];
-      prop_spec.dependencies = prop_spec.dependencies.concat(dependencies);
-      dependencies = this.structure_dependencies(dependencies);
+      prop_spec.dependencies = prop_spec.dependencies.concat({
+        obj: object,
+        fields: fields
+      });
       _results = [];
-      for (_i = 0, _len = dependencies.length; _i < _len; _i++) {
-        dep = dependencies[_i];
-        obj = this.resolve_ref(dep['ref']);
-        _results.push((function() {
-          var _j, _len1, _ref, _results1;
-          _ref = dep['fields'];
-          _results1 = [];
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            fld = _ref[_j];
-            _results1.push(safebind(this, obj, "change:" + fld, prop_spec['callbacks']['changedep']));
-          }
-          return _results1;
-        }).call(this));
+      for (_i = 0, _len = fields.length; _i < _len; _i++) {
+        fld = fields[_i];
+        _results.push(safebind(this, object, "change:" + fld, prop_spec['callbacks']['changedep']));
       }
       return _results;
     };
 
-    HasProperties.prototype.register_property = function(prop_name, getter, setter, use_cache) {
+    HasProperties.prototype.register_setter = function(prop_name, setter) {
+      var prop_spec;
+      prop_spec = this.properties[prop_name];
+      return prop_spec.setter = setter;
+    };
+
+    HasProperties.prototype.register_property = function(prop_name, getter, use_cache) {
       var changedep, prop_spec, propchange,
         _this = this;
       if (_.isUndefined(use_cache)) {
@@ -247,7 +210,7 @@
         'getter': getter,
         'dependencies': [],
         'use_cache': use_cache,
-        'setter': setter,
+        'setter': null,
         'callbacks': {
           changedep: changedep,
           propchange: propchange
@@ -264,7 +227,7 @@
       dependencies = prop_spec.dependencies;
       for (_i = 0, _len = dependencies.length; _i < _len; _i++) {
         dep = dependencies[_i];
-        obj = this.resolve_ref(dep['ref']);
+        obj = dep.obj;
         _ref = dep['fields'];
         for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
           fld = _ref[_j];
@@ -314,12 +277,10 @@
     };
 
     HasProperties.prototype.ref = function() {
-      var ref;
-      ref = {
-        id: this.id,
-        collection: this.get_collection_ref()
+      return {
+        'type': this.type,
+        'id': this.id
       };
-      return ref;
     };
 
     HasProperties.prototype.resolve_ref = function(ref) {
@@ -341,9 +302,20 @@
       }
     };
 
+    HasProperties.prototype.url = function() {
+      var base;
+      base = "/cdx/bb/" + Continuum.docid + "/" + this.type + "/";
+      if (this.isNew()) {
+        return base;
+      }
+      return base + this.get('id');
+    };
+
     HasProperties.prototype.sync = function(method, model, options) {
       return options.success(model);
     };
+
+    HasProperties.prototype.defaults = {};
 
     return HasProperties;
 

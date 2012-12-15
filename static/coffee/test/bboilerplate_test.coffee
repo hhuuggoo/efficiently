@@ -9,11 +9,8 @@ class TestObjects extends Backbone.Collection
 test('computed_properties', ->
   window.testobjects = new TestObjects()
   model = window.testobjects.create({'a' : 1, 'b': 1})
-  model.register_property('c',
-    () -> @get('a') + @get('b'),
-    null, false
-  )
-  model.add_dependencies('c', ['a', 'b'])
+  model.register_property('c', () -> @get('a') + @get('b'))
+  model.add_dependencies('c', model, ['a', 'b'])
   temp =  model.get('c')
   ok(temp == 2)
 )
@@ -23,8 +20,9 @@ test('cached_properties_react_changes', ->
   model = window.testobjects.create({'a' : 1, 'b': 1})
   model.register_property('c',
     () -> @get('a') + @get('b'),
+    true
   )
-  model.add_dependencies('c', ['a', 'b'])
+  model.add_dependencies('c', model, ['a', 'b'])
   temp =  model.get('c')
   ok(temp == 2)
   temp = model.get_cache('c')
@@ -67,13 +65,15 @@ test('has_prop_manages_event_for_views', ->
 )
 
 test('property_setters', ->
+  window.testobjects = new TestObjects()
   model = window.testobjects.create({'a' : 1, 'b': 1})
   prop =  () -> @get('a') + @get('b')
   setter = (val) ->
     @set('a', val/2, {silent:true})
     @set('b', val/2)
-  model.register_property('c', prop, setter)
-  model.add_dependencies('c', ['a', 'b'])
+  model.register_property('c', prop, true)
+  model.add_dependencies('c', model, ['a', 'b'])
+  model.register_setter('c', setter)
   model.set('c', 100)
   ok(model.get('a') == 50)
   ok(model.get('b') == 50)

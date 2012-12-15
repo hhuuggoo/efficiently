@@ -39,7 +39,7 @@
   });
 
   test('hide_children_test', function() {
-    var node, node2, node3, node4, nodes, view, view2, view3, view4;
+    var node, node2, node3, node4, node5, nodes, view, view2, view3, view4;
     nodes = deepmultinode_setup();
     node = nodes[0];
     node2 = nodes[1];
@@ -49,10 +49,20 @@
     view2 = view.childrenview.views[node2.id];
     view3 = view2.childrenview.views[node3.id];
     view4 = view2.childrenview.views[node4.id];
-    ok(view2.viewstate.get('hide_children') === false);
+    ok(!view2.viewstate.get('all_hidden'));
+    ok(!view2.viewstate.get('any_hidden'));
     view3.viewstate.set('hide', true);
+    ok(_.any(view2.viewstate.get('any_hidden')));
+    ok(!_.any(view2.viewstate.get('all_hidden')));
     view4.viewstate.set('hide', true);
-    return ok(view2.viewstate.get('hide_children') === true);
+    ok(_.any(view2.viewstate.get('all_hidden')));
+    node5 = Efficiently.outlinenodes.create({
+      'text': 'foo'
+    });
+    view2.model.add_child(node5);
+    ok(!_.any(view2.viewstate.get('all_hidden')));
+    view2.childrenview.views[node5.id].viewstate.set('hide', true);
+    return ok(_.any(view2.viewstate.get('all_hidden')));
   });
 
   test('doc_view', function() {
