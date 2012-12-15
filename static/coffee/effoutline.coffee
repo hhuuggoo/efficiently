@@ -19,8 +19,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @viewstate = options.viewstate
     @docview = options.docview
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
-    BBoilerplate.safebind(this, @model, "change", @render)
-    BBoilerplate.safebind(this, @viewstate, "change", @render)
+    BBoilerplate.safebind(this, @model, "change:children", @render)
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
@@ -34,6 +33,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     return new Efficiently.BasicNodeView(options)
 
   render : () ->
+    console.log('basicrender')
     @mainview.$el.detach()
     @childrenview.$el.detach()
     @$el.addClass('outline')
@@ -169,6 +169,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     else
       parent.reorder_child(@docview.currnode, curridx + 1)
       return false
+
   moveright : (e) =>
     parent = @docview.currnode.parent()
     upper_sibling = @docview.upper_sibling(@docview.currnode, true)
@@ -194,8 +195,10 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return false
 
   deletekey : (e) =>
-    if not @docview.nodeviews[@docview.currnode.id].nodetext()
-      return @deletenode(e)
+    @docview.nodeviews[@docview.currnode.id].nodetext()
+    # if not @docview.nodeviews[@docview.currnode.id].nodetext()
+    #    return @deletenode(e)
+    return true
 
   deletenode : (e) =>
     nextnode = @docview.upper_node(@docview.currnode, true)
@@ -274,6 +277,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
   unselect : () ->
     if @currnode
+      @currview().mainview.unfocus()
       @viewstates[@currnode.id].set(
         select: false
         edit : false
@@ -478,19 +482,25 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   events :
     'click'  : 'select'
-    'focusout' : 'save'
+    'focusout' : 'unfocus'
 
   select : (toedit) ->
     if _.isUndefined(toedit)
       toedit = true
     @docview.select(@model, true)
 
-  save : () ->
+  unfocus : () ->
     @model.set('text', @$el.find('.outline-input').val())
-    @viewstate.set('edit', false)
+    @model.change()
 
+  save : () ->
+    if @viewstate.get('edit')
+      @model.set('text', @$el.find('.outline-input').val())
+    else
+      @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
 
   render : (options) ->
+    console.log("rendering")
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
       chidden : false
