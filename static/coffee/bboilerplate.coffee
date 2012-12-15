@@ -273,8 +273,8 @@ class BBoilerplate.HasProperties extends Backbone.Model
   ref : ->
     # ### method : HasProperties::ref
     #generates a reference to this model
-    'type' : this.type
-    'id' : this.id
+    id : @id
+    collection : @get_collection_ref()
 
   resolve_ref : (ref) ->
     # ### method : HasProperties::resolve_ref

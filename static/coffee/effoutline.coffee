@@ -73,9 +73,11 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
     @register_property('all_hidden',
       () -> _.all(@get('children_hide_status'), (x) -> return x),
       true)
+    @add_dependencies('all_hidden', @, 'children_hide_status')
     @register_property('any_hidden',
       () -> _.any(@get('children_hide_status'), (x) -> return x),
       true)
+    @add_dependencies('any_hidden', @, 'children_hide_status')
 
   #this seems overly complex
   set_child_viewstates : (child_viewstates) ->
@@ -83,6 +85,8 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
         return _.map(child_viewstates, ((model) -> model.get('hide')))
       , null, true
     )
+    for viewstate in child_viewstates
+      @add_dependencies('children_hide_status', viewstate, 'hide')
     @trigger("change:children_hide_status")
     @trigger("change")
 

@@ -52,17 +52,17 @@
     ok(!view2.viewstate.get('all_hidden'));
     ok(!view2.viewstate.get('any_hidden'));
     view3.viewstate.set('hide', true);
-    ok(_.any(view2.viewstate.get('any_hidden')));
-    ok(!_.any(view2.viewstate.get('all_hidden')));
+    ok(view2.viewstate.get('any_hidden'));
+    ok(!view2.viewstate.get('all_hidden'));
     view4.viewstate.set('hide', true);
-    ok(_.any(view2.viewstate.get('all_hidden')));
+    ok(view2.viewstate.get('all_hidden'));
     node5 = Efficiently.outlinenodes.create({
       'text': 'foo'
     });
     view2.model.add_child(node5);
-    ok(!_.any(view2.viewstate.get('all_hidden')));
+    ok(!view2.viewstate.get('all_hidden'));
     view2.childrenview.views[node5.id].viewstate.set('hide', true);
-    return ok(_.any(view2.viewstate.get('all_hidden')));
+    return ok(view2.viewstate.get('all_hidden'));
   });
 
   test('doc_view', function() {

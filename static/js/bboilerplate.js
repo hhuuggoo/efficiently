@@ -278,8 +278,8 @@
 
     HasProperties.prototype.ref = function() {
       return {
-        'type': this.type,
-        'id': this.id
+        id: this.id,
+        collection: this.get_collection_ref()
       };
     };
 
