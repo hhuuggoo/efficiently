@@ -8,7 +8,9 @@ $(() ->
         outlines = document['outline']
         Efficiently.outlinenodes.add(outlines)
         root = Efficiently.outlinenodes.get(root_id)
+        document = new Efficiently.Document()
         docview = new Efficiently.DocView(
+          doc : document
           root : root
           el : $('.rootnode')
         )

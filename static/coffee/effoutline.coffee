@@ -216,6 +216,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @toggle_outline
     if nsmodified and e.keyCode == @keycodes.SLASH
       return @toggle_outline_global
+    @docview.currview().save()
 
   toggle_outline_global : (e) =>
     if @docview.outline_state == 'hide_all'
@@ -275,9 +276,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return false
 
   deletekey : (e) =>
-    @docview.nodeviews[@docview.currnode.id].nodetext()
-    # if not @docview.nodeviews[@docview.currnode.id].nodetext()
-    #    return @deletenode(e)
+    if not @docview.nodeviews[@docview.currnode.id].nodetext()
+      return @deletenode(e)
     return true
 
   deletenode : (e) =>
@@ -510,7 +510,7 @@ class Efficiently.Document extends Efficiently.EfficientlyModel
   make_state_regexp_map : () ->
     map = {}
     for state in @get('todostates')
-      map[state] = new RegExp("(^#{state})")
+      map[state] = new RegExp("(^#{state} )")
     return map
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
@@ -626,14 +626,16 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   save : () ->
     if @viewstate.get('edit')
-      @model.set('text', @$el.find('.outline-input').val())
-    else
       @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
+    else
+      @model.set('text', @$el.find('.outline-input').val())
 
   render : (options) ->
     window.rendertimes += 1
+    text = _.escape(@mget('text'))
+    text = Efficiently.format_text(text, @docview.doc)
     @$el.html(Efficiently.main_node_template(
-      text : @mget('text'),
+      text : text
       chidden : @viewstate.get('any_hidden')
       edit : @viewstate.get('edit')
     ))
@@ -697,6 +699,6 @@ Efficiently.format_text  = (text, document) ->
   for own key, regexp of document.state_regexp_map
     if text.match(regexp)
       color = document.get('todocolors')[key]
-      html = "<span style='color:#{color}'>#{key}</span>"
+      html = "<span style='color:#{color}'>#{key} </span>"
       text = text.replace(regexp, html)
   return text
