@@ -216,8 +216,13 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @toggle_outline
     if nsmodified and e.keyCode == @keycodes.SLASH
       return @toggle_outline_global
-    @docview.currview().contentview.save()
+    if nsmodified and e.keyCode == @keycodes.LT
+      return @toggle_todo
+    #@docview.currview().contentview.save()
     return null
+
+  toggle_todo : (e) =>
+    @docview.currview().model.toggle_todo_state()
 
   toggle_outline_global : (e) =>
     if @docview.outline_state == 'hide_all'
@@ -588,14 +593,19 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     return null
 
   toggle_todo_state : () =>
-    todo_state = @get('text')
-    if outline_state == 'hide_all'
-      @set('outline', 'show_children')
-    else if outline_state == 'show_children'
-      @set('outline', 'show_all')
+    todostate = Efficiently.parse_text(@get('text'), @doc).todo
+    todostates = @doc.get('todostates')
+    curridx = _.indexOf(todostates, todostate)
+    if curridx == todostates.length - 1
+      newstate = ""
+    else if curridx < 0
+      newstate = todostates[0]
     else
-      @set('outline', 'hide_all')
-    console.log('setting', outline_state, @get('outline'))
+      newstate = todostates[curridx + 1]
+    newtxt = Efficiently.set_text(@get('text'), @doc,
+      {'todo' : newstate}
+    )
+    @set('text', newtxt)
     return null
 
 class Efficiently.OutlineNodes extends Backbone.Collection
@@ -625,7 +635,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   events :
     'click'  : 'select'
-    'focusout' : 'unfocus'
 
   select : (toedit) ->
     if _.isUndefined(toedit)
@@ -637,6 +646,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     @model.change()
 
   save : () ->
+    console.log('save!')
     if @viewstate.get('edit')
       @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
     else
