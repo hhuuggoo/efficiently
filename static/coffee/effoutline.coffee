@@ -414,9 +414,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     parent = node.parent()
     if !parent
       return null
-    curridx = parent.child_index(node)
+    curridx = @child_index(parent, node, visible)
+    children = @children(parent, visible)
     if curridx != 0
-      parent.child(curridx - 1)
+      return children[curridx - 1]
     else
       return null
 
