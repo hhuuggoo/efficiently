@@ -19,7 +19,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @render()
 
   remove : () ->
-    @docview.remove(this, @viewstate)
+    @docview.deregister(this, @viewstate)
     return super()
 
   tree_apply : (func, level) ->
@@ -342,7 +342,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @$el.html('')
     @$el.append(@childrenview.$el)
 
-  remove : (id, view, viewstate) ->
+  deregister : (id) ->
     delete @nodeviews[id]
     delete @viewstates[id]
     return
