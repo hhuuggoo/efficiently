@@ -335,7 +335,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @viewstates = {}
     @root = options.root
     @model = options.root
-    @doc = options.doc || new Efficiently.Document()
     @outline_state = 'show_all'
     @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
@@ -518,6 +517,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   collection_ref : ['Efficiently', 'outlinenodes']
   initialize : (attrs, options) ->
     super(attrs, options)
+    @doc = options.doc
     if _.isNull(attrs.children)
       @set('children', [])
 
@@ -587,6 +587,17 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       child.tree_apply(func, newlevel)
     return null
 
+  toggle_todo_state : () =>
+    todo_state = @get('text')
+    if outline_state == 'hide_all'
+      @set('outline', 'show_children')
+    else if outline_state == 'show_children'
+      @set('outline', 'show_all')
+    else
+      @set('outline', 'hide_all')
+    console.log('setting', outline_state, @get('outline'))
+    return null
+
 class Efficiently.OutlineNodes extends Backbone.Collection
   model : Efficiently.OutlineNode
   url : ''
@@ -634,7 +645,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   render : (options) ->
     window.rendertimes += 1
     text = _.escape(@mget('text'))
-    text = Efficiently.format_text(text, @docview.doc)
+    text = Efficiently.format_text(text, @model.doc)
     @$el.html(Efficiently.main_node_template(
       text : text
       chidden : @viewstate.get('any_hidden')

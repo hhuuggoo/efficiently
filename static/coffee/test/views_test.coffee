@@ -1,8 +1,9 @@
 deepmultinode_setup = ()->
-  node = Efficiently.outlinenodes.create({'text' : 'foo'})
-  node2 = Efficiently.outlinenodes.create({'text' : 'foo2'})
-  node3 = Efficiently.outlinenodes.create({'text' : 'foo3'})
-  node4 = Efficiently.outlinenodes.create({'text' : 'foo4'})
+  doc = new Efficiently.Document()
+  node = Efficiently.outlinenodes.create({'text' : 'foo'}, {'doc':doc})
+  node2 = Efficiently.outlinenodes.create({'text' : 'foo2'}, {'doc':doc})
+  node3 = Efficiently.outlinenodes.create({'text' : 'foo3'}, {'doc':doc})
+  node4 = Efficiently.outlinenodes.create({'text' : 'foo4'}, {'doc':doc})
   node.add_child(node2)
   node2.add_child(node3)
   node2.add_child(node4)
@@ -40,7 +41,8 @@ test('hide_children_test', ()->
   ok(not view2.viewstate.get('all_hidden'))
   view4.viewstate.set('hide', true)
   ok(view2.viewstate.get('all_hidden'))
-  node5 = Efficiently.outlinenodes.create({'text' : 'foo'})
+  node5 = Efficiently.outlinenodes.create({'text' : 'foo'},
+    {'doc' : node2.doc})
   view2.model.add_child(node5)
   ok(not view2.viewstate.get('all_hidden'))
   view2.childrenview.views[node5.id].viewstate.set('hide', true)
@@ -91,7 +93,9 @@ test('render_outline_test', ()->
   view2 = view.childrenview.views[node2.id]
   view3 = view2.childrenview.views[node3.id]
   view4 = view2.childrenview.views[node4.id]
-  node5 = Efficiently.outlinenodes.create({'text' : 'foo'})
+  node5 = Efficiently.outlinenodes.create({'text' : 'foo'},
+    {'doc' : node2.doc}
+  )
   node4.add_child(node5)
   view5 = view4.childrenview.views[node5.id]
   view2.viewstate.set('outline', 'show_children')

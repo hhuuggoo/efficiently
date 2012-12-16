@@ -3,18 +3,27 @@
   var deepmultinode_setup;
 
   deepmultinode_setup = function() {
-    var node, node2, node3, node4;
+    var doc, node, node2, node3, node4;
+    doc = new Efficiently.Document();
     node = Efficiently.outlinenodes.create({
       'text': 'foo'
+    }, {
+      'doc': doc
     });
     node2 = Efficiently.outlinenodes.create({
       'text': 'foo2'
+    }, {
+      'doc': doc
     });
     node3 = Efficiently.outlinenodes.create({
       'text': 'foo3'
+    }, {
+      'doc': doc
     });
     node4 = Efficiently.outlinenodes.create({
       'text': 'foo4'
+    }, {
+      'doc': doc
     });
     node.add_child(node2);
     node2.add_child(node3);
@@ -62,6 +71,8 @@
     ok(view2.viewstate.get('all_hidden'));
     node5 = Efficiently.outlinenodes.create({
       'text': 'foo'
+    }, {
+      'doc': node2.doc
     });
     view2.model.add_child(node5);
     ok(!view2.viewstate.get('all_hidden'));
@@ -116,6 +127,8 @@
     view4 = view2.childrenview.views[node4.id];
     node5 = Efficiently.outlinenodes.create({
       'text': 'foo'
+    }, {
+      'doc': node2.doc
     });
     node4.add_child(node5);
     view5 = view4.childrenview.views[node5.id];
