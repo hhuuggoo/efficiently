@@ -116,7 +116,7 @@
     output = Efficiently.format_text("hello", document);
     ok(output === "hello");
     output = Efficiently.format_text("TODO hello", document);
-    return ok(output.search("<span style='color:red'>TODO</span>") === 0);
+    return ok(output.search("<span style='color:red'>TODO </span>") === 0);
   });
 
 }).call(this);

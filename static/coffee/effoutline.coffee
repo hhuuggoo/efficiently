@@ -335,7 +335,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @viewstates = {}
     @root = options.root
     @model = options.root
-    @doc = options.doc
+    @doc = options.doc || new Efficiently.Document()
     @outline_state = 'show_all'
     @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)

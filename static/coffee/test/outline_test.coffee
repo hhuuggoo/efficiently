@@ -83,6 +83,6 @@ test('test_format_text', ->
   output = Efficiently.format_text("hello", document)
   ok(output == "hello")
   output = Efficiently.format_text("TODO hello", document)
-  ok(output.search("<span style='color:red'>TODO</span>") == 0)
+  ok(output.search("<span style='color:red'>TODO </span>") == 0)
 
 )
