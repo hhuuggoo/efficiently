@@ -13,7 +13,10 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
     @viewstate = options.viewstate
+    if not options.docview
+      debugger
     @docview = options.docview
+    options.nodeview = @
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
@@ -46,7 +49,10 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     viewstate = new Efficiently.OutlineViewState({'model' : model})
     options.model = model
     options.viewstate = viewstate
-    return new Efficiently.BasicNodeView(options)
+    options.docview = @docview
+    view = new Efficiently.BasicNodeView(options)
+    @docview.register(model.id, view, viewstate)
+    return view
 
   render : () ->
     @mainview.$el.detach()
@@ -294,6 +300,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @viewstates = {}
     @root = options.root
     @model = options.root
+    @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     viewstate = new Efficiently.OutlineViewState(
       model : @root
@@ -302,11 +309,13 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       model : @root
       viewstate : viewstate
       docview : this
+      nodeview : this
     )
     @register(@root.id, this, viewstate)
     @childrenview = view
     @render()
     @currnode = null
+
     return this
 
   delegateEvents : (events) ->
@@ -351,15 +360,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @nodeviews[id] = view
     @viewstates[id] = viewstate
     return
-
-  make_view : (model, options) ->
-    options = options || {}
-    options = _.extend({}, options)
-    options.docview = this
-    view = Efficiently.BasicNodeView::make_view(model, options)
-    viewstate = view.viewstate
-    @register(model.id, view, viewstate)
-    return view
 
   children : (node, visible) ->
     if not visible
@@ -578,6 +578,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     super(options)
     @viewstate = options.viewstate
     @docview = options.docview
+    @nodeview = options.nodeview
     @views = {}
     @render()
 
@@ -589,10 +590,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     children = @model.children()
     child_refs = (model.ref() for model in children)
     BBoilerplate.build_views(@views, child_refs, (ref) =>
-      if @docview
-        return @docview.make_view(@model.resolve_ref(ref))
-      else
-        return Efficiently.BasicNodeView::make_view(@model.resolve_ref(ref))
+      @nodeview.make_view(@model.resolve_ref(ref))
     )
 
   render : () ->

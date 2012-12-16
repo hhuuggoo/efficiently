@@ -29,13 +29,15 @@
     node2 = nodes[1];
     node3 = nodes[2];
     node4 = nodes[3];
-    view = Efficiently.BasicNodeView.prototype.make_view(node);
+    view = new Efficiently.DocView({
+      root: node
+    });
     $('#test1').append(view.$el);
     childnode = $('#test1').find(".children:first");
-    ok($($('#test1').find('.outline')[0]).find('.children:first').children().length === 1);
-    ok($($('#test1').find('.outline')[1]).find('.children:first').children().length === 2);
-    ok($($('#test1').find('.outline')[2]).find('.children:first').children().length === 0);
-    return ok($($('#test1').find('.outline')[3]).find('.children:first').children().length === 0);
+    ok($('#test1').find('.children:first').children().length === 1);
+    ok($($('#test1').find('.outline')[0]).find('.children:first').children().length === 2);
+    ok($($('#test1').find('.outline')[1]).find('.children:first').children().length === 0);
+    return ok($($('#test1').find('.outline')[2]).find('.children:first').children().length === 0);
   });
 
   test('hide_children_test', function() {
@@ -45,7 +47,9 @@
     node2 = nodes[1];
     node3 = nodes[2];
     node4 = nodes[3];
-    view = Efficiently.BasicNodeView.prototype.make_view(node);
+    view = new Efficiently.DocView({
+      root: node
+    });
     view2 = view.childrenview.views[node2.id];
     view3 = view2.childrenview.views[node3.id];
     view4 = view2.childrenview.views[node4.id];
