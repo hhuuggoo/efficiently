@@ -703,3 +703,27 @@ Efficiently.format_text  = (text, document) ->
       html = "<span style='color:#{color}'>#{key} </span>"
       text = text.replace(regexp, html)
   return text
+
+
+Efficiently.parse_text  = (text, document) ->
+  data = {}
+  data['text'] = text
+  for own key, regexp of document.state_regexp_map
+    if text.match(regexp)
+      data['todo'] = key
+  return data
+
+Efficiently.set_text = (text, document, data) ->
+  if not _.isUndefined(data.todo)
+    if data.todo
+      newval = data.todo + " "
+    else
+      newval = data.todo
+    set = false
+    for own key, regexp of document.state_regexp_map
+      if text.match(regexp)
+        text = text.replace(regexp, newval)
+        set = true
+    if not set
+      text = "#{newval}#{text}"
+  return text

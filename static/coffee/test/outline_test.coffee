@@ -86,3 +86,25 @@ test('test_format_text', ->
   ok(output.search("<span style='color:red'>TODO </span>") == 0)
 
 )
+
+test('test_parse_text', ->
+  document = new Efficiently.Document()
+  output = Efficiently.parse_text("hello", document)
+  ok(output.text == "hello")
+  ok(_.isUndefined(output.todo) or _.isNull(output.todo))
+  output = Efficiently.parse_text("INPROGRESS hello", document)
+  ok(output.text == "INPROGRESS hello")
+  ok(output.todo == "INPROGRESS")
+)
+
+test('test_set_text', ->
+  document = new Efficiently.Document()
+  output = Efficiently.set_text("hello", document, {'todo' : "INPROGRESS"})
+  ok(output == "INPROGRESS hello")
+  output = Efficiently.set_text("INPROGRESS hello", document, {'todo' : ''})
+  ok(output == "hello")
+  output = Efficiently.set_text("INPROGRESS hello", document,
+    {'todo' : "DONE"})
+  ok(output == "DONE hello")
+
+)
