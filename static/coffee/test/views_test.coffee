@@ -84,7 +84,10 @@ test('render_outline_test', ()->
   node2 = nodes[1]
   node3 = nodes[2]
   node4 = nodes[3]
-  view = new Efficiently.DocView(root : node)
+  view = new Efficiently.DocView(
+    root : node
+    el : $('#render_outline_test')
+  )
   view2 = view.childrenview.views[node2.id]
   view3 = view2.childrenview.views[node3.id]
   view4 = view2.childrenview.views[node4.id]
@@ -92,19 +95,20 @@ test('render_outline_test', ()->
   node4.add_child(node5)
   view5 = view4.childrenview.views[node5.id]
   view2.viewstate.set('outline', 'show_children')
+  ok(view2.$el.find('.children').is(":visible"))
   ok(not view2.viewstate.get('hide'))
   ok(view5.viewstate.get('hide') )
   ok(not view3.viewstate.get('hide'))
   ok(not view4.viewstate.get('hide'))
   view2.viewstate.set('outline', 'show_all')
+  ok(view2.$el.find('.children').is(":visible"))
   ok(not view2.viewstate.get('hide'))
-  ok(not view5.viewstate.get('hide') )
+  ok(not view5.viewstate.get('hide'))
   ok(not view3.viewstate.get('hide'))
   ok(not view4.viewstate.get('hide'))
   view2.viewstate.set('outline', 'hide_all')
-  ok(view5.viewstate.get('hide'))
   ok(view3.viewstate.get('hide'))
   ok(view4.viewstate.get('hide'))
   ok(not view2.viewstate.get('hide'))
-  ok(view2.$el.find('.children').length == 0) #should not display child el
+  ok(not view2.$el.find('.children').is(":visible"))
 )

@@ -334,6 +334,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @viewstates = {}
     @root = options.root
     @model = options.root
+    @doc = options.doc
     @outline_state = 'show_all'
     @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
@@ -350,7 +351,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @childrenview = view
     @render()
     @currnode = null
-
     return this
 
   delegateEvents : (events) ->
@@ -479,7 +479,8 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   show_children : (node) ->
     children = @children(node, false)
     for child in children
-      child.tree_apply(@hide, null)
+      for grandchild in @children(child, false)
+        @hide(grandchild)
       @unhide(child)
     return null
 
@@ -490,15 +491,25 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   hide_all_children : (node) ->
     children = @children(node, false)
     for child in children
-      child.tree_apply(@hide, null)
+      @hide(child)
     return null
+
+class Efficiently.Document extends Efficiently.EfficientlyModel
+  defaults :
+    title : ''
+    todostates : ["TODO", "INPROGRESS", "DONE"]
+    todocolors :
+      TODO : 'red'
+      INPROGRESS : 'red'
+			DONE : 'green'
+
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   collection_ref : ['Efficiently', 'outlinenodes']
   initialize : (attrs, options) ->
     super(attrs, options)
     if _.isNull(attrs.children)
-      attrs.children = []
+      @set('children', [])
 
   defaults:
     documentids : null
@@ -566,8 +577,6 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       child.tree_apply(func, newlevel)
     return null
 
-
-
 class Efficiently.OutlineNodes extends Backbone.Collection
   model : Efficiently.OutlineNode
   url : ''
@@ -613,6 +622,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
 
   render : (options) ->
+    window.rendertimes += 1
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
       chidden : @viewstate.get('any_hidden')
