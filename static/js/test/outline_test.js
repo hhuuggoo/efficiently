@@ -147,4 +147,12 @@
     return ok(output === "DONE hello");
   });
 
+  test('test_parentheses_words', function() {
+    var output;
+    output = Efficiently.parentheses_words("A and (B and C)");
+    ok(output[0] === "A");
+    ok(output[1] === "and");
+    return ok(output[2] === "(B and C)");
+  });
+
 }).call(this);

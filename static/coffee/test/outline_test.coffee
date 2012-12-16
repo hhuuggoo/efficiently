@@ -108,3 +108,11 @@ test('test_set_text', ->
   ok(output == "DONE hello")
 
 )
+
+
+test('test_parentheses_words', ->
+  output = Efficiently.parentheses_words("A and (B and C)")
+  ok(output[0] == "A")
+  ok(output[1] == "and")
+  ok(output[2] == "(B and C)")
+)
