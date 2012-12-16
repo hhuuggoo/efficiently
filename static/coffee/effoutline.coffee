@@ -42,6 +42,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     BBoilerplate.safebind(this, @model, "change:children", @render)
     BBoilerplate.safebind(this, @viewstate, "change:outline", @render_outline)
+    BBoilerplate.safebind(this, @viewstate, "change:all_hidden", @render)
     return this
 
   render_outline : () ->
@@ -70,8 +71,12 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @$el.addClass('outline')
     @$el.addClass('clearfix')
     @$el.append(@mainview.$el)
-    if @docview.children(@model, true).length != 0
-      @$el.append(@childrenview.$el)
+    @$el.append(@childrenview.$el)
+    if @docview.children(@model, true).length == 0
+      @childrenview.$el.hide()
+    else
+      @childrenview.$el.show()
+
 
   remove : () ->
     @mainview.remove()
@@ -90,7 +95,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     return @docview.viewstates[id]
 
 class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
-  outline_states : ['hide', 'show_children', 'show_all']
+  outline_states : ['hide_all', 'show_children', 'show_all']
   defaults :
     hide : false
     edit : false
@@ -98,13 +103,15 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
     outline : 'show_all'
 
   toggle_outline_state : () =>
-    outline_state == 'hide'
-    if outline_state == 'hide'
+    outline_state = @get('outline')
+    if outline_state == 'hide_all'
       @set('outline', 'show_children')
     else if outline_state == 'show_children'
-      @set('outline', 'hide')
-    else
       @set('outline', 'show_all')
+    else
+      @set('outline', 'hide_all')
+    console.log('setting', outline_state, @get('outline'))
+    return null
 
   initialize : (attrs, options) ->
     super(attrs, options)
@@ -209,7 +216,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @toggle_outline
 
   toggle_outline : (e) =>
-    @docview.currview().toggle_outline_state()
+    @docview.currview().viewstate.toggle_outline_state()
     return false
 
   moveup : (e) =>
@@ -477,7 +484,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   initialize : (attrs, options) ->
     super(attrs, options)
     if _.isNull(attrs.children)
-      this.set('children', [])
+      attrs.children = []
 
   defaults:
     documentids : null
@@ -564,8 +571,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     super(options)
     @viewstate = options.viewstate
     @docview = options.docview
-    BBoilerplate.safebind(this, @model, "change", @render)
-    BBoilerplate.safebind(this, @viewstate, "change", @render)
     @render()
 
   delegateEvents : (events) ->
@@ -573,6 +578,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @model, "change", @render)
     BBoilerplate.safebind(this, @viewstate, "change", @render)
     return this
+
   events :
     'click'  : 'select'
     'focusout' : 'unfocus'
@@ -593,10 +599,9 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
 
   render : (options) ->
-    console.log("rendering")
     @$el.html(Efficiently.main_node_template(
       text : @mget('text'),
-      chidden : false
+      chidden : @viewstate.get('any_hidden')
       edit : @viewstate.get('edit')
     ))
     if @viewstate.get('select')
@@ -616,7 +621,11 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
           node.resizeNow.call(node)
         , 100
       )
-
+    if @viewstate.get('hide')
+      @$el.hide()
+    else
+      @$el.show()
+window.rendertimes = 0
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
     super(options)
