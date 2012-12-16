@@ -748,3 +748,22 @@ Efficiently.set_text = (text, document, data) ->
     if not set
       text = "#{newval}#{text}"
   return text
+
+Efficiently.tree_search = (expression, docview) ->
+  docview.show_all_children(docview.model)
+  egraph = Efficiently.expression_graph(expression)
+  regexes = [new RegExp("/(^|\s)@(\w+)/g"), new RegExp(/(^|\s)#(\w+)/g)]
+  regexes = regexes.concat(_.values(docview.model.doc.state_regexp_map))
+  f = (node, tags_found) ->
+    _.extend(tags_found, Efficiently.get_tags(node.get('text'), regexes))
+    matched = Efficiently.eval_expression_graph(
+      egraph, node.get('text'), tags_found
+    )
+    children_matched = _.map(node.children(), (child) ->
+      f(child, _.clone(tags_found))
+    )
+    if not _.any(children_matched) and not matched
+      docview.hide(node)
+    else
+      docview.unhide(node)
+  f(docview.model, {})

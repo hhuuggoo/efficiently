@@ -113,7 +113,7 @@ test('render_outline_test', ()->
   view2.viewstate.set('outline', 'hide_all')
   ok(view3.viewstate.get('hide'))
   ok(view4.viewstate.get('hide'))
-  ok(not view2.viewstate.get('hide'))
+  ok(not view2.viewstate.get('hidoute'))
   ok(not view2.$el.find('.children').is(":visible"))
 )
 
@@ -130,5 +130,22 @@ test('toggle_todo_test', ()->
   view2 = view.childrenview.views[node2.id]
   node2.toggle_todo_state()
   ok(node2.get('text').indexOf("TODO")==0)
-  debugger
+)
+test('tree_search_test', ()->
+  nodes = deepmultinode_setup()
+  node = nodes[0]
+  node2 = nodes[1]
+  node3 = nodes[2]
+  node4 = nodes[3]
+  view = new Efficiently.DocView(
+    root : node
+    el : $('#tree_search')
+  )
+  Efficiently.tree_search("foo3", view)
+  view2 = view.childrenview.views[node2.id]
+  view3 = view2.childrenview.views[node3.id]
+  view4 = view2.childrenview.views[node4.id]
+  ok(view4.viewstate.get('hide'))
+  ok(not view3.viewstate.get('hide'))
+  ok(not view2.viewstate.get('hide'))
 )

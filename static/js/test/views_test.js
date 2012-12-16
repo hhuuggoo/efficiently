@@ -147,7 +147,7 @@
     view2.viewstate.set('outline', 'hide_all');
     ok(view3.viewstate.get('hide'));
     ok(view4.viewstate.get('hide'));
-    ok(!view2.viewstate.get('hide'));
+    ok(!view2.viewstate.get('hidoute'));
     return ok(!view2.$el.find('.children').is(":visible"));
   });
 
@@ -164,8 +164,27 @@
     });
     view2 = view.childrenview.views[node2.id];
     node2.toggle_todo_state();
-    ok(node2.get('text').indexOf("TODO") === 0);
-    debugger;
+    return ok(node2.get('text').indexOf("TODO") === 0);
+  });
+
+  test('tree_search_test', function() {
+    var node, node2, node3, node4, nodes, view, view2, view3, view4;
+    nodes = deepmultinode_setup();
+    node = nodes[0];
+    node2 = nodes[1];
+    node3 = nodes[2];
+    node4 = nodes[3];
+    view = new Efficiently.DocView({
+      root: node,
+      el: $('#tree_search')
+    });
+    Efficiently.tree_search("foo3", view);
+    view2 = view.childrenview.views[node2.id];
+    view3 = view2.childrenview.views[node3.id];
+    view4 = view2.childrenview.views[node4.id];
+    ok(view4.viewstate.get('hide'));
+    ok(!view3.viewstate.get('hide'));
+    return ok(!view2.viewstate.get('hide'));
   });
 
 }).call(this);
