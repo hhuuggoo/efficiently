@@ -15,7 +15,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @viewstate = options.viewstate
     @docview = options.docview
     options.nodeview = @
-    @mainview = new Efficiently.BasicNodeContentView(options)
+    @contentview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @docview.register(@model.id, this, @viewstate)
     @render()
@@ -66,11 +66,11 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     return view
 
   render : () ->
-    @mainview.$el.detach()
+    @contentview.$el.detach()
     @childrenview.$el.detach()
     @$el.addClass('outline')
     @$el.addClass('clearfix')
-    @$el.append(@mainview.$el)
+    @$el.append(@contentview.$el)
     @$el.append(@childrenview.$el)
     if @docview.children(@model, true).length == 0
       @childrenview.$el.hide()
@@ -79,13 +79,13 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
 
 
   remove : () ->
-    @mainview.remove()
+    @contentview.remove()
     @childrenview.remove()
     super()
 
   nodetext : () ->
     if @viewstate.get('edit')
-      @mainview.save()
+      @contentview.save()
     return @mget('text')
 
   getview : (id) ->
@@ -216,7 +216,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @toggle_outline
     if nsmodified and e.keyCode == @keycodes.SLASH
       return @toggle_outline_global
-    @docview.currview().save()
+    @docview.currview().contentview.save()
+    return null
 
   toggle_outline_global : (e) =>
     if @docview.outline_state == 'hide_all'
@@ -254,8 +255,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   moveright : (e) =>
     parent = @docview.currnode.parent()
     upper_sibling = @docview.upper_sibling(@docview.currnode, true)
-    if upper_sibling != parent
-      @docview.currview().mainview.save() #save cause view is going away
+    if upper_sibling != parent and upper_sibling
+      @docview.currview().contentview.save() #save cause view is going away
       parent.remove_child(@docview.currnode)
       upper_sibling.add_child(@docview.currnode)
     @docview.select(@docview.currnode)
@@ -268,7 +269,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     grandparent = parent.parent()
     if not grandparent
       return false
-    @docview.currview().mainview.save()
+    @docview.currview().contentview.save()
     curridx = grandparent.child_index(parent)
     parent.remove_child(@docview.currnode)
     grandparent.add_child(@docview.currnode, curridx + 1)
@@ -365,7 +366,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
   unselect : () ->
     if @currnode
-      @currview().mainview.unfocus()
+      @currview().contentview.unfocus()
       @viewstates[@currnode.id].set(
         select: false
         edit : false
