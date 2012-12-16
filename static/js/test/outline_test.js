@@ -148,11 +148,17 @@
   });
 
   test('test_parentheses_words', function() {
-    var output;
+    var graph, output;
     output = Efficiently.parentheses_words("A and (B and C)");
     ok(output[0] === "A");
     ok(output[1] === "and");
-    return ok(output[2] === "(B and C)");
+    ok(output[2] === "(B and C)");
+    graph = Efficiently.expression_graph("A and (B and not C) or D");
+    ok(Efficiently.eval_expression_graph(graph, "A B", {}));
+    ok(!Efficiently.eval_expression_graph(graph, "A", {}));
+    ok(Efficiently.eval_expression_graph(graph, "D", {}));
+    ok(Efficiently.eval_expression_graph(graph, "A B", {}));
+    return ok(!Efficiently.eval_expression_graph(graph, "A B C", {}));
   });
 
 }).call(this);
