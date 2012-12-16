@@ -77,3 +77,12 @@ test('tree_apply', ->
   ok(node3.get('text') == 'monkey')
   ok(node4.get('text') == 'monkey')
 )
+
+test('test_format_text', ->
+  document = new Efficiently.Document()
+  output = Efficiently.format_text("hello", document)
+  ok(output == "hello")
+  output = Efficiently.format_text("TODO hello", document)
+  ok(output.search("<span style='color:red'>TODO</span>") == 0)
+
+)

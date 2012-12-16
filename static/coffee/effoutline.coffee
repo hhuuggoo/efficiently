@@ -501,8 +501,17 @@ class Efficiently.Document extends Efficiently.EfficientlyModel
     todocolors :
       TODO : 'red'
       INPROGRESS : 'red'
-			DONE : 'green'
+      DONE : 'green'
 
+  initialize : (attrs, options) ->
+    super(attrs, options)
+    @state_regexp_map = @make_state_regexp_map()
+
+  make_state_regexp_map : () ->
+    map = {}
+    for state in @get('todostates')
+      map[state] = new RegExp("(^#{state})")
+    return map
 
 class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
   collection_ref : ['Efficiently', 'outlinenodes']
@@ -683,3 +692,11 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     child_container = @$el.find('.children')
     for childid in @mget('children')
       child_container.append(@views[childid].$el)
+
+Efficiently.format_text  = (text, document) ->
+  for own key, regexp of document.state_regexp_map
+    if text.match(regexp)
+      color = document.get('todocolors')[key]
+      html = "<span style='color:#{color}'>#{key}</span>"
+      text = text.replace(regexp, html)
+  return text
