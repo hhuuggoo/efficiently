@@ -214,6 +214,19 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @movedown
     if nsmodified and e.keyCode == @keycodes.GT
       return @toggle_outline
+    if nsmodified and e.keyCode == @keycodes.SLASH
+      return @toggle_outline_global
+
+  toggle_outline_global : (e) =>
+    if @docview.outline_state == 'hide_all'
+      @docview.outline_state = 'show_children'
+    else if @docview.outline_state == 'show_children'
+      @docview.outline_state = 'show_all'
+    else
+      @docview.outline_state = 'hide_all'
+    for child in @docview.children(@docview.model, false)
+      @docview.getviewstate(child.id).set('outline', @docview.outline_state)
+    return false
 
   toggle_outline : (e) =>
     @docview.currview().viewstate.toggle_outline_state()
@@ -321,6 +334,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @viewstates = {}
     @root = options.root
     @model = options.root
+    @outline_state = 'show_all'
     @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     @viewstate = new Efficiently.OutlineViewState(
