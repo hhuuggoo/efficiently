@@ -81,6 +81,11 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
       @mainview.save()
     return @mget('text')
 
+  getview : (id) ->
+    return @docview.nodeviews[id]
+
+  getviewstate : (id) ->
+    return @docview.viewstates[id]
 
 class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
   outline_states : ['hide', 'show_children', 'show_all']
@@ -374,13 +379,19 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       )
       return children
 
+  child_index : (parent, node, visible) ->
+    children = @children(parent, visible)
+    childids = _.map(children, (x) -> x.id)
+    return _.indexOf(childids, node.id)
+
   lower_sibling : (node, visible) ->
     parent = node.parent()
     if not parent
       return null
-    curridx = parent.child_index(node)
-    if curridx < (parent.num_children() - 1)
-      return parent.child(curridx + 1)
+    curridx = @child_index(parent, node, visible)
+    children = @children(parent, visible)
+    if curridx < children.length - 1
+      return children[curridx + 1]
     else
       return null
 
