@@ -10,10 +10,6 @@ class Efficiently.EfficientlyModel extends BBoilerplate.HasProperties
 
 
 class Efficiently.BasicNodeView extends BBoilerplate.BasicView
-  remove : () ->
-    @docview.remove(this, @viewstate)
-    return super()
-
   initialize : (options) ->
     super(options)
     @viewstate = options.viewstate
@@ -21,6 +17,24 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @mainview = new Efficiently.BasicNodeContentView(options)
     @childrenview = new Efficiently.BasicChildrenView(options)
     @render()
+
+  remove : () ->
+    @docview.remove(this, @viewstate)
+    return super()
+
+  tree_apply : (func, level) ->
+    func(this);
+    if level > 0
+      newlevel = level - 1
+    else if _.isNull(level)
+      newlevel = null
+    else
+      return null
+    children = @get('children')
+    for childid in children
+      child = @collection.get(childid)
+      child.tree_apply(func, newlevel)
+    return null
 
   delegateEvents : (events) ->
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
@@ -63,10 +77,21 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
 
 
 class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
+  outline_states : ['hide', 'show_children', 'show_all']
   defaults :
     hide : false
     edit : false
     select : false
+    outline : 'show_all'
+
+  toggle_outline_state : () =>
+    outline_state == 'hide'
+    if outline_state == 'hide'
+      @set('outline', 'show_children')
+    else if outline_state == 'show_children'
+      @set('outline', 'hide')
+    else
+      @set('outline', 'show_all')
 
   initialize : (attrs, options) ->
     super(attrs, options)
