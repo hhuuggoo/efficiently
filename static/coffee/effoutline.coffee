@@ -199,7 +199,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if not modified and e.keyCode == @keycodes.ESC
       return @exitsearch
 
-  entersearch : (e) =>
+  enterfilter : (e) =>
     @docview.$el.find(".filter").focus()
 
   exitsearch : (e) =>
@@ -245,7 +245,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if nsmodified and e.keyCode == @keycodes.LT
       return @toggle_todo
     if nsmodified and e.keyCode == @keycodes.O_KEY
-      return @entersearch
+      return @enterfilter
 
     #@docview.currview().contentview.save()
     return null
