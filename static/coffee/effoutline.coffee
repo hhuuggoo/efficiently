@@ -39,6 +39,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     return null
 
   delegateEvents : (events) ->
+    super(events)
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     BBoilerplate.safebind(this, @model, "change:children", @render)
     BBoilerplate.safebind(this, @viewstate, "change:outline", @render_outline)
@@ -136,7 +137,6 @@ class Efficiently.OutlineViewState extends Efficiently.EfficientlyModel
     @trigger("change")
 
 
-
 class Efficiently.KeyEventer extends BBoilerplate.BasicView
   keycodes :
     UP : 38
@@ -157,6 +157,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     BACKSPACE : 8
     DELETE : 46
     O_KEY : 79
+    ESC : 27
 
   initialize : (options) ->
     super(options)
@@ -179,11 +180,33 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return e.ctrlKey || e.altKey
 
   keydown : (e) =>
-    func = @get_keyfunction(e)
+    if @docview.ui_state == 'normal'
+      func = @get_keyfunction(e)
+    else if @docview.ui_state == 'filter'
+      func = @get_filterkeyfunction(e)
     if (func)
       return func(e)
     else
       return true
+
+  get_filterkeyfunction : (e) =>
+    modified = @modified(e)
+    nsmodified = @nsmodified(e)
+    if not modified and e.keyCode == @keycodes.ENTER
+      return @filter
+    if not modified and e.keyCode == @keycodes.DOWN
+      return @exitsearch
+    if not modified and e.keyCode == @keycodes.ESC
+      return @exitsearch
+
+  exitsearch : (e) =>
+    @docview.$el.find(".filter").blur()
+    @docview.select(@docview.currnode)
+
+  filter : (e) =>
+    Efficiently.tree_filter(@docview.filterexpression(), @docview)
+    e.preventDefault()
+    return false
 
   get_keyfunction : (e) =>
     modified = @modified(e)
@@ -341,6 +364,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @root = options.root
     @model = options.root
     @outline_state = 'show_all'
+    @ui_state = 'normal'
     @docview = this
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     @viewstate = new Efficiently.OutlineViewState(
@@ -358,10 +382,26 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @currnode = null
     return this
 
+  filterexpression : () ->
+    @$el.find('.filter').val()
+
+  events :
+    "focusin .filter" : "filterin"
+    "focusout .filter" : "filterout"
+
+  filterin : () =>
+    console.log('filterin')
+    @ui_state = 'filter'
+
+  filterout : () =>
+    console.log('filterout')
+    @ui_state = 'normal'
+
   delegateEvents : (events) ->
     super(events)
     BBoilerplate.safebind(this, @model, "destroy", @destroy)
     return this
+
   currview : () ->
     return @nodeviews[@currnode.id]
 
@@ -369,16 +409,18 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return @viewstates[@currnode.id]
 
   unselect : () ->
+    console.log('unselecting')
     if @currnode
       @currview().contentview.unfocus()
       @viewstates[@currnode.id].set(
-        select: false
+        select : false
         edit : false
       )
       @currnode = null
 
   select : (node, toedit) ->
-    @unselect()
+    if @currnode != node
+      @unselect()
     @currnode = node
     if _.isUndefined(toedit)
       toedit = true
@@ -389,6 +431,15 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
   render : () ->
     @$el.html('')
+    @$el.append($(
+      """
+    	<div class="left"> Filter:  </div>
+    	<div class="abox">
+        <textarea type="text" class="left filter textborder"></textarea>
+      </div>
+      <hr class="mainsep"/>
+      """
+    ))
     @$el.append(@childrenview.$el)
 
   deregister : (id) ->
@@ -654,6 +705,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   render : (options) ->
     window.rendertimes += 1
+    console.log(window.rendertimes)
     text = _.escape(@mget('text'))
     text = Efficiently.format_text(text, @model.doc)
     @$el.html(Efficiently.main_node_template(
@@ -749,7 +801,7 @@ Efficiently.set_text = (text, document, data) ->
       text = "#{newval}#{text}"
   return text
 
-Efficiently.tree_search = (expression, docview) ->
+Efficiently.tree_filter = (expression, docview) ->
   docview.show_all_children(docview.model)
   egraph = Efficiently.expression_graph(expression)
   regexes = [new RegExp("/(^|\s)@(\w+)/g"), new RegExp(/(^|\s)#(\w+)/g)]
@@ -764,6 +816,8 @@ Efficiently.tree_search = (expression, docview) ->
     )
     if not _.any(children_matched) and not matched
       docview.hide(node)
+      return false
     else
       docview.unhide(node)
+      return true
   f(docview.model, {})

@@ -261,14 +261,14 @@ button{
     float:left;
 }
 
-.search{
+.filter{
     width: 70%;
     margin: 0px 0px 0px 7px;
     height: 18px;
     padding: 0px 0px 0px 0px;
     border: 3px solid #64B5FF;    
 }
-.search:focus{
+.filter:focus{
     width: 70%;
     margin: 0px 0px 0px 7px;
     height: 18px;

@@ -167,7 +167,7 @@
     return ok(node2.get('text').indexOf("TODO") === 0);
   });
 
-  test('tree_search_test', function() {
+  test('tree_filter_test', function() {
     var node, node2, node3, node4, nodes, view, view2, view3, view4;
     nodes = deepmultinode_setup();
     node = nodes[0];
@@ -176,9 +176,9 @@
     node4 = nodes[3];
     view = new Efficiently.DocView({
       root: node,
-      el: $('#tree_search')
+      el: $('#tree_filter')
     });
-    Efficiently.tree_search("foo3", view);
+    Efficiently.tree_filter("foo3", view);
     view2 = view.childrenview.views[node2.id];
     view3 = view2.childrenview.views[node3.id];
     view4 = view2.childrenview.views[node4.id];
