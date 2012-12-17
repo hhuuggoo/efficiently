@@ -812,6 +812,8 @@ Efficiently.format_text  = (text, document) ->
       color = document.get('todocolors')[key]
       html = "<span style='color:#{color}'>#{key} </span>"
       text = text.replace(regexp, html)
+  text = text.replace(/(^|\s)#(\w+)/g, "$1<span class='hashtag'>#$2</span>")
+  text = text.replace(/(^|\s)@(\w+)/g, "$1<span class='hashtag'>@$2</span>");
   return text
 
 
