@@ -686,8 +686,13 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   delegateEvents : (events) ->
     super(events)
-    BBoilerplate.safebind(this, @model, "change", @render)
-    BBoilerplate.safebind(this, @viewstate, "change", @render)
+    BBoilerplate.safebind(this, @model, "change:text", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:hide", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:edit", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:select", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:any_hidden", @render)
+    BBoilerplate.safebind(this, @model.doc, "change:todostates", @render)
+    BBoilerplate.safebind(this, @model.doc, "change:todocolors", @render)
     return this
 
   events :
@@ -711,7 +716,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   render : (options) ->
     window.rendertimes += 1
-    console.log(window.rendertimes)
+    console.log(window.rendertimes, arguments)
     text = _.escape(@mget('text'))
     text = Efficiently.format_text(text, @model.doc)
     @$el.html(Efficiently.main_node_template(
@@ -725,21 +730,17 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @$el.removeClass("shade")
     @$el.addClass("content clearfix")
     node = @$el.find('textarea')
-    node.height(0)
-    node.autoResize()
     node.val(@mget('text'))
     if @viewstate.get('edit')
+      node.height(0)
+      node.autoResize()
       @$el.find('.outline-input').focus()
-    if @viewstate.get('edit')
       _.defer((()->node.resizeNow.call(node)))
-      window.setTimeout(() =>
-          node.resizeNow.call(node)
-        , 100
-      )
     if @viewstate.get('hide')
       @$el.hide()
     else
       @$el.show()
+
 window.rendertimes = 0
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
   initialize : (options) ->
@@ -754,6 +755,7 @@ class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
     super(events)
     BBoilerplate.safebind(this, @model, "change:children", @render)
     return this
+
   build_views : (options) ->
     children = @model.children()
     child_refs = (model.ref() for model in children)
