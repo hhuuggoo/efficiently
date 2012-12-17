@@ -214,6 +214,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   get_keyfunction : (e) =>
     modified = @modified(e)
     nsmodified = @nsmodified(e)
+    if @docview.currnode
+      @docview.currview().contentview.save()
     if not modified and e.keyCode == @keycodes.DOWN
       return @cursor_down
     if not modified and e.keyCode == @keycodes.UP
@@ -247,7 +249,6 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if nsmodified and e.keyCode == @keycodes.O_KEY
       return @enterfilter
 
-    #@docview.currview().contentview.save()
     return null
 
   toggle_todo : (e) =>
@@ -583,6 +584,15 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     if _.isNull(attrs.children)
       @set('children', [])
 
+  sync : (method, model, options) ->
+    console.log('sync')
+    if model.id of model.collection.storage
+      options.success(model)
+    else
+      @collection.storage[mode.id] = model
+      @collection.sync_all()
+
+
   defaults:
     documentids : null
     text : ''
@@ -663,11 +673,29 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       {'todo' : newstate}
     )
     @set('text', newtxt)
+    @save()
     return null
 
 class Efficiently.OutlineNodes extends Backbone.Collection
+  initialize : () ->
+    @storage = {}
+    @sync_all = _.throttle(@_sync_all, 3000)
   model : Efficiently.OutlineNode
   url : ''
+  _sync_all : () =>
+    tosave = {'outline' : {}}
+    for own id, model of @storage
+      tosave.outline[id] = model
+      delete @storage[id]
+    saveurl = "/bulk/" + window.doc_id
+    console.log('sync', JSON.stringify(tosave))
+    $.post(saveurl, {'data' : JSON.stringify(tosave)})
+      .error(() ->
+        for own id, model of tosave.outline
+          @storage[id] = @get(id)
+      )
+
+
 
 Efficiently.outlinenodes = new Efficiently.OutlineNodes()
 
@@ -704,19 +732,20 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     @docview.select(@model, true)
 
   unfocus : () ->
-    @model.set('text', @$el.find('.outline-input').val())
-    @model.change()
+    @save()
 
   save : () ->
-    console.log('save!')
-    if @viewstate.get('edit')
-      @model.set('text', @$el.find('.outline-input').val(), {'silent' : true})
-    else
-      @model.set('text', @$el.find('.outline-input').val())
+    newval = @$el.find('.outline-input').val()
+    oldval = @model.get('text')
+    if oldval != newval
+      if @viewstate.get('edit')
+        @model.set('text', newval, {'silent' : true})
+      else
+        @model.set('text', newval)
+      @model.save()
 
   render : (options) ->
     window.rendertimes += 1
-    console.log(window.rendertimes, arguments)
     text = _.escape(@mget('text'))
     text = Efficiently.format_text(text, @model.doc)
     @$el.html(Efficiently.main_node_template(

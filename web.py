@@ -350,7 +350,6 @@ class BulkSave(AliasedUserHandler):
             clientid = data.pop('clientid')
         else:
             clientid = None
-            
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':
