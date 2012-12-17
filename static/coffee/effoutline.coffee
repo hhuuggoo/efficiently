@@ -74,9 +74,9 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @$el.append(@contentview.$el)
     @$el.append(@childrenview.$el)
     if @docview.children(@model, true).length == 0
-      @childrenview.$el.hide()
+      @childrenview.$el.addClass('hide')
     else
-      @childrenview.$el.show()
+      @childrenview.$el.removeClass('hide')
 
 
   remove : () ->
@@ -737,9 +737,9 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @$el.find('.outline-input').focus()
       _.defer((()->node.resizeNow.call(node)))
     if @viewstate.get('hide')
-      @$el.hide()
+      @$el.addClass('hide')
     else
-      @$el.show()
+      @$el.removeClass('hide')
 
 window.rendertimes = 0
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
