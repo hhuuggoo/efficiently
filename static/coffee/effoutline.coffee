@@ -350,14 +350,14 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   enter : (e) =>
     parent = @docview.currnode.parent()
     curridx = parent.child_index(@docview.currnode)
-    newnode = Efficiently.outlinenodes.create({}, {'doc' : @docview.model.doc})
+    newnode = @docview.model.doc.newnode()
     newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
     return false
 
   modenter : (e) =>
-    newnode = Efficiently.outlinenodes.create({}, {'doc' : @docview.model.doc})
+    newnode = @docview.model.doc.newnode()
     newnode = @docview.currnode.add_child(newnode)
     e.preventDefault()
     @docview.select(newnode)
@@ -398,7 +398,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     "click .addbutton" : "addnode"
 
   addnode : () =>
-    newnode = Efficiently.outlinenodes.create({}, {'doc' : @model.doc})
+    newnode = @model.doc.newnode()
     @model.add_child(newnode)
     @select(newnode)
 
@@ -572,6 +572,12 @@ class Efficiently.Document extends Efficiently.EfficientlyModel
       TODO : 'red'
       INPROGRESS : 'red'
       DONE : 'green'
+  newnode : (attrs, options) ->
+    attrs = attrs || {}
+    options = options || {}
+    attrs.documentid = @id
+    options.doc = @
+    return Efficiently.outlinenodes.create(attrs, options)
 
   initialize : (attrs, options) ->
     super(attrs, options)
@@ -590,15 +596,6 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     @doc = options.doc
     if _.isNull(attrs.children)
       @set('children', [])
-
-  sync : (method, model, options) ->
-    console.log('sync')
-    if model.id of model.collection.storage
-      options.success(model)
-    else
-      @collection.storage[mode.id] = model
-      @collection.sync_all()
-
 
   defaults:
     documentids : null
@@ -721,7 +718,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   delegateEvents : (events) ->
     super(events)
-    BBoilerplate.safebind(this, @model, "change:text", @render)
+    BBoilerplate.safebind(this, @model, "change:text", @render_text)
     BBoilerplate.safebind(this, @viewstate, "change:hide", @render)
     BBoilerplate.safebind(this, @viewstate, "change:edit", @render)
     BBoilerplate.safebind(this, @viewstate, "change:select", @render)
@@ -751,12 +748,22 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
         @model.set('text', newval)
       @model.save()
 
+  render_text : () ->
+    text = _.escape(@mget('text'))
+    html = Efficiently.format_text(text, @model.doc)
+    @$el.find(".outline-textdisplay").html(html)
+    node = @$el.find('textarea')
+    node.val(text)
+    if @viewstate.get('edit')
+      node.height(0)
+      node.autoResize()
+      @$el.find('.outline-input').focus()
+      _.defer((()->node.resizeNow.call(node)))
+
   render : (options) ->
     window.rendertimes += 1
-    text = _.escape(@mget('text'))
-    text = Efficiently.format_text(text, @model.doc)
+    console.log(window.rendertimes)
     @$el.html(Efficiently.main_node_template(
-      text : text
       chidden : @viewstate.get('any_hidden')
       edit : @viewstate.get('edit')
     ))
@@ -765,17 +772,11 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     else
       @$el.removeClass("shade")
     @$el.addClass("content clearfix")
-    node = @$el.find('textarea')
-    node.val(@mget('text'))
-    if @viewstate.get('edit')
-      node.height(0)
-      node.autoResize()
-      @$el.find('.outline-input').focus()
-      _.defer((()->node.resizeNow.call(node)))
     if @viewstate.get('hide')
       @$el.addClass('hide')
     else
       @$el.removeClass('hide')
+    @render_text()
 
 window.rendertimes = 0
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView

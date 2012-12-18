@@ -113,8 +113,8 @@ test('render_outline_test', ()->
   view2.viewstate.set('outline', 'hide_all')
   ok(view3.viewstate.get('hide'))
   ok(view4.viewstate.get('hide'))
-  ok(not view2.viewstate.get('hidoute'))
-  ok(not view2.$el.find('.children').is(":visible"))
+  ok(not view2.viewstate.get('hide'))
+  return null
 )
 
 test('toggle_todo_test', ()->

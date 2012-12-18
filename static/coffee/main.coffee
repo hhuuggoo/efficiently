@@ -4,6 +4,14 @@ $(() ->
     root_id = $("#root_id").html()
     mode = $('#mode').html()
     client_id = $('#client_id').html()
+    Efficiently.OutlineNode::sync = (method, model, options) ->
+      console.log('sync')
+      if model.id of model.collection.storage
+        options.success(model)
+      else
+        @collection.storage[model.id] = model
+        @collection.sync_all()
+
     $.get("/document/" + doc_id, (data) ->
         document = JSON.parse(data)
         outlines = document['outline']
