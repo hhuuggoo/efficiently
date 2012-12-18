@@ -4,7 +4,7 @@ import tornado.ioloop
 import tornado.web
 import settings
 import pymongo
-import pymongo.objectid
+import bson.objectid
 import bcrypt
 import cjson
 import tornadio
@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 def getid():
     return hashlib.sha1(
-        str(pymongo.objectid.ObjectId()) + str(np.random.random())
+        str(bson.objectid.ObjectId()) + str(np.random.random())
         ).hexdigest()
 
 hostname = "localhost"
