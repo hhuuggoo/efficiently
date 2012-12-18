@@ -350,14 +350,14 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   enter : (e) =>
     parent = @docview.currnode.parent()
     curridx = parent.child_index(@docview.currnode)
-    newnode = Efficiently.outlinenodes.create()
+    newnode = Efficiently.outlinenodes.create({}, {'doc' : @docview.model.doc})
     newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
     return false
 
   modenter : (e) =>
-    newnode = Efficiently.outlinenodes.create()
+    newnode = Efficiently.outlinenodes.create({}, {'doc' : @docview.model.doc})
     newnode = @docview.currnode.add_child(newnode)
     e.preventDefault()
     @docview.select(newnode)
@@ -395,6 +395,12 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   events :
     "focusin .filter" : "filterin"
     "focusout .filter" : "filterout"
+    "click .addbutton" : "addnode"
+
+  addnode : () =>
+    newnode = Efficiently.outlinenodes.create({}, {'doc' : @model.doc})
+    @model.add_child(newnode)
+    @select(newnode)
 
   filterin : () =>
     console.log('filterin')
@@ -440,6 +446,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @$el.html('')
     @$el.append($(
       """
+      <button type="button" class="left addbutton ctrlbutton">+</button>
     	<div class="left"> Filter:  </div>
     	<div class="abox">
         <textarea type="text" class="left filter textborder"></textarea>
