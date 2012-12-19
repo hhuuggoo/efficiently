@@ -120,7 +120,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
     @properties = {}
     @property_cache = {}
     if not _.has(attrs, 'id')
-      this.id = _.uniqueId(this.type)
+      this.id = BBoilerplate.uniqueId(this.type)
       this.attributes['id'] = this.id
     _.defer(() =>
       if not @inited
@@ -321,7 +321,8 @@ class BBoilerplate.BasicView extends Backbone.View
   initialize : (options) ->
     #autogenerates id
     if not _.has(options, 'id')
-      this.id = _.uniqueId('BasicView')
+      this.id = BBoilerplate.uniqueId('BasicView')
+
   remove : ->
     #handles lifecycle of events bound by safebind
 

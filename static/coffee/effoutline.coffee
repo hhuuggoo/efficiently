@@ -762,7 +762,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
 
   render : (options) ->
     window.rendertimes += 1
-    console.log(window.rendertimes)
     @$el.html(Efficiently.main_node_template(
       chidden : @viewstate.get('any_hidden')
       edit : @viewstate.get('edit')

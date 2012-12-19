@@ -115,7 +115,7 @@
       this.properties = {};
       this.property_cache = {};
       if (!_.has(attrs, 'id')) {
-        this.id = _.uniqueId(this.type);
+        this.id = BBoilerplate.uniqueId(this.type);
         this.attributes['id'] = this.id;
       }
       return _.defer(function() {
@@ -331,7 +331,7 @@
 
     BasicView.prototype.initialize = function(options) {
       if (!_.has(options, 'id')) {
-        return this.id = _.uniqueId('BasicView');
+        return this.id = BBoilerplate.uniqueId('BasicView');
       }
     };
 
