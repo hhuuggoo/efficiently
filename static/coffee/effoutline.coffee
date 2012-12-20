@@ -749,8 +749,9 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @model.save()
 
   render_text : () ->
-    text = _.escape(@mget('text'))
-    html = Efficiently.format_text(text, @model.doc)
+    text = @mget('text')
+    escapedtext = _.escape(text)
+    html = Efficiently.format_text(escapedtext, @model.doc)
     @$el.find(".outline-textdisplay").html(html)
     node = @$el.find('textarea')
     node.val(text)
