@@ -336,7 +336,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       @select_first_node()
     else
       newnode = @docview.lower_node(@docview.currnode, true)
-      @docview.select(newnode, true)
+      if newnode and newnode != @docview.model #not root
+        @docview.select(newnode, true)
     return false
 
   cursor_up : () =>
@@ -344,7 +345,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       @select_first_node()
     else
       newnode = @docview.upper_node(@docview.currnode, true)
-      @docview.select(newnode, true)
+      if newnode and newnode != @docview.model #not root
+        @docview.select(newnode, true)
     return false
 
   enter : (e) =>
