@@ -510,8 +510,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return @viewstates[@currnode.id]
 
   unselect : () ->
-    console.log('unselecting')
-    if @currnode
+    if @currview() and @currview().contentview
       @currview().contentview.unfocus()
       @viewstates[@currnode.id].set(
         select : false
