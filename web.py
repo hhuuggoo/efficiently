@@ -331,6 +331,7 @@ class Document(AliasedUserHandler):
                                    'status' : {'$ne' : 'DELETE'}})
 
         outline = list(outline)
+        logging.debug("numoutlines %d", len(outline))
         outline = [outline_mongo_to_app(e, self.current_user) \
                    for e in outline]
         self.write(cjson.encode({'document':document,

@@ -405,6 +405,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       nextnode = @docview.lower_node(@docview.currnode, true)
     parent = @docview.currnode.parent()
     parent.remove_child(@docview.currnode)
+    @docview.currnode.del()
     @docview.unselect()
     if nextnode
       @docview.select(nextnode, true)
@@ -766,6 +767,13 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     @set('text', newtxt)
     @save()
     return null
+
+  del : () ->
+    @tree_apply((node) ->
+        node.set('status', 'DELETE')
+        node.save()
+      , null
+    )
 
 class Efficiently.OutlineNodes extends Backbone.Collection
   initialize : () ->
