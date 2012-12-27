@@ -180,9 +180,6 @@ class SmartDocRedirector(AuthHandler):
             self.redirect("/manage")
 
 class Register(SmartDocRedirector):
-    def get(self):
-        self.clear_all_cookies()
-        self.render("templates/register.html", user=self.current_user);
 
     def post(self):
         username = self.get_argument('username')
@@ -209,7 +206,7 @@ class Login(SmartDocRedirector):
             self.current_user = username
             self.smart_redirect()
         else:
-            self.redirect("/register")
+            self.redirect("/login")
 
 class Logout(AuthHandler):
     def get(self):
