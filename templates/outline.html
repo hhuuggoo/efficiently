@@ -38,9 +38,12 @@
 </div>
 <script type="text/template" id="main-template">
   <div class="fakedotcontainer">
-    <image class="fakedot"> </image>	  
+    <% if (!chidden) { %>
+    <image src="/static/images/bullet.svg" class="fakedot"> </image>	  
+    <% }else{ %>
+    <image src="/static/images/add.svg" class="plusicon"> </image>	  
+    <% } %>
   </div>
-  <div class="hideindicator <%= chidden ? '' : 'hide' %>">+</div>
   <div class="abox">
     <textarea class="outline-input <%= edit ? '' : 'hide'%>"></textarea>
     <div class="outline-textdisplay <%= edit ? 'hide' : ''%>"></div>

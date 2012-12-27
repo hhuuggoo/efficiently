@@ -74,11 +74,15 @@ ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 100%;  }
     float:left;
 }
 .fakedot{
-    float: right;
-    width:5px;
-    height:5px;
-    background: #000;
-    margin: 7px 10px 0px 0px 
+    padding-bottom : 1px;
+    padding-left : 2px;
+    height : 18px;
+    width : 18px;
+}
+.plusicon{
+    width : 50%;
+    padding-left : 6px;
+    padding-bottom : 1px;
 }
 textarea{
     line-height : 18px;
