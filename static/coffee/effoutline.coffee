@@ -401,7 +401,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
 
   deletenode : (e) =>
     nextnode = @docview.upper_node(@docview.currnode, true)
-    if not nextnode
+    if not nextnode or nextnode == @docview.model #nextnode should not be root
       nextnode = @docview.lower_node(@docview.currnode, true)
     parent = @docview.currnode.parent()
     parent.remove_child(@docview.currnode)
