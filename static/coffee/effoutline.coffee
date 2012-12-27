@@ -184,10 +184,78 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       func = @get_keyfunction(e)
     else if @docview.ui_state == 'filter'
       func = @get_filterkeyfunction(e)
+    else if @docview.ui_state == 'isearch'
+      func = @get_isearchkeyfunction(e)
     if (func)
       return func(e)
     else
       return true
+
+  get_isearchkeyfunction : (e) =>
+    modified = @modified(e)
+    nsmodified = @nsmodified(e)
+    if e.keyCode == @keycodes.ESC
+      return @exitisearch
+    if nsmodified and e.keyCode == @keycodes.R_BRACKET
+      return (() => @isearch('down', true))
+    if nsmodified and e.keyCode == @keycodes.L_BRACKET
+      return (() => @isearch('up', true))
+
+  focus_isearch : (e) =>
+    $('#searchbox').fadeIn(300);
+    console.log('focus isearch');
+    $('#searchtext').focus();
+
+  isearch : (direction, findnext) =>
+    if not @docview.currnode or @docview.currviewstate().get('hide')
+      @select_first_node()
+      $('#searchtext').focus()
+    node = @docview.currnode
+    searchtxt = $('#searchtext').val()
+    textarea = @docview.nodeviews[node.id].$el.find('.outline-input')[0]
+    if direction == 'down'
+      currpoint = textarea.selectionEnd
+      result = @isearch_down(node, searchtxt, currpoint)
+    else
+      currpoint = textarea.selectionStart - 1
+      result = @isearch_up(node, searchtxt, currpoint)
+    if result
+      [newnode, newidx, endidx] = result
+      if newnode != @docview.currnode
+        @docview.select(newnode)
+      textarea = @docview.nodeviews[newnode.id].$el
+      textarea = textarea.find('.outline-input')[0]
+      textarea.setSelectionRange(newidx, endidx)
+    return null
+
+  isearch_down : (node, searchtxt, currpoint) =>
+    if _.isUndefined(currpoint)
+      currpoint = 0
+    currtxt = @docview.nodeviews[node.id].nodetext()
+    newidx = currtxt.indexOf(searchtxt, currpoint)
+    if newidx >= 0
+      return [node, newidx, newidx + searchtxt.length]
+    else
+      newnode = @docview.lower_node(node, true)
+      if newnode
+        return @isearch_down(newnode, searchtxt, 0)
+    return false
+
+  isearch_up : (node, searchtxt, currpoint) =>
+    currtxt = @docview.nodeviews[node.id].nodetext()
+    if _.isUndefined(currpoint)
+      currpoint = currtxt.length
+    if currpoint >= 0 #currpoint = -1 if we're done searching an item
+      newidx = currtxt.lastIndexOf(searchtxt, currpoint)
+    else newidx = -1
+    if newidx >= 0
+      return [node, newidx, newidx + searchtxt.length]
+    else
+      newnode = @docview.upper_node(node, true)
+      if newnode
+        return @isearch_up(newnode, searchtxt)
+    return false
+
 
   get_filterkeyfunction : (e) =>
     modified = @modified(e)
@@ -195,14 +263,26 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if not modified and e.keyCode == @keycodes.ENTER
       return @filter
     if not modified and e.keyCode == @keycodes.DOWN
-      return @exitsearch
+      return @exitfilter
     if not modified and e.keyCode == @keycodes.ESC
-      return @exitsearch
+      return @exitfilter
+    else
+      return null
+
+  enterisearch : (e) =>
+    @docview.ui_state = 'isearch'
+    @focus_isearch(e)
+
+  exitisearch : (e) =>
+    @docview.ui_state = 'normal'
+    $('#searchbox').fadeOut(300);
+    if @docview.currnode
+      @docview.select(@docview.currnode)
 
   enterfilter : (e) =>
     @docview.$el.find(".filter").focus()
 
-  exitsearch : (e) =>
+  exitfilter : (e) =>
     @docview.$el.find(".filter").blur()
     @docview.select(@docview.currnode)
 
@@ -214,7 +294,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   get_keyfunction : (e) =>
     modified = @modified(e)
     nsmodified = @nsmodified(e)
-    if @docview.currnode
+    if @docview.currview() and @docview.currview().contentview
       @docview.currview().contentview.save()
     if not modified and e.keyCode == @keycodes.DOWN
       return @cursor_down
@@ -248,7 +328,10 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @toggle_todo
     if nsmodified and e.keyCode == @keycodes.O_KEY
       return @enterfilter
-
+    if nsmodified and e.keyCode == @keycodes.R_BRACKET
+      return @enterisearch
+    if nsmodified and e.keyCode == @keycodes.L_BRACKET
+      return @enterisearch
     return null
 
   toggle_todo : (e) =>
@@ -418,7 +501,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return this
 
   currview : () ->
-    return @nodeviews[@currnode.id]
+    if @currnode
+      return @nodeviews[@currnode.id]
+    else
+      return null
 
   currviewstate : () ->
     return @viewstates[@currnode.id]
