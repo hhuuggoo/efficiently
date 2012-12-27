@@ -400,6 +400,9 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     return true
 
   deletenode : (e) =>
+    if @docview.model.children().length == 1 and
+        @docview.model.children()[0] == @docview.currnode
+      return false
     nextnode = @docview.upper_node(@docview.currnode, true)
     if not nextnode or nextnode == @docview.model #nextnode should not be root
       nextnode = @docview.lower_node(@docview.currnode, true)
@@ -481,12 +484,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   events :
     "focusin .filter" : "filterin"
     "focusout .filter" : "filterout"
-    "click .addbutton" : "addnode"
-
-  addnode : () =>
-    newnode = @model.doc.newnode()
-    @model.add_child(newnode)
-    @select(newnode)
 
   filterin : () =>
     console.log('filterin')
@@ -534,7 +531,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @$el.html('')
     @$el.append($(
       """
-      <button type="button" class="left addbutton ctrlbutton">+</button>
     	<div class="left"> Filter:  </div>
     	<div class="abox">
         <textarea type="text" class="left filter textborder"></textarea>

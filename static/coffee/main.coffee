@@ -18,6 +18,10 @@ $(() ->
         document = new Efficiently.Document(id : doc_id)
         Efficiently.outlinenodes.add(outlines, {'doc' : document})
         root = Efficiently.outlinenodes.get(root_id)
+        if root.get('children').length == 0
+          newnode = document.newnode(text : "Just start typing!")
+          newnode.save()
+          root.add_child(newnode)
         docview = new Efficiently.DocView(
           doc : document
           root : root
@@ -27,6 +31,7 @@ $(() ->
           docview : docview
         )
         window.keyeventer = keyeventer
+        keyeventer.select_first_node()
         window.docview = docview
     )
 )
