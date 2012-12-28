@@ -180,9 +180,6 @@ class SmartDocRedirector(AuthHandler):
             self.redirect("/manage")
 
 class Register(SmartDocRedirector):
-    def get(self):
-        self.clear_all_cookies()
-        self.render("templates/register.html", user=self.current_user);
 
     def post(self):
         username = self.get_argument('username')
@@ -209,7 +206,7 @@ class Login(SmartDocRedirector):
             self.current_user = username
             self.smart_redirect()
         else:
-            self.redirect("/register")
+            self.redirect("/login")
 
 class Logout(AuthHandler):
     def get(self):
@@ -331,6 +328,7 @@ class Document(AliasedUserHandler):
                                    'status' : {'$ne' : 'DELETE'}})
 
         outline = list(outline)
+        logging.debug("numoutlines %d", len(outline))
         outline = [outline_mongo_to_app(e, self.current_user) \
                    for e in outline]
         self.write(cjson.encode({'document':document,
@@ -350,7 +348,6 @@ class BulkSave(AliasedUserHandler):
             clientid = data.pop('clientid')
         else:
             clientid = None
-            
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':

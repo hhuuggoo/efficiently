@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QUnit Test Suite</title>
+  <link rel="stylesheet" href="../../vendor/qunit/css/qunit.css" type="text/css" media="screen">
+  <script type="text/javascript" src="../../vendor/qunit/js/qunit.js"></script>
+  <link type="text/css" rel="stylesheet" href="../../vendor/jquery/css/themes/base/jquery-ui.min.css"/>
+  <!-- Your project file goes here -->
+  <script type="text/javascript" src="../../vendor/jquery/js/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="../../vendor/underscore/underscore.js"></script>
+  <script type="text/javascript" src="../../vendor/backbone/backbone.js"></script>
+  <script type="text/javascript" src="../../vendor/buckets/buckets.js"></script>
+  <script type="text/javascript" src="../../js/bboilerplate.js"></script>
+  <script type="text/javascript" src="../../js/effoutline.js"></script>
+  <script type="text/javascript" src="../../js/parser.js"></script>  
+  <script type="text/javascript" src="../../js/test/bboilerplate_test.js"></script>
+  <script type="text/javascript" src="../../js/test/outline_test.js"></script>
+  <script type="text/template" id="main-template">
+    <div class="clearfix">
+      <div class="content ">
+        <div class="fakedotcontainer">
+          <image class="fakedot"> </image>	  
+        </div>
+        <div class="hideindicator <%= chidden ? '' : 'hide' %>">+</div>
+        <div class="abox outline-input">
+          <textarea class="outline-input" style="display:none" 
+                    value="<%= text %>"></textarea>
+          <div class="outline-textdisplay"><%= text %></div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="children-template">
+    <div class="clearfix">
+	  <div class="clearfix">
+	    <div class="edge topedge"></div>
+	    <div class="fakedotcontainer"></div>
+	    <div class="abox">
+	      <div id="" class="children"></div>
+	    </div>
+	  </div>
+	  <div class="edge bottomedge"></div>
+    </div>
+  </script>
+  
+</head>
+<body>
+  <h1 id="qunit-header">QUnit Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+</body>
+</html>

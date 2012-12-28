@@ -36,24 +36,20 @@
         height = target.val('').height(),
         scroll = textarea.scrollHeight,
         offset = scroll > height ? (scroll - height) : 0;
-        target.data('minHeight', height);
-        target.data('scrollOffset', offset);
+        target.data('minHeight', 0);
+        target.data('scrollOffset', 0);
         return target.val(value);
     }
 
     function resize() { 
-	var
-        target = $(this),
-        targetHeight = target.height(),
-        scrollOffset = target.data('scrollOffset'),
-        minHeight = target.data('minHeight'),
-        scrollTop = frame.scrollTop(),
-        scrollHeight = target.height(minHeight).prop('scrollHeight') - scrollOffset;
+        var target = $(this);
+        var scrollOffset = 0;
+        var minHeight = 0;
+        //scrollTop = frame.scrollTop(),
+        var scrollHeight = target.height(0).prop('scrollHeight');
         target.height(scrollHeight);
-        frame.scrollTop(scrollTop);
-        if (targetHeight !== scrollHeight) {
-            target.trigger('autoresize:resize', scrollHeight);
-        }
+        //frame.scrollTop(scrollTop);
+
     }
 
     function apply() {

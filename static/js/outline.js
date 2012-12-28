@@ -728,7 +728,7 @@ $(function(){
 		}
 	    });
 	global_event_hooks();
-	window.register_sockets();
+	//window.register_sockets();
 	if (root.get('children').length == 0){
 	    add_new_child(root);
 	    root.render();
