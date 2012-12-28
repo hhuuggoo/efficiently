@@ -167,6 +167,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   delegateEvents : (events) ->
     super(events)
     $(document).bind('keydown.keyeventer', @keydown)
+    $(document).bind('keyup.keyeventer', @keyup)
     return this
 
   undelegateEvents : (events) ->
@@ -178,6 +179,10 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
 
   nsmodified : (e) =>
     return e.ctrlKey || e.altKey
+
+  keyup : (e) =>
+    if @docview.currview() and @docview.currview().contentview
+      @docview.currview().contentview.save()
 
   keydown : (e) =>
     if @docview.ui_state == 'normal'
@@ -294,8 +299,6 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
   get_keyfunction : (e) =>
     modified = @modified(e)
     nsmodified = @nsmodified(e)
-    if @docview.currview() and @docview.currview().contentview
-      @docview.currview().contentview.save()
     if not modified and e.keyCode == @keycodes.DOWN
       return @cursor_down
     if not modified and e.keyCode == @keycodes.UP
