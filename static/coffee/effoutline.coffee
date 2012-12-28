@@ -44,6 +44,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @model, "change:children", @render)
     BBoilerplate.safebind(this, @viewstate, "change:outline", @render_outline)
     BBoilerplate.safebind(this, @viewstate, "change:all_hidden", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:hide", @render_hidden)
     return this
 
   render_outline : () ->
@@ -66,6 +67,12 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     view = new Efficiently.BasicNodeView(options)
     return view
 
+  render_hidden : () =>
+    if @viewstate.get('hide')
+      @$el.addClass('hide')
+    else
+      @$el.removeClass('hide')
+
   render : () ->
     @contentview.$el.detach()
     @childrenview.$el.detach()
@@ -77,7 +84,7 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
       @childrenview.$el.addClass('hide')
     else
       @childrenview.$el.removeClass('hide')
-
+    @render_hidden()
 
   remove : () ->
     @contentview.remove()
@@ -823,7 +830,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   delegateEvents : (events) ->
     super(events)
     BBoilerplate.safebind(this, @model, "change:text", @render_text)
-    BBoilerplate.safebind(this, @viewstate, "change:hide", @render)
     BBoilerplate.safebind(this, @viewstate, "change:edit", @render)
     BBoilerplate.safebind(this, @viewstate, "change:select", @render)
     BBoilerplate.safebind(this, @viewstate, "change:any_hidden", @render)
