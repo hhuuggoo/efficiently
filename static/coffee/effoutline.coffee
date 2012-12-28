@@ -368,6 +368,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return false
     else
       parent.reorder_child(@docview.currnode, curridx - 1)
+      @docview.select(@docview.currnode)
       return false
 
   movedown : (e) =>
@@ -377,6 +378,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return false
     else
       parent.reorder_child(@docview.currnode, curridx + 1)
+      @docview.select(@docview.currnode)
       return false
 
   moveright : (e) =>
