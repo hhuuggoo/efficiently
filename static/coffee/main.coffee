@@ -7,7 +7,7 @@ $(() ->
     Efficiently.OutlineNode::sync = (method, model, options) ->
       console.log('sync')
       if model.id of model.collection.storage
-        options.success(model)
+        options.success({})
       else
         @collection.storage[model.id] = model
         @collection.sync_all()
