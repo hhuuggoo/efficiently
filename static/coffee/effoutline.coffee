@@ -537,6 +537,8 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
       select: true
       edit : toedit
     )
+    if toedit # hack
+      @nodeviews[node.id].$el.find('.outline-input').focus()
 
   render : () ->
     @$el.html('')
