@@ -882,10 +882,6 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     else
       @$el.removeClass("shade")
     @$el.addClass("content clearfix")
-    if @viewstate.get('hide')
-      @$el.addClass('hide')
-    else
-      @$el.removeClass('hide')
     @render_text()
 
 window.rendertimes = 0
