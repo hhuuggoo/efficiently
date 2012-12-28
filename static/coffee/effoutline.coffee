@@ -292,8 +292,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     @docview.select(@docview.currnode)
 
   filter : (e) =>
-    Efficiently.tree_filter(@docview.filterexpression(), @docview)
     e.preventDefault()
+    Efficiently.tree_filter(@docview.filterexpression(), @docview)
     return false
 
   get_keyfunction : (e) =>
@@ -943,6 +943,8 @@ Efficiently.set_text = (text, document, data) ->
   return text
 
 Efficiently.tree_filter = (expression, docview) ->
+  if not expression
+    return false
   docview.show_all_children(docview.model)
   egraph = Efficiently.expression_graph(expression)
   regexes = [new RegExp("/(^|\s)@(\w+)/g"), new RegExp(/(^|\s)#(\w+)/g)]
