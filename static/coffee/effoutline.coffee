@@ -512,6 +512,8 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
 
   delegateEvents : (events) ->
     #don't need basic node view's rendering
+    #ooh ugly hack
+    BBoilerplate.BasicView::delegateEvents.call(this, events)
     return this
 
   currview : () ->
