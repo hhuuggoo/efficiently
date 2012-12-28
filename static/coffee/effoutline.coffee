@@ -959,9 +959,9 @@ Efficiently.set_text = (text, document, data) ->
   return text
 
 Efficiently.tree_filter = (expression, docview) ->
+  docview.show_all_children(docview.model)
   if not expression
     return false
-  docview.show_all_children(docview.model)
   egraph = Efficiently.expression_graph(expression)
   regexes = [new RegExp("/(^|\s)@(\w+)/g"), new RegExp(/(^|\s)#(\w+)/g)]
   regexes = regexes.concat(_.values(docview.model.doc.state_regexp_map))
