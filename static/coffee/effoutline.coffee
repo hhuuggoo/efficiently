@@ -237,6 +237,9 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if _.isUndefined(currpoint)
       currpoint = 0
     currtxt = @docview.nodeviews[node.id].nodetext()
+
+    if searchtxt == searchtxt.toLowerCase()
+      currtxt = currtxt.toLowerCase()
     newidx = currtxt.indexOf(searchtxt, currpoint)
     if newidx >= 0
       return [node, newidx, newidx + searchtxt.length]
@@ -250,9 +253,12 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     currtxt = @docview.nodeviews[node.id].nodetext()
     if _.isUndefined(currpoint)
       currpoint = currtxt.length
+    if searchtxt == searchtxt.toLowerCase()
+      currtxt = currtxt.toLowerCase()
     if currpoint >= 0 #currpoint = -1 if we're done searching an item
       newidx = currtxt.lastIndexOf(searchtxt, currpoint)
-    else newidx = -1
+    else
+      newidx = -1
     if newidx >= 0
       return [node, newidx, newidx + searchtxt.length]
     else
