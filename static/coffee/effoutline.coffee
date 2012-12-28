@@ -480,7 +480,6 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @outline_state = 'show_all'
     @ui_state = 'normal'
     @docview = this
-    BBoilerplate.safebind(this, @model, "destroy", @destroy)
     @viewstate = new Efficiently.OutlineViewState(
       model : @root
     )
@@ -512,8 +511,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     @ui_state = 'normal'
 
   delegateEvents : (events) ->
-    super(events)
-    BBoilerplate.safebind(this, @model, "destroy", @destroy)
+    #don't need basic node view's rendering
     return this
 
   currview : () ->
