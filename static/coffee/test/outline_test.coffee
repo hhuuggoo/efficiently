@@ -121,4 +121,7 @@ test('test_parentheses_words', ->
   ok(Efficiently.eval_expression_graph(graph, "D", {}))
   ok(Efficiently.eval_expression_graph(graph, "A B", {}))
   ok(not Efficiently.eval_expression_graph(graph, "A B C", {}))
+  #test tags work
+  ok(Efficiently.eval_match("#m1", "foo", {'#m1' : true}))
+  ok(not Efficiently.eval_match("#m1", "foo", {}))
 )

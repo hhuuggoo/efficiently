@@ -61,7 +61,9 @@ expression_graph = (input_string) ->
   return globalop
 
 eval_match = (arg, txt, tags) ->
-  if tags.arg
+  if txt.indexOf("is your login") >= 0
+    debugger
+  if tags[arg]
     return true
   if txt.indexOf(arg) >= 0
     return true
@@ -94,5 +96,6 @@ get_tags = (txt, regexes) ->
 
 Efficiently.get_tags = get_tags
 Efficiently.eval_expression_graph = eval_expression_graph
+Efficiently.eval_match = eval_match
 Efficiently.expression_graph = expression_graph
 Efficiently.parentheses_words = parentheses_words

@@ -158,7 +158,11 @@
     ok(!Efficiently.eval_expression_graph(graph, "A", {}));
     ok(Efficiently.eval_expression_graph(graph, "D", {}));
     ok(Efficiently.eval_expression_graph(graph, "A B", {}));
-    return ok(!Efficiently.eval_expression_graph(graph, "A B C", {}));
+    ok(!Efficiently.eval_expression_graph(graph, "A B C", {}));
+    ok(Efficiently.eval_match("#m1", "foo", {
+      '#m1': true
+    }));
+    return ok(!Efficiently.eval_match("#m1", "foo", {}));
   });
 
 }).call(this);
