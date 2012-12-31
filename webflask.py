@@ -224,6 +224,17 @@ def docview(mode, docid):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document, session.get('username'))
+    otherdocs = app.db.document.find(
+        {'username':session.get('username'),
+         'status':'ACTIVE',
+         '_id' : {'$ne' : docid}}
+        )
+    docdatas = []
+    for doc in otherdocs:
+        docdatas.append(
+            {'docurl' : "/docview/rw/" + doc['_id'],
+             'doctitle' : doc['title']}
+            )
     if mode == 'rw' and can_write(document, session.get('username')):
         return render_template(
             "outline.html",
@@ -233,12 +244,21 @@ def docview(mode, docid):
             title=document['title'],
             owner=document['username'],
             mode='rw',
-            client_id=topid
+            client_id=topid,
+            docdatas=docdatas
             )
     elif mode =='r' and can_read(document, session.get('username')):
-        pass
-        
-        
+        return render_template(
+            "outline.html",
+            root_id=document['root_id'],
+            document_id=document['id'],
+            user=session.get('username'),
+            title=document['title'],
+            owner=document['username'],
+            mode='r',
+            client_id=topid,
+            docdatas=docdatas
+            )
 
 @app.route("/document/<docid>")
 def document(docid):

@@ -32,10 +32,19 @@
       	  {% include "narrowlogo.html" %}
       	    <ul class="pull-right nav nav-pills" style="">
       	      {% if user %}
-      	      <li><a class="navbuttons" href="/manage">Documents</a></li>              
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
+                <ul class="dropdown-menu" role="menu">                
+                  {% for docdata in docdatas %}
+                  <li style="float:left">
+                    <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
       	      {% endif %}
               <li class="dropdown">
-                <a class="navbuttons dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
                 <ul class="dropdown-menu" role="menu">
       	          {% if document_id and mode == 'rw'%}
       	          <li><a href="/import/{{ document_id }}">Import</a></li>
@@ -46,14 +55,14 @@
                 </ul>
       	      {% if user %}
       	      <li>
-      		    <a class="navbuttons" href="/manage">Logged in as <strong> {{user}} </strong> </a>
+      		    <a href="/manage">Logged in as <strong> {{user}} </strong> </a>
       	      </li>
       	      <li>
-      		    <a class="navbuttons" href="/logout">Logout</a>
+      		    <a href="/logout">Logout</a>
       	      </li>
       	      {% else %}
-      	      <li><a class="navbuttons" id="loginlink">Login</a></li>
-      	      <li><a class="navbuttons" id="registerlink">Register</a></li>
+      	      <li><a id="loginlink">Login</a></li>
+      	      <li><a id="registerlink">Register</a></li>
       	      {% endif %}
       	    </ul>
 	</div>
