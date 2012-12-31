@@ -6,5 +6,8 @@ $(()->
   $('#registerlink').click(() ->
     $('#registermodal').modal({'show' : true})
   )
+  $('#createlink').click(() ->
+    $('#createmodal').modal({'show' : true})
+  )
 
 )

@@ -173,8 +173,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
 
   delegateEvents : (events) ->
     super(events)
-    $(document).bind('keydown.keyeventer', @keydown)
-    $(document).bind('keyup.keyeventer', @keyup)
+    @docview.$el.bind('keydown.keyeventer', @keydown)
+    @docview.$el.bind('keyup.keyeventer', @keyup)
     return this
 
   undelegateEvents : (events) ->
@@ -556,6 +556,10 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
         <textarea type="text" class="left filter textborder"></textarea>
       </div>
       <hr class="mainsep"/>
+    <div class="searchbox hide" id="searchbox">
+      <textarea class="searchtext" id="searchtext"></textarea>
+      <div>Alt + [ and Alt + ] to search forward and backwards.  Escape to exit</div>
+    </div>
       """
     ))
     @$el.append(@childrenview.$el)

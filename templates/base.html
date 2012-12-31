@@ -4,9 +4,9 @@
   <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Efficiently</title>
     <link rel="stylesheet" type="text/css" 
-	  href="/static/themes/base/jquery.ui.all.css">
+	      href="/static/themes/base/jquery.ui.all.css">
     <link rel="stylesheet/less" 
-	  href="/static/vendor/bootstrap/less/bootstrap.less" type="text/css" >
+	      href="/static/vendor/bootstrap/less/bootstrap.less" type="text/css" >
     <link href='http://fonts.googleapis.com/css?family=Lobster Two|Open+Sans|Open+Sans+Condensed:300|Courgette|Boogaloo rel='stylesheet' type='text/css'>    
     <link rel="stylesheet/less" type="text/css" href="/static/css/yata.less"/>    
     <!-- end basecss -->
@@ -17,9 +17,9 @@
     <script src="/static/js/jquery.autoresize.js" type="text/javascript"></script>
     <script type="text/javascript" src="/static/js/jquery-ui-1.8.16.custom.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.js" 
-	    type="text/javascript"></script>
+	        type="text/javascript"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap-modal.js" 
-	    type="text/javascript"></script>
+	        type="text/javascript"></script>
     <script src="/static/js/underscore.string.js" type="text/javascript"></script>
     <script src="/static/js/base.js" type="text/javascript"></script>
     <!-- end basejs -->
@@ -28,44 +28,49 @@
     <script src="/static/vendor/less/less-1.3.0.min.js" type="text/javascript"></script>        
     <body>
       <div class="navbar">
-	<div class="navbar-inner titlerow">
+	    <div class="navbar-inner titlerow">
       	  {% include "narrowlogo.html" %}
-      	    <ul class="pull-right nav nav-pills" style="">
+      	  <ul class="pull-right nav nav-pills" style="">
+      	    {% if user %}
+      	    <li>
+      		  <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
+      	    </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <li tabindex="-1">
+                  <a id="createlink">Create a new Document</a>
+                </li>
+                <li class="divider">
+                </li>
+                {% for docdata in docdatas %}
+                <li tabindex="-1" style="float:left;clear:both;">
+                  <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+      	    {% endif %}
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
+              <ul class="dropdown-menu" role="menu">
+      	        {% if document_id and mode == 'rw'%}
+      	        <li><a href="/import/{{ document_id }}">Import</a></li>
+      	        {% endif %}
+      	        {% if document_id %}
+      	        <li><a href="/export/{{ document_id }}">Export</a></li>
+      	        {% endif %}
+              </ul>
       	      {% if user %}
-      	      <li>
-      		    <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
-      	      </li>
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
-                <ul class="dropdown-menu" role="menu">                
-                  {% for docdata in docdatas %}
-                  <li style="float:left">
-                    <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </li>
-      	      {% endif %}
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
-                <ul class="dropdown-menu" role="menu">
-      	          {% if document_id and mode == 'rw'%}
-      	          <li><a href="/import/{{ document_id }}">Import</a></li>
-      	          {% endif %}
-      	          {% if document_id %}
-      	          <li><a href="/export/{{ document_id }}">Export</a></li>
-      	          {% endif %}
-                </ul>
-      	      {% if user %}
-      	      <li>
-      		    <a href="/logout">Logout</a>
-      	      </li>
-      	      {% else %}
-      	      <li><a id="loginlink">Login</a></li>
-      	      <li><a id="registerlink">Register</a></li>
-      	      {% endif %}
-      	    </ul>
-	</div>
+      	    <li>
+      		  <a href="/logout">Logout</a>
+      	    </li>
+      	    {% else %}
+      	    <li><a id="loginlink">Login</a></li>
+      	    <li><a id="registerlink">Register</a></li>
+      	    {% endif %}
+      	  </ul>
+	    </div>
       </div>
       <!-- <div class="navbar navbar-fixed-top titlerow"> -->
       <!-- 	<div class="navbar-iner"> -->
@@ -75,56 +80,71 @@
       <!-- 	</div> -->
       <!-- </div> -->
       <div class="wrap">
-      {% block main %}
-      
-      {% endblock %}
+        {% block main %}
+        
+        {% endblock %}
       </div>
       <footer>
-	<div class="container">
-	  <div class="row-fluid">
-	    <div class="span4">
-	      &copy;2012 efficiently.com
-	      <br>
-	      <a href="mailto:humongo.shi@gmail.com">Contact Us</a>
+	    <div class="container">
+	      <div class="row-fluid">
+	        <div class="span4">
+	          &copy;2012 efficiently.com
+	          <br>
+	          <a href="mailto:humongo.shi@gmail.com">Contact Us</a>
+	        </div>
+	      </div>
 	    </div>
-	  </div>
-	</div>
       </footer>
+      <div class="modal hide" id="createmodal" style="position:absolute">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">×</button>
+	      <h3>Create Document</h3>
+	    </div>
+	    <div class="modal-body">
+	      <form class="" action="/create" method="POST">
+	        <!-- Label and text input -->
+	        <label for="title">Title</label>
+	        <input type="text" id="title" name="title" />
+	        <br>
+	        <input class="btn btn-primary" type="submit"/>
+	      </form>
+	    </div>
+      </div>
       <div class="modal hide" id="loginmodal" style="position:absolute">
-	<div class="modal-header">
-	  <button type="button" class="close" data-dismiss="modal">×</button>
-	  <h3>Login</h3>
-	</div>
-	<div class="modal-body">
-	  <form class="" action="/login" method="POST">
-	    <!-- Label and text input -->
-	    <label for="username">username</label>
-	    <input type="text" id="username" name="username" />
-	    <label for="password">password</label>
-	    <input type="password" id="password" name="password"/>
-	    <br>
-	    <input class="btn btn-primary" type="submit"/>
-	  </form>
-	</div>
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">×</button>
+	      <h3>Login</h3>
+	    </div>
+	    <div class="modal-body">
+	      <form class="" action="/login" method="POST">
+	        <!-- Label and text input -->
+	        <label for="username">username</label>
+	        <input type="text" id="username" name="username" />
+	        <label for="password">password</label>
+	        <input type="password" id="password" name="password"/>
+	        <br>
+	        <input class="btn btn-primary" type="submit"/>
+	      </form>
+	    </div>
       </div>
       <div class="modal hide" id="registermodal" style="position:absolute">
-	<div class="modal-header">
-	  <button type="button" class="close" data-dismiss="modal">×</button>
-	  <h3>Register</h3>
-	</div>
-	<div class="modal-body">
-	  <form action="/register" method="POST">
-	    <!-- Label and text input -->
-	    <label for="username">username</label>
-	    <input type="text" id="username" name="username" />
-	    <label for="password">password</label>
-	    <input type="password" id="password" name="password"/>
-	    <label for="email">email</label>
-	    <input type="text" id="email" name="email"/>
-	    <br>
-	    <input class="btn btn-primary" type="submit"/>
-	  </form>
-	</div>
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">×</button>
+	      <h3>Register</h3>
+	    </div>
+	    <div class="modal-body">
+	      <form action="/register" method="POST">
+	        <!-- Label and text input -->
+	        <label for="username">username</label>
+	        <input type="text" id="username" name="username" />
+	        <label for="password">password</label>
+	        <input type="password" id="password" name="password"/>
+	        <label for="email">email</label>
+	        <input type="text" id="email" name="email"/>
+	        <br>
+	        <input class="btn btn-primary" type="submit"/>
+	      </form>
+	    </div>
       </div>
     </body>
 </html>
