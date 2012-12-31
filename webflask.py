@@ -278,7 +278,7 @@ def create():
     docid = create_document(session.get('username'), title, app.db)
     return redirect("/docview/rw/" + docid)
 
-@app.route("/bulk/<docid>", methods=["POST"])
+@app.route("/bulk/<docid>/", methods=["POST"])
 def bulk(docid):
     if not session.get('username'):
         return redirect("/login")
@@ -292,6 +292,129 @@ def bulk(docid):
                     d = outline_app_to_mongo(d, session.get('username'))
                     save_outline(d, app.db)
         return "success"
+
+@app.route("/import/<docid>/", methods=["POST"])
+def docimportpost(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        outlines = update_db_from_txt(request.form['data'],
+            session.get('username'), docid)
+        return redirect("/docview/rw/" + docid)
+
+@app.route("/import/<docid>/", methods=["GET"])
+def docimportget(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        return render_template("import.html",
+                               docid=docid,
+                               user=session.get('username'))
+    
+def update_db_from_txt(txt, user, docid, prefix="*"):
+    document = app.db.document.find_one({'_id' : docid, 'username' : user})
+    document = doc_mongo_to_app(document, document['username'])
+    nodes = outlines_from_text(txt, user, docid, prefix=prefix)
+    add_to_root = []
+    for n in nodes:
+        if n['parent'] is None:
+            n['parent'] = document['root_id']
+            add_to_root.append(n['id'])
+    print add_to_root
+    for n in nodes:
+        n = outline_app_to_mongo(n, user)
+        data = "parent: %s id: %s txt: %s children: %s" % (str(n['parent']), str(n['_id']), str(n['text']), str(n['children']))
+        print data
+        save_outline(n, app.db)
+    app.db.outline.update({'_id' : document['root_id'], 'username' : user},
+                      {'$pushAll' : {'children' : add_to_root}},
+                      safe=True)
+    root = app.db.outline.find_one({'_id' : document['root_id'],
+                                'username' : user})
+    root = outline_mongo_to_app(root, user)
+    nodes.insert(0, root)
+    return nodes
+    
+def outlines_from_text(txt, user, docid, prefix="*"):
+    def bare_outline(txt, user, docid):
+        return {'id' : getid(),
+                'text' : txt, 
+                'username' : user,
+                'children' : [],
+                'parent': None,
+                'documentid': docid,
+                'status' : 'ACTIVE'}
+    def prefix_count(txtentry):
+        non_prefix_idx =  np.nonzero(np.array(list(txtentry)) == prefix)[0]
+        if len(non_prefix_idx) == 0:
+            return 0
+        else:
+            return non_prefix_idx[-1] + 1
+        
+    if not txt.startswith(prefix):
+        return [bare_outline(txt, user, docid)]
+    outlines = {}
+    outline_order = []
+    node_order = []
+
+    for idx, line in enumerate(txt.splitlines()):
+        if not line.startswith(prefix):
+            continue
+        level = prefix_count(line)
+        logging.debug("level %s", level)
+        node = bare_outline(line[level:], user, docid)
+
+        outlines[node['id']] = node
+        outline_order.append(node)
+        if len(node_order) == 0:
+            node_order.append((level, node))
+        else:
+            node_levels = np.array([x[0] for x in node_order])
+            node_parent_idx = np.nonzero(node_levels < level)[0]
+            logging.debug('parent %s', str(node_parent_idx))
+            if len(node_parent_idx) == 0:
+                node_order = [(level, node)]
+                continue
+            else:
+                node_parent_idx = node_parent_idx[-1]
+            del node_order[node_parent_idx + 1:]
+            node_order[-1][1]['children'].append(node['id'])
+            node['parent'] = node_order[-1][1]['id']
+            node_order.append((level, node))
+    for n in outline_order:
+        data = "parent: %s id: %s txt: %s children: %s" % (str(n['parent']), str(n['id']), str(n['text']), str(n['children']))
+        print data
+    return outline_order
+
+def doc_to_text(document, user, prefix="*"):
+    outlines = db.outline.find({'documentid': document['id'],
+                                'username': user,
+                                'status' : {'$ne' : 'DELETE'}})
+    outline_dict = {}
+    for o in outlines:
+        o = outline_mongo_to_app(o, user)
+        outline_dict[o['id']] = o
+    root = outline_dict[document['root_id']]
+    output = node_to_text(outline_dict, root, user, prefix=prefix)
+    logging.debug(output)
+    return output
+
+def node_to_text(outlines, outline, user, prefix="*", level=0):
+    output = "".join(["*" for x in range(level)])
+    output += ' '
+    output += outline['text']
+
+    children_txt = [node_to_text(outlines, outlines[x], user,
+                                 prefix=prefix, level=level+1)
+                    for x in outline['children']]
+    total_txt = [output]
+    total_txt.extend(children_txt)
+    return "\r\n".join(total_txt)
+
 
 if __name__ == "__main__":
     prepare_app(app)

@@ -2,13 +2,12 @@
 {% block main %}
 <p>Import Data</p>
 <div>
-  <form action="/import/{{docid}}" method="POST">
+  <form action="/import/{{docid}}/" method="POST">
     <!-- Label and text input -->
     <label for="data">Data</label>
-    <textarea class="import" id="data" name="data">
-    </textarea>
+    <textarea class="importtext" id="data" name="data"></textarea>
     <br>
     <input type="submit"></input>
   </form>
 </div>
-{% end %}
+{% endblock %}
