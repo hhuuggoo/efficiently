@@ -235,7 +235,8 @@ def docview(mode, docid):
             {'docurl' : "/docview/rw/" + doc['_id'],
              'doctitle' : doc['title']}
             )
-    if mode == 'rw' and can_write(document, session.get('username')):
+    if (mode == 'rw' and can_write(document, session.get('username'))) \
+       or (mode =='r' and can_read(document, session.get('username'))): 
         return render_template(
             "outline.html",
             root_id=document['root_id'],
@@ -243,22 +244,12 @@ def docview(mode, docid):
             user=session.get('username'),
             title=document['title'],
             owner=document['username'],
-            mode='rw',
+            mode=mode,
             client_id=topid,
             docdatas=docdatas
             )
-    elif mode =='r' and can_read(document, session.get('username')):
-        return render_template(
-            "outline.html",
-            root_id=document['root_id'],
-            document_id=document['id'],
-            user=session.get('username'),
-            title=document['title'],
-            owner=document['username'],
-            mode='r',
-            client_id=topid,
-            docdatas=docdatas
-            )
+    else:
+        return
 
 @app.route("/document/<docid>")
 def document(docid):
@@ -286,6 +277,21 @@ def create():
     title = request.form['title']
     docid = create_document(session.get('username'), title, app.db)
     return redirect("/docview/rw/" + docid)
+
+@app.route("/bulk/<docid>", methods=["POST"])
+def bulk(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        data = cjson.decode(request.form['data'])
+        for dtype, objects in data.iteritems():
+            for k, d in objects.iteritems():
+                if dtype == 'outline':
+                    d = outline_app_to_mongo(d, session.get('username'))
+                    save_outline(d, app.db)
+        return "success"
 
 if __name__ == "__main__":
     prepare_app(app)
