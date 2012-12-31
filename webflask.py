@@ -12,7 +12,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 gevent.monkey.patch_all()
-from flask import app, request, g, session, redirect, render_template, Flask
+from flask import (app, request, g, session,
+                   redirect, render_template, Flask,
+                   flash, jsonify)
+
 app = Flask(__name__)
 
 def prepare_app(app):
@@ -153,8 +156,16 @@ def defaultpage():
     if not session.get('username'):
         return redirect("/login")
     user = app.db.user.find_one({'username' : session.get('username')})
-    document = db.document.find({'_id': user['defaultdoc']})
-    return redirect("/docview/rw/" + user['defaultdoc'])
+    if not user.get('defaultdoc'):
+        document = app.db.document.find_one(
+            {'username' : session.get('username')}
+            )
+        app.db.user.update({'_id' : user['_id']},
+                           {'$set' : {'defaultdoc' : document['_id']}},
+                           safe=True)
+    else:
+        document = app.db.document.find_one({'_id': user['defaultdoc']})
+    return redirect("/docview/rw/" + document['_id'])
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -164,16 +175,92 @@ def register():
     password = request.form('password')
     email = request.form('email')
     create_initial_data(username, password, email, 'Main')
+    session['username'] = username
     return defaultpage()
 
 @app.route("/login", methods=["GET"])
 def splash():
-    return render_template("splash.html")
+    return render_template("splash.html",
+                           user=None,
+                           document_id=None,
+                           mode=None,
+                           )
 
 @app.route("/login", methods=["POST"])
 def loginpost():
-    pass
-    
-    
+    username = request.form['username']
+    password = request.form['password']
+    user_dict = app.db.user.find_one({'username' : username})
+    if bcrypt.hashpw(password, user_dict['salt']) == user_dict['passhash']:
+        session['username'] = username
+    else:
+        flash("invalid username or password", "error")
+    return defaultpage()
+
+@app.route("/logout")
+def logout():
+    session['username'] = None
+
+def can_read(document, username):
+    valid_users = set()
+    valid_users.update(document['rwuser'])
+    valid_users.update(document['ruser'])        
+    valid_users.add(document['username'])
+    return 'all' in valid_users or session.get('username') in valid_users
+
+def can_write(document, username):
+    valid_users = set()
+    valid_users.update(document['rwuser'])
+    valid_users.add(document['username'])
+    return 'all' in valid_users or session.get('username') in valid_users
+
+        
+topid =  0
+@app.route("/docview/<mode>/<docid>/")
+def docview(mode, docid):
+    global topid
+    topid += 1
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if mode == 'rw' and can_write(document, session.get('username')):
+        return render_template(
+            "outline.html",
+            root_id=document['root_id'],
+            document_id=document['id'],
+            user=session.get('username'),
+            title=document['title'],
+            owner=document['username'],
+            mode='rw',
+            client_id=topid
+            )
+    elif mode =='r' and can_read(document, session.get('username')):
+        pass
+        
+        
+
+@app.route("/document/<docid>")
+def document(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_read(document, session.get('username')):
+        document = app.db.document.find_one({'_id' : docid})
+        document = doc_mongo_to_app(document, session.get('username'))
+        outline = app.db.outline.find({'documentid': docid,
+                                   'username': session.get('username'),
+                                   'status' : {'$ne' : 'DELETE'}})
+        outline = list(outline)
+        logging.debug("numoutlines %d", len(outline))
+        outline = [outline_mongo_to_app(e, session.get('username'))
+                   for e in outline]
+        return jsonify(document=document,
+                       outline=outline)
+
 if __name__ == "__main__":
+    prepare_app(app)
+    app.secret_key="asdfa;lkja;sdlkfja;sdf"
+    app.debug=True
     app.run(port=9000)

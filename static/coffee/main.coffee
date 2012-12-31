@@ -13,7 +13,7 @@ $(() ->
         @collection.sync_all()
 
     $.get("/document/" + doc_id, (data) ->
-        document = JSON.parse(data)
+        document = data
         outlines = document['outline']
         document = new Efficiently.Document(id : doc_id)
         Efficiently.outlinenodes.add(outlines, {'doc' : document})

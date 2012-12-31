@@ -74,7 +74,7 @@
 <!-- <script src="/static/js/keybindings.js"></script> -->
 <!-- <script src="/static/js/socket.io.js"></script> -->
 <!-- end outlinejs -->
-{% end %}
+{% endblock %}
 {% block main %}
 <hr class="mainsep"/>
 <!-- information passed down to client -->
@@ -94,7 +94,7 @@
       {% if mode == 'r' %}
       Warning, this document is opened in read only mode, 
       you will not be able to save any changes
-      {% end %}
+      {% endif %}
       <div class="abox" id="{{document_id}}-display}}">
       </div>
       <div id="{{document_id}}-outline" class="rootnode">
@@ -161,4 +161,4 @@
     </div>
 </ul>
 </div>
-{% end %}
+{% endblock %}

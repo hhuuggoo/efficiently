@@ -32,24 +32,28 @@
       	  {% include "narrowlogo.html" %}
       	    <ul class="pull-right nav nav-pills" style="">
       	      {% if user %}
-      	      <li><a href="/manage">Documents</a></li>
+      	      <li><a class="navbuttons" href="/manage">Documents</a></li>              
       	      {% endif %}
-      	      {% if document_id and mode == 'rw'%}
-      	      <li><a href="/import/{{ document_id }}">Import</a></li>
-      	      {% endif %}
-      	      {% if document_id %}
-      	      <li><a href="/export/{{ document_id }}">Export</a></li>
-      	      {% endif %}
+              <li class="dropdown">
+                <a class="navbuttons dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
+                <ul class="dropdown-menu" role="menu">
+      	          {% if document_id and mode == 'rw'%}
+      	          <li><a href="/import/{{ document_id }}">Import</a></li>
+      	          {% endif %}
+      	          {% if document_id %}
+      	          <li><a href="/export/{{ document_id }}">Export</a></li>
+      	          {% endif %}
+                </ul>
       	      {% if user %}
       	      <li>
-      		<a href="/manage">Logged in as <strong> {{user}} </strong> </a>
+      		    <a class="navbuttons" href="/manage">Logged in as <strong> {{user}} </strong> </a>
       	      </li>
       	      <li>
-      		<a href="/logout">Logout</a>
+      		    <a class="navbuttons" href="/logout">Logout</a>
       	      </li>
       	      {% else %}
-      	      <li><a id="loginlink">Login</a></li>
-      	      <li><a id="registerlink">Register</a></li>
+      	      <li><a class="navbuttons" id="loginlink">Login</a></li>
+      	      <li><a class="navbuttons" id="registerlink">Register</a></li>
       	      {% endif %}
       	    </ul>
 	</div>

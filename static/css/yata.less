@@ -22,23 +22,16 @@
 .navbar {
   margin : 0px;
 }
-.subnav{
-  background-color : @dark;
-  border-radius : 5px;  
-  margin-top : 15px;
-  margin-left : 0px;  
+
+.navbar .nav > li > a:hover {
+  text-decoration: none;
+  background-color: @ultralight;
+  color : @dark;
 }
-.subnav .nav {
-  margin-bottom: 0;
-}
-.subnav .nav > li{
-  float : right;
-}
-.subnav .nav > li > a {
-  margin: 0;
-  border-radius: 0;
-  -webkit-border-radius: 0;
-     -moz-border-radius: 0;
+    
+.navbar .nav > li > a {
+  text-decoration: none;
+  color: white;
 }
 
 @background : #fff;
@@ -73,15 +66,6 @@ body {
 .mynav {
 }
 
-.navbar .nav > li > a:hover {
-  text-decoration: none;
-  background-color: @ultralight;
-  color : @dark;
-}
-.navbar .nav > li > a {
-  text-decoration: none;
-  color: white;
-}
 
 footer{
   background-color : @dark;
