@@ -309,26 +309,6 @@ button{
 
 }
 
-.nav ul
-{
-margin: 0;
-padding: 0;
-list-style-type: none;
-text-align: center;
-}
-
-.nav ul li { display: inline; }
-
-.nav ul li 
-{
-text-decoration: none;
-padding: .2em 1em;
-}
-
-.nav-button{
-    display : inline;
-    padding : 0;
-}
 
 .control{
     position : fixed;

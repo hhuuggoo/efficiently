@@ -279,6 +279,14 @@ def document(docid):
         return jsonify(document=document,
                        outline=outline)
 
+@app.route("/create", methods=['POST'])
+def create():
+    if not session.get('username'):
+        return redirect("/login")
+    title = request.form['title']
+    docid = create_document(session.get('username'), title, app.db)
+    return redirect("/docview/rw/" + docid)
+
 if __name__ == "__main__":
     prepare_app(app)
     app.secret_key="asdfa;lkja;sdlkfja;sdf"

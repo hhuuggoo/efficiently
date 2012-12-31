@@ -7,8 +7,13 @@
         'show': true
       });
     });
-    return $('#registerlink').click(function() {
+    $('#registerlink').click(function() {
       return $('#registermodal').modal({
+        'show': true
+      });
+    });
+    return $('#createlink').click(function() {
+      return $('#createmodal').modal({
         'show': true
       });
     });
