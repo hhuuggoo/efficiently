@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 gevent.monkey.patch_all()
 from flask import (app, request, g, session,
                    redirect, render_template, Flask,
-                   flash, jsonify)
+                   flash, jsonify, Response)
 
 app = Flask(__name__)
 
@@ -314,7 +314,32 @@ def docimportget(docid):
         return render_template("import.html",
                                docid=docid,
                                user=session.get('username'))
+
     
+@app.route("/export/<docid>/", methods=["GET"])
+def docexport(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_read(document, session.get('username')):
+        doc = app.db.document.find_one({'_id' : docid,
+                                        'username' : session.get('username')})
+        doc = doc_mongo_to_app(doc, session.get('username'))
+        return Response(doc_to_text(doc, session.get('username')),
+                        mimetype="text/plain")
+
+@app.route("/export/<docid>/", methods=["GET"])
+def docexportget(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        return render_template("export.html",
+                               docid=docid,
+                               user=session.get('username'))
+
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = app.db.document.find_one({'_id' : docid, 'username' : user})
     document = doc_mongo_to_app(document, document['username'])
@@ -391,7 +416,7 @@ def outlines_from_text(txt, user, docid, prefix="*"):
     return outline_order
 
 def doc_to_text(document, user, prefix="*"):
-    outlines = db.outline.find({'documentid': document['id'],
+    outlines = app.db.outline.find({'documentid': document['id'],
                                 'username': user,
                                 'status' : {'$ne' : 'DELETE'}})
     outline_dict = {}
