@@ -113,7 +113,7 @@ def create_document(user, title, db):
 def create_initial_data(user, passwd, email, title, db):
     salt = bcrypt.gensalt(log_rounds=7)
     passhash = bcrypt.hashpw(passwd, salt)
-    docid = create_document(user, title)
+    docid = create_document(user, title, db)
     db.user.insert({'username':user,
                     'salt' : salt,
                     'passhash':passhash,
@@ -172,9 +172,9 @@ def register():
     username = request.form['username']
     assert "," not in username
     assert username != 'all'
-    password = request.form('password')
-    email = request.form('email')
-    create_initial_data(username, password, email, 'Main')
+    password = request.form['password']
+    email = request.form['email']
+    create_initial_data(username, password, email, 'Main', app.db)
     session['username'] = username
     return defaultpage()
 
@@ -200,6 +200,7 @@ def loginpost():
 @app.route("/logout")
 def logout():
     session['username'] = None
+    return redirect("/login")
 
 def can_read(document, username):
     valid_users = set()
@@ -278,7 +279,7 @@ def create():
     docid = create_document(session.get('username'), title, app.db)
     return redirect("/docview/rw/" + docid)
 
-@app.route("/bulk/<docid>/", methods=["POST"])
+@app.route("/bulk/<docid>", methods=["POST"])
 def bulk(docid):
     if not session.get('username'):
         return redirect("/login")
@@ -293,7 +294,7 @@ def bulk(docid):
                     save_outline(d, app.db)
         return "success"
 
-@app.route("/import/<docid>/", methods=["POST"])
+@app.route("/import/<docid>", methods=["POST"])
 def docimportpost(docid):
     if not session.get('username'):
         return redirect("/login")
@@ -304,7 +305,7 @@ def docimportpost(docid):
             session.get('username'), docid)
         return redirect("/docview/rw/" + docid)
 
-@app.route("/import/<docid>/", methods=["GET"])
+@app.route("/import/<docid>", methods=["GET"])
 def docimportget(docid):
     if not session.get('username'):
         return redirect("/login")
@@ -316,7 +317,7 @@ def docimportget(docid):
                                user=session.get('username'))
 
     
-@app.route("/export/<docid>/", methods=["GET"])
+@app.route("/export/<docid>", methods=["GET"])
 def docexport(docid):
     if not session.get('username'):
         return redirect("/login")
@@ -328,17 +329,6 @@ def docexport(docid):
         doc = doc_mongo_to_app(doc, session.get('username'))
         return Response(doc_to_text(doc, session.get('username')),
                         mimetype="text/plain")
-
-@app.route("/export/<docid>/", methods=["GET"])
-def docexportget(docid):
-    if not session.get('username'):
-        return redirect("/login")
-    document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
-    if can_write(document, session.get('username')):
-        return render_template("export.html",
-                               docid=docid,
-                               user=session.get('username'))
 
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = app.db.document.find_one({'_id' : docid, 'username' : user})
