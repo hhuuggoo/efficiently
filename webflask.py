@@ -680,6 +680,9 @@ if __name__ == "__main__":
         app.debug=True
         app.run(port=9000)
     elif sys.argv[1] == 'prod':
+        prepare_app(app)
+        app.secret_key="asdfa;lkja;sdlkfja;sdf"
+        app.debug=False
         from gevent.pywsgi import WSGIServer
         http_server = WSGIServer(('', 9000), app,
                                  keyfile="/etc/nginx/server.key",
