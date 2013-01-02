@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="container-fluid">
+  <div class="row-fluid">  
+    <div class="span6">
+      <h4> Document Settings</h4>
+      {% if can_write %}
+      <form class="form" action="/docsettings/{{ document_id }}" 
+            method="POST">
+        <label><strong>Title</strong></label>
+        <input type="text" value="{{ title }}" name="title"/>
+        <label for="delete" class="checkbox">
+          <input type="checkbox" name="delete">        
+          Delete this document, warning, cannot be undone
+        </label>
+        <h5>Sharing</h5>
+        Specify lists of users, separated by commas.
+	    Examples:  
+        <ul>
+          <li>
+            <strong> all </strong> will give access to everyone.
+          </li>
+          <li>
+            <strong> frank, hugo, wendy@wendy.com </strong> 
+            will give access to users frank, hugo and 
+            whomever receives email at wendy@wendy.com.
+          </li>
+        </ul>
+        <label for="rwuser">
+	      Users who can edit this document:
+	      <br/>
+	    </label>
+	    <textarea class="sharetext" name="rwuser">{{ rwusers }}</textarea>
+	    <label for="rusers">
+	      Users who can view, but cannot edit this document
+	    </label>
+	    <textarea class="sharetext" name="ruser">{{ rusers }}</textarea>
+        <br/>
+        <br/>        
+        <input class="btn-primary" type="submit"/>
+      </form>
+      {% else %}
+      <p> You do not have permissions to change settings on this document </p>
+      {% endif %}
+    </div>
+    <div class="span6">
+      <h4> User Settings </h4>
+      <form class="form" action="/usersettings">
+        <label for="password">
+          Change Password
+        </label>
+        <input type="password" name="password">
+        <label for="password">
+          Confirm Password
+        </label>
+        <input type="password" name="password2">
+        <label for="email">
+          Email Address
+        </label>
+        <input type="text" name="email" value="{{email}}">
+        <br/>
+        <input class="btn-primary" type="submit"/>        
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

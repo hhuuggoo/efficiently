@@ -31,10 +31,12 @@
 	    <div class="navbar-inner titlerow">
       	  {% include "narrowlogo.html" %}
       	  <ul class="pull-right nav nav-pills" style="">
-      	    {% if user %}
+      	    {% if user and document_id%}
       	    <li>
       		  <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
       	    </li>
+            {% endif %}
+      	    {% if showdocs %}
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
@@ -51,17 +53,18 @@
               </ul>
             </li>
       	    {% endif %}
+      	    {% if display_data_menu %}
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
               <ul class="dropdown-menu" role="menu">
       	        {% if document_id and mode == 'rw'%}
       	        <li><a href="/import/{{ document_id }}">Import</a></li>
       	        {% endif %}
-      	        {% if document_id %}
       	        <li><a href="/export/{{ document_id }}">Export</a></li>
-      	        {% endif %}
               </ul>
-      	      {% if user %}
+            </li>
+      	    {% endif %}
+      	    {% if user %}
       	    <li>
       		  <a href="/logout">Logout</a>
       	    </li>

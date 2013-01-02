@@ -42,11 +42,13 @@ def doc_mongo_to_app(d, user):
             'status': d.get('status', 'ACTIVE'),
             'rwuser': d.get('rwuser', []),
             'ruser': d.get('ruser', []),
+            'rwemail': d.get('rwemail', []),
+            'remail': d.get('remail', []),
             }
 def doc_app_to_mongo(d, user):
     assert 'root_id' in d
-    assert '_id' in d
-    return {'_id' : str(d['_id']),
+    assert 'id' in d
+    return {'_id' : str(d['id']),
             'root_id':d.get('root_id'),
             'title' : d.get('title', ''),
             'username' : user,
@@ -55,9 +57,11 @@ def doc_app_to_mongo(d, user):
             'status': d.get('status', 'ACTIVE'),
             'rwuser': d.get('rwuser', []),
             'ruser': d.get('ruser', []),
+            'rwemail': d.get('rwemail', []),
+            'remail': d.get('remail', []),
             }
 
-def save_doc(d):
+def save_doc(d, db):
     id_val = d.pop('_id')
     db.document.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
@@ -156,15 +160,22 @@ def defaultpage():
     if not session.get('username'):
         return redirect("/login")
     user = app.db.user.find_one({'username' : session.get('username')})
-    if not user.get('defaultdoc'):
+    document = None
+    if user.get('defaultdoc'):
+        document = app.db.document.find_one({'_id': user['defaultdoc'],
+                                             'status' : 'ACTIVE'
+                                             })
+    if not document:
         document = app.db.document.find_one(
-            {'username' : session.get('username')}
+            {'username' : session.get('username'),
+             'status' : 'ACTIVE'
+             }
             )
-        app.db.user.update({'_id' : user['_id']},
-                           {'$set' : {'defaultdoc' : document['_id']}},
-                           safe=True)
-    else:
-        document = app.db.document.find_one({'_id': user['defaultdoc']})
+    if not document:
+        docid = create_document(session.get('username'), 'Main', app.db)
+        document = app.db.document.find_one({'_id': docid,
+                                             'status' : 'ACTIVE'
+                                             })        
     return redirect("/docview/rw/" + document['_id'])
 
 @app.route("/register", methods=["POST"])
@@ -223,7 +234,8 @@ def docview(mode, docid):
     topid += 1
     if not session.get('username'):
         return redirect("/login")
-    document = app.db.document.find_one({'_id' : docid})
+    #FIXME should show error page if doc is invalid/missing
+    document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
     document = doc_mongo_to_app(document, session.get('username'))
     otherdocs = app.db.document.find(
         {'username':session.get('username'),
@@ -237,7 +249,11 @@ def docview(mode, docid):
              'doctitle' : doc['title']}
             )
     if (mode == 'rw' and can_write(document, session.get('username'))) \
-       or (mode =='r' and can_read(document, session.get('username'))): 
+       or (mode =='r' and can_read(document, session.get('username'))):
+        user = app.db.user.find_one({'username' : session.get('username')})
+        app.db.user.update({'_id' : user['_id']},
+                           {'$set' : {'defaultdoc' : document['id']}},
+                           safe=True)
         return render_template(
             "outline.html",
             root_id=document['root_id'],
@@ -247,7 +263,9 @@ def docview(mode, docid):
             owner=document['username'],
             mode=mode,
             client_id=topid,
-            docdatas=docdatas
+            docdatas=docdatas,
+            display_data_menu=True,
+            showdocs=True
             )
     else:
         return
@@ -262,8 +280,7 @@ def document(docid):
         document = app.db.document.find_one({'_id' : docid})
         document = doc_mongo_to_app(document, session.get('username'))
         outline = app.db.outline.find({'documentid': docid,
-                                   'username': session.get('username'),
-                                   'status' : {'$ne' : 'DELETE'}})
+                                       'status' : {'$ne' : 'DELETE'}})
         outline = list(outline)
         logging.debug("numoutlines %d", len(outline))
         outline = [outline_mongo_to_app(e, session.get('username'))
@@ -330,6 +347,57 @@ def docexport(docid):
         return Response(doc_to_text(doc, session.get('username')),
                         mimetype="text/plain")
 
+@app.route("/settings/<docid>", methods=["GET"])
+def settingsget(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        return render_template(
+            "settings.html",
+            can_write=True,
+            rwusers=", ".join(document['rwuser'] + document['rwemail']),
+            rusers=", ".join(document['ruser'] + document['remail']),
+            title=document['title'],
+            document_id=document['id'],
+            user=session.get('username')
+            )
+    else:
+        return render_template(
+            "settings.html",
+            can_write=False,
+            )
+@app.route("/docsettings/<docid>", methods=["POST"])
+def docsettingspost(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document, session.get('username'))
+    if can_write(document, session.get('username')):
+        docupdate = {}
+        if request.form.get('delete', False):
+            app.db.document.update({'_id' : docid},
+                                   {'$set' : {'status' : 'DELETE'}})
+            return redirect("/")
+        if request.form.get('title'):
+            document['title'] = request.form['title']
+        if request.form.get('rwuser'):
+            rwuser = [x.strip() for x in request.form['rwuser'].split(",")]
+            rwemail = [x for x in rwuser if "@" in x]
+            rwuser = [x for x in rwuser if "@" not in x]
+            document['rwemail'] = rwemail
+            document['rwuser'] = rwuser
+        if request.form.get('ruser'):
+            ruser = [x.strip() for x in request.form['ruser'].split(",")]
+            remail = [x for x in ruser if "@" in x]
+            ruser = [x for x in ruser if "@" not in x]
+            document['remail'] = remail
+            document['ruser'] = ruser
+        document = doc_app_to_mongo(document, session.get('username'))
+        save_doc(document, app.db)
+    return redirect("/settings/" + docid)
+    
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = app.db.document.find_one({'_id' : docid, 'username' : user})
     document = doc_mongo_to_app(document, document['username'])
