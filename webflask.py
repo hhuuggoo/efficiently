@@ -113,6 +113,7 @@ def create_document(user, title, db):
         'username':user,
         'documentid' : docid}, safe=True)
     return docid
+
     
 def create_initial_data(user, passwd, email, title, db):
     salt = bcrypt.gensalt(log_rounds=7)
@@ -181,8 +182,9 @@ def defaultpage():
 @app.route("/register", methods=["POST"])
 def register():
     username = request.form['username']
-    assert "," not in username
-    assert username != 'all'
+    if "," in username or username == "all":
+        flash("invalid username", "error")
+        return defaultpage()
     password = request.form['password']
     email = request.form['email']
     create_initial_data(username, password, email, 'Main', app.db)
@@ -349,6 +351,7 @@ def docexport(docid):
 
 @app.route("/settings/<docid>", methods=["GET"])
 def settingsget(docid):
+    session['docid'] = docid
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
@@ -397,7 +400,35 @@ def docsettingspost(docid):
         document = doc_app_to_mongo(document, session.get('username'))
         save_doc(document, app.db)
     return redirect("/settings/" + docid)
-    
+
+@app.route("/usersettings", methods=["POST"])
+def usersettings():
+    #FIXME setup flash messages for errors, look into dict shield
+    #for validation
+    user = app.db.user.find_one({'username' : session.get('username')})
+    updates = {}
+    if not session.get('username'):
+        return redirect("/login")
+    if request.form.get('password'):
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+        if password != password2:
+            flash("passwords do not match", "error")
+            return redirect("/settings/" + session.get('docid'))
+        salt = bcrypt.gensalt(log_rounds=7)
+        passhash = bcrypt.hashpw(password, salt)
+        updates['salt'] = salt
+        updates['passhash'] = passhash
+        flash("password changed", "info")
+    if request.form.get('email'):
+        email = request.form.get('email')
+        updates['email'] = email
+        flash("email changed", "info")        
+    app.db.user.update({'_id' : user['_id']},
+                       {'$set' : updates},
+                       safe=True)
+    return redirect("/settings/" + session.get('docid'))
+
 def update_db_from_txt(txt, user, docid, prefix="*"):
     document = app.db.document.find_one({'_id' : docid, 'username' : user})
     document = doc_mongo_to_app(document, document['username'])

@@ -21,9 +21,8 @@
             <strong> all </strong> will give access to everyone.
           </li>
           <li>
-            <strong> frank, hugo, wendy@wendy.com </strong> 
-            will give access to users frank, hugo and 
-            whomever receives email at wendy@wendy.com.
+            <strong> frank, hugo, wendy </strong> 
+            will give access to users frank, hugo and wendy.
           </li>
         </ul>
         <label for="rwuser">
@@ -45,7 +44,7 @@
     </div>
     <div class="span6">
       <h4> User Settings </h4>
-      <form class="form" action="/usersettings">
+      <form class="form" action="/usersettings" method="POST">
         <label for="password">
           Change Password
         </label>
