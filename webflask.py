@@ -238,6 +238,9 @@ def docview(mode, docid):
         return redirect("/login")
     #FIXME should show error page if doc is invalid/missing
     document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
+    if not document :
+        flash("invalid document", "error")
+        return redirect("/login")
     document = doc_mongo_to_app(document, session.get('username'))
     otherdocs = app.db.document.find(
         {'username':session.get('username'),
