@@ -9,6 +9,10 @@ import hashlib
 import sys
 import numpy as np
 import logging
+import time
+import json
+import os
+import os.path
 logging.basicConfig(level=logging.DEBUG)
 
 gevent.monkey.patch_all()
@@ -18,6 +22,17 @@ from flask import (app, request, g, session,
 
 app = Flask(__name__)
 
+def send_email(fromaddr, toaddrs, subject, txtdata):
+    keypath = os.path.join(os.environ['HOME'], "keys.json")
+    with open(keypath) as f:
+        data = f.read()
+        keys = json.loads(data)
+        from boto.ses import SESConnection
+        connection = SESConnection(
+            aws_access_key_id=keys["AWS_ACCESS_KEY"],
+            aws_secret_access_key=keys["AWS_SECRET_KEY"])
+        connection.send_email(fromaddr, subject, txtdata, toaddrs)
+    
 def prepare_app(app):
     conn = pymongo.Connection()
     db = conn['task']
@@ -160,6 +175,9 @@ def separate_orphans(root_id, nodes, user):
 def defaultpage():
     if not session.get('username'):
         return redirect("/login")
+    if session.get('sharelinks'):
+        process_shares(session.get('username'), session.pop('sharelinks'),
+                       app.db)
     user = app.db.user.find_one({'username' : session.get('username')})
     document = None
     if user.get('defaultdoc'):
@@ -259,6 +277,7 @@ def docview(mode, docid):
         app.db.user.update({'_id' : user['_id']},
                            {'$set' : {'defaultdoc' : document['id']}},
                            safe=True)
+        import pdb;pdb.set_trace()
         return render_template(
             "outline.html",
             root_id=document['root_id'],
@@ -374,6 +393,71 @@ def settingsget(docid):
             "settings.html",
             can_write=False,
             )
+def send_share_email(shareinfo):
+    msg = \
+"""You have been invited too %s the document %s on Efficiently.
+Please visit the following link, %s
+"""
+    url = request.host_url + "share/" + shareinfo['temphash']    
+    if shareinfo['mode'] == 'rw':
+        msg = msg % ('edit', shareinfo['title'], url)
+    else:
+        msg = msg % ('view', shareinfo['title'], url)
+    send_email("info@eff.iciently.com", [shareinfo['email']],
+               "Someone has shared a document with you",
+               msg)
+
+def makeshare(docid, email, mode, title, db):
+    temphash = getid()
+    shareinfo = {'temphash' : temphash,
+                 'timestamp' : time.time(),
+                 'mode' : mode,
+                 'docid' : docid,
+                 'email' : email,
+                 'title' : title
+                 }
+    db.sharelinks.insert(shareinfo,
+                         safe=True
+                         )
+    return shareinfo
+    
+def process_share(username, temphash, use_flash, db):
+    shareinfo = db.sharelinks.find_one({'temphash' : temphash})
+    if not shareinfo:
+        if use_flash:
+            flash("invalid shared link", "error")
+        return False
+    if shareinfo['mode'] == 'rw':
+        field = 'rwuser'
+    else:
+        field = 'ruser'
+    app.db.document.update(
+        {'_id' : shareinfo['docid']},
+        {'$addToSet' : {field : username}},
+        safe=True
+        )
+    return shareinfo
+        
+def process_shares(username, temphashes, db):
+    results = []
+    for x in temphashes:
+        results.append(process_share(username, temphash, False, db))
+    return results
+    
+@app.route("/share/<temphash>")
+def share(temphash):
+    if session.get('username'):
+        result = process_share(session.get('username'), temphash,
+                               True, app.db)
+        if result:
+            return redirect(
+                "/docview/%s/%s" % (result['mode'], result['docid'])
+                )
+        else:
+            return redirect("/login")
+    else:
+        session.setdefault('sharelinks', []).append(temphash)
+    
 @app.route("/docsettings/<docid>", methods=["POST"])
 def docsettingspost(docid):
     if not session.get('username'):
@@ -390,14 +474,26 @@ def docsettingspost(docid):
             document['title'] = request.form['title']
         if request.form.get('rwuser'):
             rwuser = [x.strip() for x in request.form['rwuser'].split(",")]
-            rwemail = [x for x in rwuser if "@" in x]
-            rwuser = [x for x in rwuser if "@" not in x]
+            rwemail = [x for x in rwuser if "@" in x and x]
+            rwuser = [x for x in rwuser if "@" not in x and x]
+            newemails = np.setdiff1d(rwemail, document['rwemail'])
+            if newemails:
+                for email in newemails:
+                    shareinfo = makeshare(docid, email, 'rw',
+                                          document['title'], app.db)
+                    send_share_email(shareinfo)
             document['rwemail'] = rwemail
             document['rwuser'] = rwuser
         if request.form.get('ruser'):
             ruser = [x.strip() for x in request.form['ruser'].split(",")]
             remail = [x for x in ruser if "@" in x]
             ruser = [x for x in ruser if "@" not in x]
+            newemails = np.setdiff1d(rwemail, document['remail'])
+            if newemails:
+                for email in newemails:
+                    shareinfo = makeshare(docid, email, 'r',
+                                          document['title'], app.db)
+                    send_share_email(shareinfo)
             document['remail'] = remail
             document['ruser'] = ruser
         document = doc_app_to_mongo(document, session.get('username'))
