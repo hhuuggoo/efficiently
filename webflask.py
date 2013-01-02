@@ -298,29 +298,34 @@ def get_rw_docdatas(username, db, docid):
             )
     return docdatas
 
+    
 topid =  0
 @app.route("/docview/<mode>/<docid>/")
 def docview(mode, docid):
     global topid
     topid += 1
-    if not session.get('username'):
-        return redirect("/login")
+    username = session.get('username')
     #FIXME should show error page if doc is invalid/missing
     document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
     if not document :
         flash("invalid document", "error")
         return redirect("/login")
     document = doc_mongo_to_app(document)
-    docdatas = get_own_docdatas(session.get('username'), app.db,
-                                document['id'])
-    rdocdatas = get_r_docdatas(session.get('username'), app.db,
-                               document['id'])
-    rwdocdatas = get_rw_docdatas(session.get('username'), app.db,
-                                 document['id'])
-    if (mode == 'rw' and can_write(document, session.get('username'))) \
-       or (mode =='r' and can_read(document, session.get('username'))):
-        user = app.db.user.find_one({'username' : session.get('username')})
-        if mode == 'rw':
+    if not username:
+        docdatas = []
+        rdocdatas = []
+        rwdocdatas = []
+    else:
+        docdatas = get_own_docdatas(username, app.db,
+                                    document['id'])
+        rdocdatas = get_r_docdatas(username, app.db,
+                                   document['id'])
+        rwdocdatas = get_rw_docdatas(username, app.db,
+                                     document['id'])
+    if (mode == 'rw' and can_write(document, username)) \
+       or (mode =='r' and can_read(document, username)):
+        if username and mode == 'rw':
+            user = app.db.user.find_one({'username' : username})            
             app.db.user.update({'_id' : user['_id']},
                                {'$set' : {'defaultdoc' : document['id']}},
                                safe=True)
@@ -328,7 +333,7 @@ def docview(mode, docid):
             "outline.html",
             root_id=document['root_id'],
             document_id=document['id'],
-            user=session.get('username'),
+            user=username,
             title=document['title'],
             owner=document['username'],
             mode=mode,
@@ -344,8 +349,6 @@ def docview(mode, docid):
 
 @app.route("/document/<docid>")
 def document(docid):
-    if not session.get('username'):
-        return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_read(document, session.get('username')):
@@ -356,6 +359,8 @@ def document(docid):
         outline = [outline_mongo_to_app(e) for e in outline]
         return jsonify(document=document,
                        outline=outline)
+    else:
+        return redirect("/login")
 
 @app.route("/create", methods=['POST'])
 def create():
@@ -367,8 +372,6 @@ def create():
 
 @app.route("/bulk/<docid>", methods=["POST"])
 def bulk(docid):
-    if not session.get('username'):
-        return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
@@ -379,11 +382,11 @@ def bulk(docid):
                     d = outline_app_to_mongo(d)
                     save_outline(d, app.db)
         return "success"
+    else:
+        return redirect("/login")
 
 @app.route("/import/<docid>", methods=["POST"])
 def docimportpost(docid):
-    if not session.get('username'):
-        return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
@@ -392,20 +395,18 @@ def docimportpost(docid):
 
 @app.route("/import/<docid>", methods=["GET"])
 def docimportget(docid):
-    if not session.get('username'):
-        return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         return render_template("import.html",
                                docid=docid,
                                user=session.get('username'))
+    else:
+        return redirect("/login")
 
     
 @app.route("/export/<docid>", methods=["GET"])
 def docexport(docid):
-    if not session.get('username'):
-        return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_read(document, session.get('username')):
@@ -413,6 +414,8 @@ def docexport(docid):
         doc = doc_mongo_to_app(doc)
         return Response(doc_to_text(doc),
                         mimetype="text/plain")
+    else:
+        return redirect("/login")
 
 @app.route("/settings/<docid>", methods=["GET"])
 def settingsget(docid):
@@ -528,11 +531,15 @@ def docsettingspost(docid):
                     send_share_email(shareinfo)
             document['rwemail'] = rwemail
             document['rwuser'] = rwuser
+        else:
+            document['rwemail'] = []
+            document['rwuser'] = []
+            
         if request.form.get('ruser'):
             ruser = [x.strip() for x in request.form['ruser'].split(",")]
             remail = [x for x in ruser if "@" in x]
             ruser = [x for x in ruser if "@" not in x]
-            newemails = np.setdiff1d(rwemail, document['remail'])
+            newemails = np.setdiff1d(remail, document['remail'])
             if newemails:
                 for email in newemails:
                     shareinfo = makeshare(docid, email, 'r',
@@ -540,6 +547,9 @@ def docsettingspost(docid):
                     send_share_email(shareinfo)
             document['remail'] = remail
             document['ruser'] = ruser
+        else:
+            document['remail'] = []
+            document['ruser'] = []
         document = doc_app_to_mongo(document)
         save_doc(document, app.db)
     return redirect("/settings/" + docid)

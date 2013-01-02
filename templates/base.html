@@ -36,7 +36,7 @@
       		  <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
       	    </li>
             {% endif %}
-      	    {% if showdocs %}
+      	    {% if showdocs and user %}
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
