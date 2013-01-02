@@ -673,7 +673,16 @@ def node_to_text(outlines, outline, prefix="*", level=0):
 
 
 if __name__ == "__main__":
-    prepare_app(app)
-    app.secret_key="asdfa;lkja;sdlkfja;sdf"
-    app.debug=True
-    app.run(port=9000)
+    import sys
+    if sys.argv[1] == 'debug':
+        prepare_app(app)
+        app.secret_key="asdfa;lkja;sdlkfja;sdf"
+        app.debug=True
+        app.run(port=9000)
+    elif sys.argv[1] == 'prod':
+        from gevent.pywsgi import WSGIServer
+        http_server = WSGIServer(('', 9000), app,
+                                 keyfile="/etc/nginx/server.key",
+                                 certfile="/etc/nginx/server.crt"
+                                 )
+        http_server.serve_forever()
