@@ -45,11 +45,41 @@
                 </li>
                 <li class="divider">
                 </li>
+                
                 {% for docdata in docdatas %}
+                <li tabindex="-1">
+                  <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
+                </li>
+                {% endfor %}
+
+                {% if rwdocdatas %}
+                <li class="divider">
+                </li>
+                <li>
+                  <a href="#">Shared docs you can edit</a>
+                </li>
+                <li class="divider">
+                </li>
+                {% for docdata in rwdocdatas %}
                 <li tabindex="-1" style="float:left;clear:both;">
                   <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
                 </li>
                 {% endfor %}
+                {% endif %}
+                {% if rdocdatas %}
+                <li class="divider">
+                </li>
+                <li>
+                  <a href="#">Shared docs you can view</a>
+                </li>
+                <li class="divider">
+                </li>
+                {% for docdata in rdocdatas %}
+                <li tabindex="-1" style="float:left;clear:both;">
+                  <a href="{{ docdata.docurl }}">{{ docdata.doctitle }}</a>
+                </li>
+                {% endfor %}
+                {% endif %}
               </ul>
             </li>
       	    {% endif %}

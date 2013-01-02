@@ -181,7 +181,6 @@ def defaultpage():
         return redirect("/login")
     document = None
     if session.get('sharelinks'):
-        import pdb;pdb.set_trace()
         results = process_shares(
             session.get('username'),
             session.pop('sharelinks'),
@@ -256,7 +255,49 @@ def can_write(document, username):
     valid_users.add(document['username'])
     return 'all' in valid_users or session.get('username') in valid_users
 
-        
+
+def get_own_docdatas(username, db, docid):
+    otherdocs = db.document.find(
+        {'username': username,
+         'status':'ACTIVE',
+         '_id' : {'$ne' : docid}}
+        )
+    docdatas = []
+    for doc in otherdocs:
+        docdatas.append(
+            {'docurl' : "/docview/rw/" + doc['_id'],
+             'doctitle' : doc['title']}
+            )
+    return docdatas
+
+def get_r_docdatas(username, db, docid):
+    otherdocs = db.document.find(
+        {'ruser' : username,
+         'status':'ACTIVE',
+         '_id' : {'$ne' : docid}}
+        )
+    docdatas = []
+    for doc in otherdocs:
+        docdatas.append(
+            {'docurl' : "/docview/r/" + doc['_id'],
+             'doctitle' : doc['title']}
+            )
+    return docdatas
+
+def get_rw_docdatas(username, db, docid):
+    otherdocs = db.document.find(
+        {'rwuser' : username,
+         'status':'ACTIVE',
+         '_id' : {'$ne' : docid}}
+        )
+    docdatas = []
+    for doc in otherdocs:
+        docdatas.append(
+            {'docurl' : "/docview/rw/" + doc['_id'],
+             'doctitle' : doc['title']}
+            )
+    return docdatas
+
 topid =  0
 @app.route("/docview/<mode>/<docid>/")
 def docview(mode, docid):
@@ -270,17 +311,12 @@ def docview(mode, docid):
         flash("invalid document", "error")
         return redirect("/login")
     document = doc_mongo_to_app(document)
-    otherdocs = app.db.document.find(
-        {'username':session.get('username'),
-         'status':'ACTIVE',
-         '_id' : {'$ne' : docid}}
-        )
-    docdatas = []
-    for doc in otherdocs:
-        docdatas.append(
-            {'docurl' : "/docview/rw/" + doc['_id'],
-             'doctitle' : doc['title']}
-            )
+    docdatas = get_own_docdatas(session.get('username'), app.db,
+                                document['id'])
+    rdocdatas = get_r_docdatas(session.get('username'), app.db,
+                               document['id'])
+    rwdocdatas = get_rw_docdatas(session.get('username'), app.db,
+                                 document['id'])
     if (mode == 'rw' and can_write(document, session.get('username'))) \
        or (mode =='r' and can_read(document, session.get('username'))):
         user = app.db.user.find_one({'username' : session.get('username')})
@@ -298,6 +334,8 @@ def docview(mode, docid):
             mode=mode,
             client_id=topid,
             docdatas=docdatas,
+            rdocdatas=rdocdatas,
+            rwdocdatas=rwdocdatas,
             display_data_menu=True,
             showdocs=True
             )
