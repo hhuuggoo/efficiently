@@ -179,22 +179,28 @@ def separate_orphans(root_id, nodes):
 def defaultpage():
     if not session.get('username'):
         return redirect("/login")
-    if session.get('sharelinks'):
-        process_shares(session.get('username'), session.pop('sharelinks'),
-                       app.db)
-    user = app.db.user.find_one({'username' : session.get('username')})
     document = None
-    if user.get('defaultdoc'):
+    if session.get('sharelinks'):
+        import pdb;pdb.set_trace()
+        results = process_shares(
+            session.get('username'),
+            session.pop('sharelinks'),
+            app.db)
+        results = [x for x in results if x]
+        if results[0]:
+            document = app.db.document.find_one({'_id' : results[0]['docid']})
+    user = app.db.user.find_one({'username' : session.get('username')})
+    if not document and user.get('defaultdoc'):
         document = app.db.document.find_one({'_id': user['defaultdoc'],
                                              'status' : 'ACTIVE'
                                              })
-    if not document:
+    if not document or not can_write(document, session.get('username')):
         document = app.db.document.find_one(
             {'username' : session.get('username'),
              'status' : 'ACTIVE'
              }
             )
-    if not document:
+    if not document or not can_write(document, session.get('username')):
         docid = create_document(session.get('username'), 'Main', app.db)
         document = app.db.document.find_one({'_id': docid,
                                              'status' : 'ACTIVE'
@@ -239,14 +245,14 @@ def logout():
 
 def can_read(document, username):
     valid_users = set()
-    valid_users.update(document['rwuser'])
-    valid_users.update(document['ruser'])        
+    valid_users.update(document.get('rwuser', []))
+    valid_users.update(document.get('ruser', []))
     valid_users.add(document['username'])
     return 'all' in valid_users or session.get('username') in valid_users
 
 def can_write(document, username):
     valid_users = set()
-    valid_users.update(document['rwuser'])
+    valid_users.update(document.get('rwuser',[]))
     valid_users.add(document['username'])
     return 'all' in valid_users or session.get('username') in valid_users
 
@@ -278,9 +284,10 @@ def docview(mode, docid):
     if (mode == 'rw' and can_write(document, session.get('username'))) \
        or (mode =='r' and can_read(document, session.get('username'))):
         user = app.db.user.find_one({'username' : session.get('username')})
-        app.db.user.update({'_id' : user['_id']},
-                           {'$set' : {'defaultdoc' : document['id']}},
-                           safe=True)
+        if mode == 'rw':
+            app.db.user.update({'_id' : user['_id']},
+                               {'$set' : {'defaultdoc' : document['id']}},
+                               safe=True)
         return render_template(
             "outline.html",
             root_id=document['root_id'],
@@ -438,7 +445,7 @@ def process_share(username, temphash, use_flash, db):
         
 def process_shares(username, temphashes, db):
     results = []
-    for x in temphashes:
+    for temphash in temphashes:
         results.append(process_share(username, temphash, False, db))
     return results
     
@@ -455,6 +462,7 @@ def share(temphash):
             return redirect("/login")
     else:
         session.setdefault('sharelinks', []).append(temphash)
+        return redirect("/login")
     
 @app.route("/docsettings/<docid>", methods=["POST"])
 def docsettingspost(docid):
