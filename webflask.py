@@ -45,13 +45,16 @@ def getid():
         str(bson.objectid.ObjectId()) + str(np.random.random())
         ).hexdigest()
 
-def doc_mongo_to_app(d, user):
+def doc_mongo_to_app(d, username=None):
+    if username is None:
+        username = d['username']
+    assert username
     assert 'root_id' in d
     assert '_id' in d
     return {'id' : str(d['_id']),
             'root_id':d.get('root_id'),
             'title' : d.get('title', ''),
-            'username' : user,
+            'username' : username,
             'todostates' : d.get('todostates',[]),
             'todocolors' : d.get('todocolors', {}),
             'status': d.get('status', 'ACTIVE'),
@@ -60,13 +63,16 @@ def doc_mongo_to_app(d, user):
             'rwemail': d.get('rwemail', []),
             'remail': d.get('remail', []),
             }
-def doc_app_to_mongo(d, user):
+
+def doc_app_to_mongo(d, username=None):
+    if username is None:
+        username = d['username']
     assert 'root_id' in d
     assert 'id' in d
     return {'_id' : str(d['id']),
             'root_id':d.get('root_id'),
             'title' : d.get('title', ''),
-            'username' : user,
+            'username' : username,
             'todostates' : d.get('todostates',[]),
             'todocolors' : d.get('todocolors', {}),
             'status': d.get('status', 'ACTIVE'),
@@ -80,22 +86,20 @@ def save_doc(d, db):
     id_val = d.pop('_id')
     db.document.update({'_id': id_val}, {'$set' : d}, upsert=True, safe=True)
 
-def outline_mongo_to_app(d, user):
+def outline_mongo_to_app(d):
     assert 'documentid' in d
     return {'id' : str(d['_id']),
             'text' : d.get('text', ''),
-            'username' : user,
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
             'status' : d.get('status', 'ACTIVE'),
             'chidden' : d.get('chidden', False)}
 
-def outline_app_to_mongo(d, user):
+def outline_app_to_mongo(d):
     assert 'documentid' in d
     return {'_id' : d['id'],
             'text' : d.get('text', ''),
-            'username' : user,
             'children' : d.get('children', []),
             'parent': d.get('parent', None),
             'documentid': d.get('documentid'),
@@ -142,7 +146,7 @@ def create_initial_data(user, passwd, email, title, db):
                     }, safe=True)
                         
 #handler if we are indexing elems by list name            
-def separate_orphans(root_id, nodes, user):
+def separate_orphans(root_id, nodes):
     dictnodes = {}
     for n in nodes:
         dictnodes[n['id']] = n
@@ -164,10 +168,10 @@ def separate_orphans(root_id, nodes, user):
         node['status'] = 'TRASH'
         node['children'] = []
         node['parent'] = []
-        save_outline(outline_app_to_mongo(node, user))
+        save_outline(outline_app_to_mongo(node))
     for node in good_nodes:
         node['status'] = 'ACTIVE'
-        save_outline(outline_app_to_mongo(node, user))
+        save_outline(outline_app_to_mongo(node))
     return good_nodes, dictnodes.values()
 
 
@@ -259,7 +263,7 @@ def docview(mode, docid):
     if not document :
         flash("invalid document", "error")
         return redirect("/login")
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     otherdocs = app.db.document.find(
         {'username':session.get('username'),
          'status':'ACTIVE',
@@ -277,7 +281,6 @@ def docview(mode, docid):
         app.db.user.update({'_id' : user['_id']},
                            {'$set' : {'defaultdoc' : document['id']}},
                            safe=True)
-        import pdb;pdb.set_trace()
         return render_template(
             "outline.html",
             root_id=document['root_id'],
@@ -299,16 +302,13 @@ def document(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_read(document, session.get('username')):
-        document = app.db.document.find_one({'_id' : docid})
-        document = doc_mongo_to_app(document, session.get('username'))
         outline = app.db.outline.find({'documentid': docid,
                                        'status' : {'$ne' : 'DELETE'}})
         outline = list(outline)
         logging.debug("numoutlines %d", len(outline))
-        outline = [outline_mongo_to_app(e, session.get('username'))
-                   for e in outline]
+        outline = [outline_mongo_to_app(e) for e in outline]
         return jsonify(document=document,
                        outline=outline)
 
@@ -325,13 +325,13 @@ def bulk(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         data = cjson.decode(request.form['data'])
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':
-                    d = outline_app_to_mongo(d, session.get('username'))
+                    d = outline_app_to_mongo(d)
                     save_outline(d, app.db)
         return "success"
 
@@ -340,10 +340,9 @@ def docimportpost(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
-        outlines = update_db_from_txt(request.form['data'],
-            session.get('username'), docid)
+        outlines = update_db_from_txt(request.form['data'], docid)
         return redirect("/docview/rw/" + docid)
 
 @app.route("/import/<docid>", methods=["GET"])
@@ -351,7 +350,7 @@ def docimportget(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         return render_template("import.html",
                                docid=docid,
@@ -363,12 +362,11 @@ def docexport(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_read(document, session.get('username')):
-        doc = app.db.document.find_one({'_id' : docid,
-                                        'username' : session.get('username')})
-        doc = doc_mongo_to_app(doc, session.get('username'))
-        return Response(doc_to_text(doc, session.get('username')),
+        doc = app.db.document.find_one({'_id' : docid})
+        doc = doc_mongo_to_app(doc)
+        return Response(doc_to_text(doc),
                         mimetype="text/plain")
 
 @app.route("/settings/<docid>", methods=["GET"])
@@ -377,7 +375,7 @@ def settingsget(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         return render_template(
             "settings.html",
@@ -463,7 +461,7 @@ def docsettingspost(docid):
     if not session.get('username'):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
-    document = doc_mongo_to_app(document, session.get('username'))
+    document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         docupdate = {}
         if request.form.get('delete', False):
@@ -496,7 +494,7 @@ def docsettingspost(docid):
                     send_share_email(shareinfo)
             document['remail'] = remail
             document['ruser'] = ruser
-        document = doc_app_to_mongo(document, session.get('username'))
+        document = doc_app_to_mongo(document)
         save_doc(document, app.db)
     return redirect("/settings/" + docid)
 
@@ -528,10 +526,11 @@ def usersettings():
                        safe=True)
     return redirect("/settings/" + session.get('docid'))
 
-def update_db_from_txt(txt, user, docid, prefix="*"):
-    document = app.db.document.find_one({'_id' : docid, 'username' : user})
-    document = doc_mongo_to_app(document, document['username'])
-    nodes = outlines_from_text(txt, user, docid, prefix=prefix)
+def update_db_from_txt(txt, docid, prefix="*"):
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document)
+    nodes = outlines_from_text(txt, document['username'],
+                               docid, prefix=prefix)
     add_to_root = []
     for n in nodes:
         if n['parent'] is None:
@@ -539,16 +538,15 @@ def update_db_from_txt(txt, user, docid, prefix="*"):
             add_to_root.append(n['id'])
     print add_to_root
     for n in nodes:
-        n = outline_app_to_mongo(n, user)
+        n = outline_app_to_mongo(n)
         data = "parent: %s id: %s txt: %s children: %s" % (str(n['parent']), str(n['_id']), str(n['text']), str(n['children']))
         print data
         save_outline(n, app.db)
-    app.db.outline.update({'_id' : document['root_id'], 'username' : user},
+    app.db.outline.update({'_id' : document['root_id']},
                       {'$pushAll' : {'children' : add_to_root}},
                       safe=True)
-    root = app.db.outline.find_one({'_id' : document['root_id'],
-                                'username' : user})
-    root = outline_mongo_to_app(root, user)
+    root = app.db.outline.find_one({'_id' : document['root_id']})
+    root = outline_mongo_to_app(root)
     nodes.insert(0, root)
     return nodes
     
@@ -603,25 +601,24 @@ def outlines_from_text(txt, user, docid, prefix="*"):
         print data
     return outline_order
 
-def doc_to_text(document, user, prefix="*"):
+def doc_to_text(document, prefix="*"):
     outlines = app.db.outline.find({'documentid': document['id'],
-                                'username': user,
                                 'status' : {'$ne' : 'DELETE'}})
     outline_dict = {}
     for o in outlines:
-        o = outline_mongo_to_app(o, user)
+        o = outline_mongo_to_app(o)
         outline_dict[o['id']] = o
     root = outline_dict[document['root_id']]
-    output = node_to_text(outline_dict, root, user, prefix=prefix)
+    output = node_to_text(outline_dict, root, prefix=prefix)
     logging.debug(output)
     return output
 
-def node_to_text(outlines, outline, user, prefix="*", level=0):
+def node_to_text(outlines, outline, prefix="*", level=0):
     output = "".join(["*" for x in range(level)])
     output += ' '
     output += outline['text']
 
-    children_txt = [node_to_text(outlines, outlines[x], user,
+    children_txt = [node_to_text(outlines, outlines[x], 
                                  prefix=prefix, level=level+1)
                     for x in outline['children']]
     total_txt = [output]
