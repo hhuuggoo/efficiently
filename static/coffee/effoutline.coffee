@@ -362,10 +362,17 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       @docview.outline_state = 'hide_all'
     for child in @docview.children(@docview.model, false)
       @docview.getviewstate(child.id).set('outline', @docview.outline_state)
+    if not @docview.currview().viewstate.get('hide')
+      @docview.select(@docview.currnode)
+    else
+      nextnode = @nearest_visible_node()
+      if nextnode
+        @docview.select(@docview.currnode)
     return false
 
   toggle_outline : (e) =>
     @docview.currview().viewstate.toggle_outline_state()
+    @docview.select(@docview.currnode)
     return false
 
   moveup : (e) =>
@@ -416,14 +423,16 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if not @docview.nodeviews[@docview.currnode.id].nodetext()
       return @deletenode(e)
     return true
-
+  nearest_visible_node : () =>
+    nextnode = @docview.upper_node(@docview.currnode, true)
+    if not nextnode or nextnode == @docview.model #nextnode should not be root
+      nextnode = @docview.lower_node(@docview.currnode, true)
+    return nextnode
   deletenode : (e) =>
     if @docview.model.children().length == 1 and
         @docview.model.children()[0] == @docview.currnode
       return false
-    nextnode = @docview.upper_node(@docview.currnode, true)
-    if not nextnode or nextnode == @docview.model #nextnode should not be root
-      nextnode = @docview.lower_node(@docview.currnode, true)
+    nextnode = @nearest_visible_node()
     parent = @docview.currnode.parent()
     parent.remove_child(@docview.currnode)
     @docview.currnode.del()
