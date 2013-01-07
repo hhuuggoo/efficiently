@@ -489,7 +489,11 @@ def process_shares(username, temphashes, db):
     for temphash in temphashes:
         results.append(process_share(username, temphash, False, db))
     return results
-    
+
+@app.route("/loginorregister")
+def loginorregister():
+    return render_template("loginorregister.html")
+
 @app.route("/share/<temphash>")
 def share(temphash):
     if session.get('username'):
@@ -500,7 +504,7 @@ def share(temphash):
                 "/docview/%s/%s" % (result['mode'], result['docid'])
                 )
         else:
-            return redirect("/login")
+            return render_template("loginorregister.html")
     else:
         session.setdefault('sharelinks', []).append(temphash)
         return redirect("/login")

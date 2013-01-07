@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <center>
+      <hr/>
+      <h4> Someone has shared a document with you, please login or register in order to view it </h4>
+      <hr/>      
+    </center>
+  </div>
+</div>
+<div class="container-fluid" style="background-color:#CDE8FF;">  
+  <div class="row-fluid">
+    <div class="span6">
+	  <form class="form" action="/login" method="POST">
+        <h3> Login </h3>
+	    <!-- Label and text input -->
+	    <label for="username">username</label>
+	    <input type="text" id="username" name="username" />
+	    <label for="password">password</label>
+	    <input type="password" id="password" name="password"/>
+	    <br>
+	    <input class="btn btn-primary" type="submit"/>
+	  </form>
+    </div>
+    <div class="span6">
+	  <form class="form" action="/register" method="POST">
+        <h3> Register </h3>        
+	    <!-- Label and text input -->
+	    <label for="username">username</label>
+	    <input type="text" id="username" name="username" />
+	    <label for="password">password</label>
+	    <input type="password" id="password" name="password"/>
+	    <label for="email">email</label>
+	    <input type="text" id="email" name="email"/>
+	    <br>
+	    <input class="btn btn-primary" type="submit"/>
+	  </form>
+    </div>
+  </div>
+</div>
+<hr/>
+<div class="container-fluid">  
+  <div class="row-fluid">
+  {% include "efficientlydescr.html" %}
+  </div>
+</div>
+<hr/>
+{% endblock %}
