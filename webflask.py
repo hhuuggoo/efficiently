@@ -3,7 +3,7 @@ import gevent.monkey
 import pymongo
 import bson.objectid
 import bcrypt
-import cjson
+import json
 import numpy as np
 import hashlib
 import sys
@@ -375,7 +375,7 @@ def bulk(docid):
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
-        data = cjson.decode(request.form['data'])
+        data = json.loads(request.form['data'])
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':
