@@ -504,10 +504,10 @@ def share(temphash):
                 "/docview/%s/%s" % (result['mode'], result['docid'])
                 )
         else:
-            return render_template("loginorregister.html")
+            return redirect("/login")
     else:
         session.setdefault('sharelinks', []).append(temphash)
-        return redirect("/login")
+        return render_template("loginorregister.html")
     
 @app.route("/docsettings/<docid>", methods=["POST"])
 def docsettingspost(docid):
