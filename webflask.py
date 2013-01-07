@@ -528,7 +528,7 @@ def docsettingspost(docid):
             rwemail = [x for x in rwuser if "@" in x and x]
             rwuser = [x for x in rwuser if "@" not in x and x]
             newemails = np.setdiff1d(rwemail, document['rwemail'])
-            if newemails:
+            if len(newemails) > 0:
                 for email in newemails:
                     shareinfo = makeshare(docid, email, 'rw',
                                           document['title'], app.db)
@@ -544,7 +544,7 @@ def docsettingspost(docid):
             remail = [x for x in ruser if "@" in x]
             ruser = [x for x in ruser if "@" not in x]
             newemails = np.setdiff1d(remail, document['remail'])
-            if newemails:
+            if len(newemails) > 0:
                 for email in newemails:
                     shareinfo = makeshare(docid, email, 'r',
                                           document['title'], app.db)
