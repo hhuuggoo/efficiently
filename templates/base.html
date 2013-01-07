@@ -2,7 +2,11 @@
 <!-- saved from url=(0050)http://www.blueprintcss.org/tests/parts/forms.html -->
 <html lang="en">
   <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
     <title>Efficiently</title>
+    {% endif %}
     <link rel="stylesheet" type="text/css" 
 	      href="/static/themes/base/jquery.ui.all.css">
     <link rel="stylesheet/less" 
