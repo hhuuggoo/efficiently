@@ -1,4 +1,10 @@
 yata.js
 effoutline.js
 test/view_test.js
+test/outline_test.js
+test/bboilerplate_test.js
+parser.js
+outlinebase.js
+bboilerplate.js
+base.js
 main.js
