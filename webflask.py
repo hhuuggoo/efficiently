@@ -692,7 +692,7 @@ if __name__ == "__main__":
         prepare_app(app)
         app.secret_key="asdfa;lkja;sdlkfja;sdf"
         app.debug=True
-        app.run(port=9000)
+        app.run(port=10000)
     elif sys.argv[1] == 'prod':
         prepare_app(app)
         app.secret_key="asdfa;lkja;sdlkfja;sdf"
