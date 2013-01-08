@@ -843,8 +843,8 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
   delegateEvents : (events) ->
     super(events)
     BBoilerplate.safebind(this, @model, "change:text", @render_text)
-    BBoilerplate.safebind(this, @viewstate, "change:edit", @render)
-    BBoilerplate.safebind(this, @viewstate, "change:select", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:edit", @render_text)
+    BBoilerplate.safebind(this, @viewstate, "change:select", @render_select)
     BBoilerplate.safebind(this, @viewstate, "change:any_hidden", @render)
     BBoilerplate.safebind(this, @model.doc, "change:todostates", @render)
     BBoilerplate.safebind(this, @model.doc, "change:todocolors", @render)
@@ -871,7 +871,19 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
         @model.set('text', newval)
       @model.save()
 
-  render_text : () ->
+  render_select : () =>
+    if @viewstate.get('select')
+      @$el.addClass("shade")
+    else
+      @$el.removeClass("shade")
+    return null
+
+  setup_autoresize : () =>
+    node = @$el.find('textarea')
+    node.height(0)
+    node.autoResize()
+
+  render_text : () =>
     text = @mget('text')
     escapedtext = _.escape(text)
     html = Efficiently.format_text(escapedtext, @model.doc)
@@ -879,10 +891,12 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     node = @$el.find('textarea')
     node.val(text)
     if @viewstate.get('edit')
-      node.height(0)
-      node.autoResize()
       @$el.find('.outline-input').focus()
-      _.defer((()->node.resizeNow.call(node)))
+      @$el.find('.outline-textdisplay').addClass('hide')
+      @$el.find('.outline-input').removeClass('hide')
+    else
+      @$el.find('.outline-textdisplay').removeClass('hide')
+      @$el.find('.outline-input').addClass('hide')
 
   render : (options) ->
     window.rendertimes += 1
@@ -890,12 +904,10 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       chidden : @viewstate.get('any_hidden')
       edit : @viewstate.get('edit')
     ))
-    if @viewstate.get('select')
-      @$el.addClass("shade")
-    else
-      @$el.removeClass("shade")
     @$el.addClass("content clearfix")
+    @render_select()
     @render_text()
+    @setup_autoresize()
 
 window.rendertimes = 0
 class Efficiently.BasicChildrenView extends BBoilerplate.BasicView
