@@ -9,5 +9,8 @@ $(()->
   $('#createlink').click(() ->
     $('#createmodal').modal({'show' : true})
   )
+  $('#sharelink').click(() ->
+    $('#sharemodal').modal({'show' : true})
+  )
 
 )

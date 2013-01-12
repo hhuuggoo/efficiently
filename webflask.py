@@ -341,7 +341,7 @@ def docview(mode, docid):
             docdatas=docdatas,
             rdocdatas=rdocdatas,
             rwdocdatas=rwdocdatas,
-            display_data_menu=True,
+            display_share_form=True,
             showdocs=True
             )
     else:
@@ -508,7 +508,54 @@ def share(temphash):
     else:
         session.setdefault('sharelinks', []).append(temphash)
         return render_template("loginorregister.html")
-    
+
+@app.route("/addtoshare/<docid>", methods=["POST"])
+def addtoshare(docid):
+    if not session.get('username'):
+        return redirect("/login")
+    document = app.db.document.find_one({'_id' : docid})
+    document = doc_mongo_to_app(document)
+    rwemail = []
+    rwuser = []
+    remail = []
+    ruser = []
+    if request.form.get('rwuser'):
+        rwuser = [x.strip() for x in request.form['rwuser'].split(",")]
+        rwemail = [x for x in rwuser if "@" in x and x]
+        rwuser = [x for x in rwuser if "@" not in x and x]
+        newemails = np.setdiff1d(rwemail, document['rwemail'])
+        if len(newemails) > 0:
+            for email in newemails:
+                shareinfo = makeshare(docid, email, 'rw',
+                                      document['title'], app.db)
+                send_share_email(shareinfo)
+        document['rwemail'] += rwemail
+        document['rwuser'] += rwuser
+    if request.form.get('ruser'):
+        ruser = [x.strip() for x in request.form['ruser'].split(",")]
+        remail = [x for x in ruser if "@" in x]
+        ruser = [x for x in ruser if "@" not in x]
+        newemails = np.setdiff1d(remail, document['remail'])
+        if len(newemails) > 0:
+            for email in newemails:
+                shareinfo = makeshare(docid, email, 'r',
+                                      document['title'], app.db)
+                send_share_email(shareinfo)
+        document['remail'] += remail
+        document['ruser'] += ruser
+    msg = ""
+    if rwemail or rwuser:
+        msg = msg + "You've invited %s to edit this outline."
+        msg = msg % ", ".join(rwemail + rwuser)
+    if remail or ruser:
+        msg = msg + "You've invited %s to view this outline."
+        msg = msg % ", ".join(remail + ruser)
+    if msg:
+        flash(msg, "success")
+    document = doc_app_to_mongo(document)
+    save_doc(document, app.db)
+    return redirect("/docview/rw/" + docid)
+
 @app.route("/docsettings/<docid>", methods=["POST"])
 def docsettingspost(docid):
     if not session.get('username'):

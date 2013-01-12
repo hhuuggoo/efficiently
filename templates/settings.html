@@ -4,14 +4,20 @@
   <div class="row-fluid">  
     <div class="span6">
       <h4> Document Settings</h4>
+      <label><strong>Data</strong></label>
+      <a href="/export/{{ document_id }}">Export data from this document</a>
+      <br/>
       {% if can_write %}
+      <a href="/import/{{ document_id }}">Import data into this document</a>
+      <br/>      
+      <br/>      
       <form class="form" action="/docsettings/{{ document_id }}" 
             method="POST">
         <label><strong>Title</strong></label>
         <input type="text" value="{{ title }}" name="title"/>
         <label for="delete" class="checkbox">
           <input type="checkbox" name="delete">        
-          Delete this document, warning, cannot be undone
+          Delete this outline, warning, cannot be undone
         </label>
         <h5>Sharing</h5>
         Specify lists of users, separated by commas.
@@ -26,12 +32,12 @@
           </li>
         </ul>
         <label for="rwuser">
-	      Users who can edit this document:
+	      Users who can edit this outline:
 	      <br/>
 	    </label>
 	    <textarea class="sharetext" name="rwuser">{{ rwusers }}</textarea>
 	    <label for="rusers">
-	      Users who can view, but cannot edit this document
+	      Users who can view, but cannot edit this outline
 	    </label>
 	    <textarea class="sharetext" name="ruser">{{ rusers }}</textarea>
         <br/>
@@ -39,7 +45,7 @@
         <input class="btn-primary" type="submit"/>
       </form>
       {% else %}
-      <p> You do not have permissions to change settings on this document </p>
+      <p> You do not have permissions to change settings on this outline </p>
       {% endif %}
     </div>
     <div class="span6">

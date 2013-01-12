@@ -42,10 +42,10 @@
             {% endif %}
       	    {% if showdocs and user %}
             <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Documents </a>
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Outlines </a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 <li tabindex="-1">
-                  <a id="createlink">Create a new Document</a>
+                  <a id="createlink">Create a new Outline</a>
                 </li>
                 <li class="divider">
                 </li>
@@ -60,7 +60,7 @@
                 <li class="divider">
                 </li>
                 <li>
-                  <a href="#">Shared docs you can edit</a>
+                  <a href="#">Shared outlines you can edit</a>
                 </li>
                 <li class="divider">
                 </li>
@@ -74,7 +74,7 @@
                 <li class="divider">
                 </li>
                 <li>
-                  <a href="#">Shared docs you can view</a>
+                  <a href="#">Shared outlines you can view</a>
                 </li>
                 <li class="divider">
                 </li>
@@ -87,16 +87,8 @@
               </ul>
             </li>
       	    {% endif %}
-      	    {% if display_data_menu %}
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Data </a>
-              <ul class="dropdown-menu" role="menu">
-      	        {% if document_id and mode == 'rw'%}
-      	        <li><a href="/import/{{ document_id }}">Import</a></li>
-      	        {% endif %}
-      	        <li><a href="/export/{{ document_id }}">Export</a></li>
-              </ul>
-            </li>
+      	    {% if display_share_form and document_id and mode == 'rw' %}
+      	    <li><a id="sharelink">Sharing</a></li>            
       	    {% endif %}
       	    {% if user %}
       	    <li>
@@ -117,16 +109,16 @@
       <!-- 	</div> -->
       <!-- </div> -->
       <div class="messages">      
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      {% for category, message in messages %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
         <div class="alert alert-{{ category }}">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
           {{ message }}
         </div>
-      {% endfor %}
-      {% endif %}
-      {% endwith %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
       </div>
       <div class="wrap">
         {% block main %}
@@ -144,10 +136,45 @@
 	      </div>
 	    </div>
       </footer>
+      <div class="modal hide" id="sharemodal" style="position:absolute">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">×</button>
+	      <h3>Sharing</h3>
+	    </div>
+	    <div class="modal-body">
+          <form class="form" action="/addtoshare/{{ document_id }}" 
+                method="POST">
+            Specify lists of users, separated by commas.
+	        Examples:  
+            <ul>
+              <li>
+                <strong> all </strong> will give access to everyone.
+              </li>
+              <li>
+                <strong> frank, hugo, wendy </strong> 
+                will give access to users frank, hugo and wendy.
+              </li>
+            </ul>
+            <label for="rwuser">
+	          Users who can edit this outline:
+	          <br/>
+	        </label>
+	        <textarea class="sharetext" name="rwuser">{{ rwusers }}</textarea>
+	        <label for="rusers">
+	          Users who can view, but cannot edit this outline
+	        </label>
+	        <textarea class="sharetext" name="ruser">{{ rusers }}</textarea>
+            <br/>
+            <br/>        
+            <input class="btn-primary" type="submit"/>
+            
+          </form>
+	    </div>
+      </div>
       <div class="modal hide" id="createmodal" style="position:absolute">
 	    <div class="modal-header">
 	      <button type="button" class="close" data-dismiss="modal">×</button>
-	      <h3>Create Document</h3>
+	      <h3>Create Outline</h3>
 	    </div>
 	    <div class="modal-body">
 	      <form class="" action="/create" method="POST">
