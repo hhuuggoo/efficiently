@@ -362,7 +362,8 @@ def document(docid):
         if split.scheme == "http":
             wsurl = "ws://%s/sub" % split.netloc
         else:
-            wsurl = "wss://%s/sub" % split.netloc
+            #hack
+            wsurl = "wss://%s:9000/sub" % split.netloc
         return jsonify(document=document,
                        outline=outline,
                        token=token,
