@@ -6,22 +6,31 @@
 
     _.extend(WebSocketWrapper.prototype, Backbone.Events);
 
-    function WebSocketWrapper(ws_conn_string) {
-      this.onmessage = __bind(this.onmessage, this);
-
+    WebSocketWrapper.prototype.connect = function() {
       var _this = this;
-      this.ws_conn_string = ws_conn_string;
       this._connected = $.Deferred();
       this.connected = this._connected.promise();
       try {
-        this.s = new WebSocket(ws_conn_string);
+        this.s = new WebSocket(this.ws_conn_string);
       } catch (error) {
-        this.s = new MozWebSocket(ws_conn_string);
+        this.s = new MozWebSocket(this.ws_conn_string);
       }
       this.s.onopen = function() {
-        return _this._connected.resolve();
+        _this._connected.resolve();
+        return _this.trigger('open');
       };
       this.s.onmessage = this.onmessage;
+      return this.s.onclose = function() {
+        return _this.trigger('close');
+      };
+    };
+
+    function WebSocketWrapper(ws_conn_string) {
+      this.onmessage = __bind(this.onmessage, this);
+
+      this.connect = __bind(this.connect, this);
+      this.ws_conn_string = ws_conn_string;
+      this.connect();
       return this;
     }
 

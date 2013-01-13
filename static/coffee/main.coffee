@@ -18,6 +18,7 @@ $(() ->
         token = document['token']
         wsurl = document['wsurl']
         document = new Efficiently.Document(id : doc_id)
+        window.document = document
         Efficiently.outlinenodes.add(outlines, {'doc' : document})
         root = Efficiently.outlinenodes.get(root_id)
         if root.get('children').length == 0
@@ -62,6 +63,27 @@ $(() ->
             outlines = msgobj['outline']
             Efficiently.wscache.addnode(outlines)
             Efficiently.wscache.update_collection()
+        )
+        window.websocket.on("close", () ->
+          $('#reconnectmodal').modal({'show' : true})
+        )
+        $('#reconnectbutton').click( () ->
+          window.websocket.connect()
+          $.when(window.websocket.connected).then(() ->
+            msg = JSON.stringify(
+              msgtype : 'subscribe',
+              topic : topic,
+              auth : token
+            )
+            window.websocket.s.send(msg)
+            $.get("/document/" + doc_id, (data) ->
+               document = data
+               token = document['token']
+               outlines = document['outline']
+               Efficiently.wscache.addnode(outlines)
+               Efficiently.wscache.update_collection()
+            )
+          )
         )
     )
 )

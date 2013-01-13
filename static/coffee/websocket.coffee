@@ -9,17 +9,23 @@
 class BBoilerplate.WebSocketWrapper
   _.extend(@prototype, Backbone.Events)
   # ### method :
-  constructor : (ws_conn_string) ->
-    @ws_conn_string = ws_conn_string
+  connect : () =>
     @_connected = $.Deferred()
     @connected = @_connected.promise()
     try
-      @s = new WebSocket(ws_conn_string)
+      @s = new WebSocket(@ws_conn_string)
     catch error
-      @s = new MozWebSocket(ws_conn_string)
+      @s = new MozWebSocket(@ws_conn_string)
     @s.onopen = () =>
       @_connected.resolve()
+      @trigger('open')
     @s.onmessage = @onmessage
+    @s.onclose = () =>
+      @trigger('close')
+
+  constructor : (ws_conn_string) ->
+    @ws_conn_string = ws_conn_string
+    @connect()
     return @
 
   onmessage : (msg) =>
