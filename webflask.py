@@ -2,6 +2,7 @@ import gevent
 import gevent.monkey
 gevent.monkey.patch_all()
 from geventwebsocket.handler import WebSocketHandler
+import uuid
 import pymongo
 import bson.objectid
 import bcrypt
@@ -755,9 +756,12 @@ def node_to_text(outlines, outline, prefix="*", level=0):
     total_txt.extend(children_txt)
     return "\r\n".join(total_txt)
 
-@app.route("/heartbeat")
+@app.route("/heartbeat", methods=['POST'])
 def heartbeat():
+    session.setdefault('id', str(uuid.uuid4()))
     gevent.sleep(3)
+    clientid = request.headers.get('WS-Clientid')    
+    print clientid
     return 'success'
 
 if __name__ == "__main__":

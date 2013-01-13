@@ -90,6 +90,7 @@ $(() ->
         )
         check_connection = () ->
           $.ajax("/heartbeat",
+            'type' : 'POST',
             'timeout' : 5000,
             'success' : check_connection,
             'error' : () -> window.websocket.trigger('close')
