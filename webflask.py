@@ -755,6 +755,10 @@ def node_to_text(outlines, outline, prefix="*", level=0):
     total_txt.extend(children_txt)
     return "\r\n".join(total_txt)
 
+@app.route("/heartbeat")
+def heartbeat():
+    time.sleep(3)
+    return 'success'
 
 if __name__ == "__main__":
     import sys

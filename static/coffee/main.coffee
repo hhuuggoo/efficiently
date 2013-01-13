@@ -67,7 +67,7 @@ $(() ->
         window.websocket.on("close", () ->
           $('#reconnectmodal').modal({'show' : true})
         )
-        $('#reconnectbutton').click( () ->
+        reconnect = () ->
           window.websocket.connect()
           $.when(window.websocket.connected).then(() ->
             msg = JSON.stringify(
@@ -84,6 +84,12 @@ $(() ->
                Efficiently.wscache.update_collection()
             )
           )
+        $('#reconnectbutton').click( () ->
+          reconnect()
         )
+        check_connection = () ->
+          $.get("/heartbeat").success(check_connection)
+            .error(() -> window.websocket.s.close())
+        check_connection()
     )
 )
