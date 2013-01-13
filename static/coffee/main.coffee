@@ -15,6 +15,8 @@ $(() ->
     $.get("/document/" + doc_id, (data) ->
         document = data
         outlines = document['outline']
+        token = document['token']
+        wsurl = document['wsurl']
         document = new Efficiently.Document(id : doc_id)
         Efficiently.outlinenodes.add(outlines, {'doc' : document})
         root = Efficiently.outlinenodes.get(root_id)
@@ -33,5 +35,33 @@ $(() ->
         window.keyeventer = keyeventer
         keyeventer.select_first_node()
         window.docview = docview
+        Efficiently.wscache = new Efficiently.WSOutlineCache(
+          Efficiently.outlinenodes, document
+        )
+        window.websocket = new BBoilerplate.WebSocketWrapper(wsurl)
+        if mode == 'rw'
+          topic = "docrw:#{doc_id}"
+        else
+          topic = "docr:#{doc_id}"
+        $.when(window.websocket.connected).then(() ->
+          msg = JSON.stringify(
+            msgtype : 'subscribe',
+            topic : topic,
+            auth : token
+          )
+          window.websocket.s.send(msg)
+        )
+        window.websocket.on("msg:#{topic}", (msg) ->
+          msgobj = JSON.parse(msg)
+          if msgobj['msgtype'] == 'status'
+            console.log('status', msgobj)
+            clientid = msgobj['status'][2]
+            $.ajaxSetup({'headers' : {'WS-Clientid' : clientid}})
+            Efficiently.clientid = clientid
+          if msgobj['msgtype'] == 'modelupdate'
+            outlines = msgobj['outline']
+            Efficiently.wscache.addnode(outlines)
+            Efficiently.wscache.update_collection()
+        )
     )
 )

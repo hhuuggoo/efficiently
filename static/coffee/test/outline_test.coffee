@@ -125,3 +125,47 @@ test('test_parentheses_words', ->
   ok(Efficiently.eval_match("#m1", "foo", {'#m1' : true}))
   ok(not Efficiently.eval_match("#m1", "foo", {}))
 )
+
+test('websocketoulinecache' , ->
+  nodes = deepmultinode_setup()
+  node = nodes[0]
+  node2 = nodes[1]
+  node3 = nodes[2]
+  node4 = nodes[3]
+  test1 =
+    text : 'foo'
+    id : 'test1'
+  test2 =
+    text : 'foo'
+    id : 'test2'
+  test3 =
+    text : 'foo'
+    id : 'test3'
+  cache = new Efficiently.WSOutlineCache(Efficiently.outlinenodes)
+  #test adding to cache
+  cache.addnode([test1, test2])
+  ok(cache.nodecache[test1.id])
+  ok(cache.nodecache[test2.id])
+
+  #test dependency checking
+  ok(cache.dependencies_met(test1.id))
+  ok(cache.dependencies_met(test2.id))
+
+  test2.children = ['test3']
+  ok(not cache.dependencies_met(test2.id))
+
+  #check deeper dependencies
+  cache.addnode([test3])
+  ok(cache.dependencies_met(test2.id))
+  test4 =
+    text : 'foo'
+    id : 'test4'
+  test3.children = ['test4']
+  ok(not cache.dependencies_met(test2.id))
+
+  #test dependencies on other existing nodes
+  cache.addnode([test4])
+  test4.children = [node.id]
+  ok(cache.dependencies_met(test4.id))
+
+)

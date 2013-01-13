@@ -1002,3 +1002,48 @@ Efficiently.tree_filter = (expression, docview) ->
       docview.unhide(node)
       return true
   f(docview.model, {})
+
+class Efficiently.WSOutlineCache
+  constructor : (collection, doc) ->
+    @collection = collection
+    @doc = doc
+    @nodecache = {}
+    @nodestatus = {}
+
+  getnode : (id) =>
+    if @nodecache[id]
+      return @nodecache[id]
+
+  addnode : (nodes) ->
+    for node in nodes
+      @nodecache[node.id] = node
+    return null
+
+  dependencies_met : (nodeid) =>
+    # if node is in the collection already, return true
+    # if we can't find the node in our cache, return false
+    # then check dependencies on the json
+    if @collection.get(nodeid)
+      return true
+    node = @nodecache[nodeid]
+    if not node
+      return false
+    if _.all(node.children, (childid) =>
+        return @dependencies_met(childid)
+      )
+        return true
+    else
+      return false
+
+  update_collection : () =>
+    tochange = []
+    for own key, node of @nodecache
+      if @dependencies_met(node.id)
+        tochange.push(key)
+        delete @nodecache[key]
+        if Efficiently.outlinenodes.get(key)
+          Efficiently.outlinenodes.get(key).set(node, {silent : true})
+        else
+          node = @doc.newnode(node, {silent : true})
+    for id in tochange
+      Efficiently.outlinenodes.get(id).change()

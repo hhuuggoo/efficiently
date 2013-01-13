@@ -1,5 +1,6 @@
 import gevent
 import gevent.monkey
+from geventwebsocket.handler import WebSocketHandler
 import pymongo
 import bson.objectid
 import bcrypt
@@ -12,15 +13,23 @@ import logging
 import time
 import json
 import os
+import urlparse
+
 import os.path
+import websocket
+import auth
+
+can_read = auth.can_read
+can_write = auth.can_write
+
 logging.basicConfig(level=logging.DEBUG)
 
 gevent.monkey.patch_all()
-from flask import (app, request, g, session,
+from flask import (request, g, session,
                    redirect, render_template, Flask,
                    flash, jsonify, Response)
 
-app = Flask(__name__)
+from app import app
 
 def send_email(fromaddr, toaddrs, subject, txtdata):
     keypath = os.path.join(os.environ['HOME'], "keys.json")
@@ -38,6 +47,9 @@ def prepare_app(app):
     db = conn['task']
     db.user.ensure_index([('username',1)], unique=True)
     app.db = db
+    app.wsmanager = websocket.WebSocketManager()
+    app.wsmanager.register_auth("docrw", auth.docrw_auth)
+    app.wsmanager.register_auth("docr", auth.docr_auth)
     
 def getid():
     #seems overly complex
@@ -242,18 +254,6 @@ def logout():
     session['username'] = None
     return redirect("/login")
 
-def can_read(document, username):
-    valid_users = set()
-    valid_users.update(document.get('rwuser', []))
-    valid_users.update(document.get('ruser', []))
-    valid_users.add(document['username'])
-    return 'all' in valid_users or session.get('username') in valid_users
-
-def can_write(document, username):
-    valid_users = set()
-    valid_users.update(document.get('rwuser',[]))
-    valid_users.add(document['username'])
-    return 'all' in valid_users or session.get('username') in valid_users
 
 
 def get_own_docdatas(username, db, docid):
@@ -357,8 +357,17 @@ def document(docid):
         outline = list(outline)
         logging.debug("numoutlines %d", len(outline))
         outline = [outline_mongo_to_app(e) for e in outline]
+        token = auth.auth_token(session.get('username'), app.secret_key)
+        split = urlparse.urlsplit(request.url)
+        if split.scheme == "http":
+            wsurl = "ws://%s/sub" % split.netloc
+        else:
+            wsurl = "wss://%s/sub" % split.netloc
         return jsonify(document=document,
-                       outline=outline)
+                       outline=outline,
+                       token=token,
+                       wsurl=wsurl
+                       )
     else:
         return redirect("/login")
 
@@ -376,11 +385,24 @@ def bulk(docid):
     document = doc_mongo_to_app(document)
     if can_write(document, session.get('username')):
         data = json.loads(request.form['data'])
+        clientid = request.headers.get('WS-Clientid')
+        to_broadcast = []        
         for dtype, objects in data.iteritems():
             for k, d in objects.iteritems():
                 if dtype == 'outline':
+                    to_broadcast.append(d)
                     d = outline_app_to_mongo(d)
                     save_outline(d, app.db)
+        try:
+            msg = json.dumps({
+                'msgtype' : 'modelupdate',
+                'outline' : to_broadcast
+                })
+            logging.debug("sending %s", msg)
+            app.wsmanager.send("docrw:%s" % docid, msg, exclude=[clientid])
+            app.wsmanager.send("docr:%s" % docid, msg, exclude=[clientid])
+        except Exception as e:
+            logging.exception(e)
         return "success"
     else:
         return redirect("/login")
@@ -740,12 +762,25 @@ if __name__ == "__main__":
         app.secret_key="asdfa;lkja;sdlkfja;sdf"
         app.debug=True
         app.run(port=10000)
+    elif sys.argv[1] == 'socket':
+        prepare_app(app)
+        app.secret_key="asdfa;lkja;sdlkfja;sdf"
+        app.debug=True
+        from gevent.pywsgi import WSGIServer
+        http_server = WSGIServer(('', 10000), app,
+                                 handler_class=WebSocketHandler,
+                                 )
+        import werkzeug.serving
+        @werkzeug.serving.run_with_reloader
+        def helper():
+            http_server.serve_forever()
     elif sys.argv[1] == 'prod':
         prepare_app(app)
         app.secret_key="asdfa;lkja;sdlkfja;sdf"
         app.debug=False
         from gevent.pywsgi import WSGIServer
         http_server = WSGIServer(('', 9000), app,
+                                 handler_class=WebSocketHandler,
                                  keyfile="/etc/nginx/server.key",
                                  certfile="/etc/nginx/server.crt"
                                  )
