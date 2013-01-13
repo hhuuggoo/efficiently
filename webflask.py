@@ -1,5 +1,6 @@
 import gevent
 import gevent.monkey
+gevent.monkey.patch_all()
 from geventwebsocket.handler import WebSocketHandler
 import pymongo
 import bson.objectid
@@ -24,7 +25,6 @@ can_write = auth.can_write
 
 logging.basicConfig(level=logging.DEBUG)
 
-gevent.monkey.patch_all()
 from flask import (request, g, session,
                    redirect, render_template, Flask,
                    flash, jsonify, Response)
@@ -757,7 +757,7 @@ def node_to_text(outlines, outline, prefix="*", level=0):
 
 @app.route("/heartbeat")
 def heartbeat():
-    time.sleep(3)
+    gevent.sleep(3)
     return 'success'
 
 if __name__ == "__main__":

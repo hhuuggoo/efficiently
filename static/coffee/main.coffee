@@ -82,14 +82,18 @@ $(() ->
                outlines = document['outline']
                Efficiently.wscache.addnode(outlines)
                Efficiently.wscache.update_collection()
+               check_connection()
             )
           )
         $('#reconnectbutton').click( () ->
           reconnect()
         )
         check_connection = () ->
-          $.get("/heartbeat").success(check_connection)
-            .error(() -> window.websocket.s.close())
+          $.ajax("/heartbeat",
+            'timeout' : 5000,
+            'success' : check_connection,
+            'error' : () -> window.websocket.trigger('close')
+          )
         check_connection()
     )
 )
