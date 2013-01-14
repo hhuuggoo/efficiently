@@ -1036,6 +1036,7 @@ class Efficiently.WSOutlineCache
       return false
 
   update_collection : () =>
+    console.log('update', @nodecache)
     tochange = []
     for own key, node of @nodecache
       if @dependencies_met(node.id)
