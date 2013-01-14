@@ -1044,6 +1044,7 @@ class Efficiently.WSOutlineCache
         if Efficiently.outlinenodes.get(key)
           Efficiently.outlinenodes.get(key).set(node, {silent : true})
         else
-          node = @doc.newnode(node, {silent : true})
+          node = new Efficiently.OutlineNode(node, {'doc' : @doc})
+          Efficiently.outlinenodes.add(node)
     for id in tochange
       Efficiently.outlinenodes.get(id).change()

@@ -65,6 +65,7 @@ $(() ->
             Efficiently.wscache.update_collection()
         )
         window.websocket.on("close", () ->
+          console.log('WS close')
           $('#reconnectmodal').modal({'show' : true})
         )
         reconnect = () ->
@@ -93,7 +94,9 @@ $(() ->
             'type' : 'POST',
             'timeout' : 5000,
             'success' : check_connection,
-            'error' : () -> window.websocket.trigger('close')
+            'error' : () ->
+              console.log('heartbeat close')
+              window.websocket.trigger('close')
           )
         check_connection()
     )
