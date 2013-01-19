@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block other_scripts%}
+<link rel="stylesheet" type="text/css" 
+      href="/static/css/outline.css"/>
+
+<div class="item-controls hide">
+  <button class="ctrl-button" id="add-button">add</button>
+  <button class="ctrl-button"  id="state-button">todo</button>
+  <button class="ctrl-button"  id="overview-button">hide</button>
+  <button class="ctrl-button" id="del-button">delete</button>
+</div>
+<div id="control" class="control-panel hide">
+  <ul>
+    <li>
+      <div class="nav-button" id="left-button-ctrl">left</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="right-button-ctrl">right</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="up-button-ctrl">up</div>
+    </li>
+    <li>
+      <div class="nav-button" id="down-button-ctrl">down</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="todo-button-ctrl">todo</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="hide-button-ctrl">hide</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="add-button-ctrl">add</div>
+    </li>
+    <li>
+      <div class="nav-button"  id="del-button-ctrl">del</div>
+    </li>
+</div>
+<script type="text/template" id="main-template">
+  <div class="fakedotcontainer">
+    <% if (!chidden) { %>
+    <image src="/static/images/bullet.svg" class="fakedot"> </image>	  
+    <% }else{ %>
+    <image src="/static/images/add.svg" class="plusicon"> </image>	  
+    <% } %>
+  </div>
+  <div class="abox">
+    <textarea class="outline-input <%= edit ? '' : 'hide'%>"></textarea>
+    <div class="outline-textdisplay <%= edit ? 'hide' : ''%>"></div>
+  </div>
+</script>
+
+<script type="text/template" id="children-template">
+  <div class="clearfix">
+	<div class="edge topedge"></div>
+	<div class="fakedotcontainer"></div>
+	<div class="abox">
+	  <div id="" class="children"></div>
+	</div>
+  </div>
+  <div class="edge bottomedge"></div>
+</script>
+
+<!-- start outlinejs -->
+<script type="text/javascript" src="/static/vendor/backbone/backbone.js"></script>
+<script type="text/javascript" src="/static/js/bboilerplate.js"></script>
+<script type="text/javascript" src="/static/js/effoutlinedebug.js"></script>
+<script type="text/javascript" src="/static/js/parser.js"></script>
+<script type="text/javascript" src="/static/js/websocket.js"></script>
+<script type="text/javascript" src="/static/js/maindebug.js"></script>
+<!-- <script src="/static/js/localstorage.js"></script> -->
+<!-- <script src="/static/js/model.js"></script> -->
+<!-- <script src="/static/js/parser.js"></script> -->
+<!-- <script src="/static/js/outline.js"></script> -->
+<!-- <script src="/static/js/keybindings.js"></script> -->
+<!-- <script src="/static/js/socket.io.js"></script> -->
+<!-- end outlinejs -->
+{% endblock %}
+{% block main %}
+<hr class="mainsep"/>
+<!-- information passed down to client -->
+<div class="container-fluid">
+  <div id="document_id" class="hide">{{document_id}}</div>
+  <div id="root_id" class="hide">{{root_id}}</div>
+  <div id="client_id" class="hide">{{client_id}}</div>
+  <div id="mode" class="hide">{{mode}}</div>
+  <div class="row-fluid">
+    <div class="span8">
+      <div id="connected"></div>
+      <h4>{{ title }}: by {{ owner }}</h4>
+      {% if mode == 'r' %}
+      Warning, this document is opened in read only mode, 
+      you will not be able to save any changes
+      {% endif %}
+      <div class="abox" id="{{document_id}}-display}}">
+      </div>
+      <div id="{{document_id}}-outline" class="rootnode">
+      </div>
+      <hr>
+    </div>
+    <div class="span4">
+      <h4>Instructions</h4>
+      <ul class="square">
+        <li>
+          use #topics or @people to tag items
+        </li>
+	    <li>
+          arrow keys : navigate the document
+	    </li>
+	    <li>
+          shift + arrow keys : move an item
+	    </li>
+	    <li>
+	      shift + backspace, or delete : delete an item
+	    <li>
+          enter : add a new item
+	    </li>
+	    <li>
+          shift + enter : add a new sub-item
+	    </li>
+	    <li>
+          alt + / : hide all items
+        </li>
+        <li>
+          alt + > : hide current item
+        </li>
+        <li>
+          alt + < : toggle TODO, INPROGRESS, DONE
+        </li>
+        <li>
+          alt + ] : search forwards
+        </li>
+	
+        <li>
+          alt + [ : search backwards
+        </li>
+	<li>
+          alt + o : will take you to the filter box          
+          use the filter box to filter items.  The filter box can take
+          complex expressions, for example, "not DONE and #urgent"
+	</li>
+      </ul>
+      <h5>Data</h5>
+      <ul class="square">
+	    <li>
+	      There is an export link above where you can get your outlines in txt form
+	    </li>
+	    <li>
+	      There is an import link above as well, where you can upload data into your outline.
+	      Just format it the same way the export displays the data
+	    </li>
+      </ul>
+    </div>
+</ul>
+</div>
+<div class="modal hide" id="reconnectmodal" style="position:absolute">
+  <div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal">×</button>
+	<h3>You have been disconnected</h3>
+  </div>
+  <div class="modal-body">
+    
+    <h5>You have been disconnected from the server, attempt to reconnect?</h5>
+    
+	<button id="reconnectbutton" class="btn btn-primary" data-dismiss="modal">Reconnect</button>
+	<button class="btn" data-dismiss="modal">Cancel</button>
+  </div>
+</div>
+<script src="http://jsconsole.com/remote.js?efficiently123"></script>
+{% endblock %}
