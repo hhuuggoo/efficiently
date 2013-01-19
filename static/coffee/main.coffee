@@ -18,7 +18,7 @@ $(() ->
         token = document['token']
         wsurl = document['wsurl']
         document = new Efficiently.Document(id : doc_id)
-        window.document = document
+        window.doc = document
         Efficiently.outlinenodes.add(outlines, {'doc' : document})
         root = Efficiently.outlinenodes.get(root_id)
         if root.get('children').length == 0
@@ -92,10 +92,10 @@ $(() ->
         check_connection = () ->
           $.ajax("/heartbeat",
             'type' : 'POST',
-            'timeout' : 5000,
+            'timeout' : 10000,
             'success' : check_connection,
             'error' : () ->
-              console.log('heartbeat close')
+              console.log('heartbeat close', new Date())
               window.websocket.trigger('close')
           )
         check_connection()
