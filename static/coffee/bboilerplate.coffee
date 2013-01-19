@@ -263,7 +263,7 @@ class BBoilerplate.HasProperties extends Backbone.Model
         return @property_cache[prop_name]
       else
         getter = prop_spec.getter
-        computed = getter.apply(this, this)
+        computed = getter.apply(this, [this])
         if @properties[prop_name].use_cache
           @add_cache(prop_name, computed)
         return computed
