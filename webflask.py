@@ -348,6 +348,53 @@ def docview(mode, docid):
     else:
         return
 
+@app.route("/docdebug/<mode>/<docid>/")
+def docdebug(mode, docid):
+    global topid
+    topid += 1
+    username = session.get('username')
+    #FIXME should show error page if doc is invalid/missing
+    document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
+    if not document :
+        flash("invalid document", "error")
+        return redirect("/login")
+    document = doc_mongo_to_app(document)
+    if not username:
+        docdatas = []
+        rdocdatas = []
+        rwdocdatas = []
+    else:
+        docdatas = get_own_docdatas(username, app.db,
+                                    document['id'])
+        rdocdatas = get_r_docdatas(username, app.db,
+                                   document['id'])
+        rwdocdatas = get_rw_docdatas(username, app.db,
+                                     document['id'])
+    if (mode == 'rw' and can_write(document, username)) \
+       or (mode =='r' and can_read(document, username)):
+        if username and mode == 'rw':
+            user = app.db.user.find_one({'username' : username})            
+            app.db.user.update({'_id' : user['_id']},
+                               {'$set' : {'defaultdoc' : document['id']}},
+                               safe=True)
+        return render_template(
+            "outlinedebug.html",
+            root_id=document['root_id'],
+            document_id=document['id'],
+            user=username,
+            title=document['title'],
+            owner=document['username'],
+            mode=mode,
+            client_id=topid,
+            docdatas=docdatas,
+            rdocdatas=rdocdatas,
+            rwdocdatas=rwdocdatas,
+            display_share_form=True,
+            showdocs=True
+            )
+    else:
+        return
+
 @app.route("/document/<docid>")
 def document(docid):
     document = app.db.document.find_one({'_id' : docid})
