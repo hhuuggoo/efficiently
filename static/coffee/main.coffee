@@ -92,7 +92,7 @@ $(() ->
         check_connection = () ->
           $.ajax("/heartbeat",
             'type' : 'POST',
-            'timeout' : 10000,
+            'timeout' : 30000,
             'success' : check_connection,
             'error' : () ->
               console.log('heartbeat close', new Date())
