@@ -248,7 +248,10 @@ def loginpost():
         session['username'] = username
     else:
         flash("invalid username or password", "error")
-    return defaultpage()
+    if session.get('next'):
+        return redirect(session.pop('next'))
+    else:
+        return defaultpage()
 
 @app.route("/logout")
 def logout():
@@ -346,7 +349,14 @@ def docview(mode, docid):
             showdocs=True
             )
     else:
-        return
+        if username:
+            flash("you are not authorized to view that outline", "error")
+            return redirect("/login")
+        else:
+            flash("please login", "error")
+            session['next'] = request.path
+            return redirect("/login")
+        return 
 
 @app.route("/docdebug/<mode>/<docid>/")
 def docdebug(mode, docid):
@@ -806,7 +816,7 @@ def node_to_text(outlines, outline, prefix="*", level=0):
 @app.route("/heartbeat", methods=['POST'])
 def heartbeat():
     session.setdefault('id', str(uuid.uuid4()))
-    gevent.sleep(3)
+    gevent.sleep(10)
     clientid = request.headers.get('WS-Clientid')    
     print clientid
     return 'success'
