@@ -90,10 +90,13 @@ $(() ->
           reconnect()
         )
         check_connection = () ->
+          console.log('heartbeat start', new Date());
           $.ajax("/heartbeat",
             'type' : 'POST',
             'timeout' : 30000,
-            'success' : check_connection,
+            'success' : () ->
+              console.log('heartbeat got', new Date());
+              check_connection()
             'error' : () ->
               console.log('heartbeat close', new Date())
               window.websocket.trigger('close')

@@ -720,6 +720,9 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     parent : null
     children : null
 
+  repair_children : () =>
+    _.map(@children(), (x) => x.set('parent', @id))
+
   add_sibling : (child, index) ->
     return @parent().add_child(child, index)
 

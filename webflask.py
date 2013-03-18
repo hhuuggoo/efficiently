@@ -199,8 +199,11 @@ def defaultpage():
             session.pop('sharelinks'),
             app.db)
         results = [x for x in results if x]
-        if results[0]:
-            document = app.db.document.find_one({'_id' : results[0]['docid']})
+        if results[-1]:
+            document = app.db.document.find_one({'_id' : results[-1]['docid']})
+            mode = results[-1]['mode']
+            return redirect("/docview/%s/%s" %(mode, document['_id']))
+            
     user = app.db.user.find_one({'username' : session.get('username')})
     if not document and user.get('defaultdoc'):
         document = app.db.document.find_one({'_id': user['defaultdoc'],
@@ -551,8 +554,10 @@ def makeshare(docid, email, mode, title, db):
 def process_share(username, temphash, use_flash, db):
     shareinfo = db.sharelinks.find_one({'temphash' : temphash})
     if not shareinfo:
-        if use_flash:
-            flash("invalid shared link", "error")
+        flash("invalid shared link", "error")
+        return False
+    if (time.time() - shareinfo['timestamp']) > 259200.0:
+        flash("link expired", "error")
         return False
     if shareinfo['mode'] == 'rw':
         field = 'rwuser'
