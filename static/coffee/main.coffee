@@ -63,51 +63,51 @@ check_connection = () ->
 
 
 $(() ->
-    doc_id = $("#document_id").html()
-    window.doc_id = $("#document_id").html()
-    root_id = $("#root_id").html()
-    mode = $('#mode').html()
-    client_id = $('#client_id').html()
-    Efficiently.OutlineNode::sync = (method, model, options) ->
-      console.log('sync')
-      if model.id of model.collection.storage
-        options.success({})
-      else
-        @collection.storage[model.id] = model
-        @collection.sync_all()
+  doc_id = $("#document_id").html()
+  window.doc_id = $("#document_id").html()
+  root_id = $("#root_id").html()
+  mode = $('#mode').html()
+  client_id = $('#client_id').html()
+  Efficiently.OutlineNode::sync = (method, model, options) ->
+    console.log('sync')
+    if model.id of model.collection.storage
+      options.success({})
+    else
+      @collection.storage[model.id] = model
+      @collection.sync_all()
 
-    $.get("/document/" + doc_id, (data) ->
-      document = data
-      outlines = document['outline']
-      token = document['token']
-      wsurl = document['wsurl']
-      document = new Efficiently.Document(id : doc_id)
-      window.doc = document
-      Efficiently.outlinenodes.add(outlines, {'doc' : document})
-      root = Efficiently.outlinenodes.get(root_id)
-      if root.get('children').length == 0
-        newnode = document.newnode(text : "Just start typing!")
-        newnode.save()
-        root.add_child(newnode)
-      docview = new Efficiently.DocView(
-        doc : document
-        root : root
-        el : $('.rootnode')
-      )
-      keyeventer = new Efficiently.KeyEventer(
-        docview : docview
-      )
-      window.keyeventer = keyeventer
-      keyeventer.select_first_node()
-      window.docview = docview
-      Efficiently.wscache = new Efficiently.WSOutlineCache(
-        Efficiently.outlinenodes, document
-      )
-      setup_websocket(wsurl)
-      check_connection()
-      $('#reconnectbutton').click( () ->
-        reconnect()
-      )
-      Efficiently.outlinenodes.map((node) -> node.repair())
-   )
+  $.get("/document/" + doc_id, (data) ->
+    document = data
+    outlines = document['outline']
+    token = document['token']
+    wsurl = document['wsurl']
+    document = new Efficiently.Document(id : doc_id)
+    window.doc = document
+    Efficiently.outlinenodes.add(outlines, {'doc' : document})
+    Efficiently.outlinenodes.map((node) -> node.repair())
+    root = Efficiently.outlinenodes.get(root_id)
+    if root.get('children').length == 0
+      newnode = document.newnode(text : "Just start typing!")
+      newnode.save()
+      root.add_child(newnode)
+    docview = new Efficiently.DocView(
+      doc : document
+      root : root
+      el : $('.rootnode')
+    )
+    keyeventer = new Efficiently.KeyEventer(
+      docview : docview
+    )
+    window.keyeventer = keyeventer
+    keyeventer.select_first_node()
+    window.docview = docview
+    Efficiently.wscache = new Efficiently.WSOutlineCache(
+      Efficiently.outlinenodes, document
+    )
+    setup_websocket(wsurl)
+    check_connection()
+    $('#reconnectbutton').click( () ->
+      reconnect()
+    )
+  )
 )
