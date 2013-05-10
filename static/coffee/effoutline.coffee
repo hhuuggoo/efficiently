@@ -367,7 +367,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     else
       nextnode = @nearest_visible_node()
       if nextnode
-        @docview.select(@docview.currnode)
+        @docview.select(nextnode)
     return false
 
   toggle_outline : (e) =>
@@ -652,7 +652,12 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     parent = node.parent()
     upper_sibling = @upper_sibling(node, visible)
     if !upper_sibling
-      return parent
+      if not visible #if don't care about visibilty, return parent
+        return parent
+      if visible and not @getviewstate(parent.id).get('hide')
+        return parent
+      else
+        return @upper_node(parent, visible)
     else
       return @bottom_most_descendant(upper_sibling, visible)
     return null
@@ -678,7 +683,7 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
   hide_all_children : (node) ->
     children = @children(node, false)
     for child in children
-      @hide(child)
+      child.tree_apply(@hide, null)
     return null
 
 class Efficiently.Document extends Efficiently.EfficientlyModel
