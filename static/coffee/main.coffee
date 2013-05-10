@@ -108,5 +108,6 @@ $(() ->
       $('#reconnectbutton').click( () ->
         reconnect()
       )
+      Efficiently.outlinenodes.map((node) -> node.repair())
    )
 )
