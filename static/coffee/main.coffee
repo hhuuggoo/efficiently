@@ -1,4 +1,4 @@
-setup_websocket = (wsurl) ->
+setup_websocket = (wsurl, token) ->
   window.websocket = new BBoilerplate.WebSocketWrapper(wsurl)
   if mode == 'rw'
     topic = "docrw:#{doc_id}"
@@ -29,7 +29,7 @@ setup_websocket = (wsurl) ->
     $('#reconnectmodal').modal({'show' : true})
   )
 
-reconnect = () ->
+reconnect = (token) ->
   window.websocket.connect()
   $.when(window.websocket.connected).then(() ->
     msg = JSON.stringify(
@@ -104,10 +104,10 @@ $(() ->
     Efficiently.wscache = new Efficiently.WSOutlineCache(
       Efficiently.outlinenodes, document
     )
-    setup_websocket(wsurl)
+    setup_websocket(wsurl, token)
     check_connection()
     $('#reconnectbutton').click( () ->
-      reconnect()
+      reconnect(token)
     )
   )
 )
