@@ -4,6 +4,7 @@ gevent.monkey.patch_all()
 from geventwebsocket.handler import WebSocketHandler
 import uuid
 import pymongo
+from pymongo.errors import DuplicateKeyError
 import bson.objectid
 import bcrypt
 import json
@@ -230,7 +231,12 @@ def register():
         return defaultpage()
     password = request.form['password']
     email = request.form['email']
-    create_initial_data(username, password, email, 'Main', app.db)
+    try:
+        create_initial_data(username, password, email, 'Main', app.db)
+    except DuplicateKeyError as e:
+        flash("there is already an account with this name", "error")
+        return defaultpage()
+        
     session['username'] = username
     return defaultpage()
 
