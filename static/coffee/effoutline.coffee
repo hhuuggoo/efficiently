@@ -742,8 +742,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     #need new array to trigger backbone change events.. not ideal
     @set('children', newchildren)
     child.set('parent', @id)
-    this.save()
-    child.save()
+    @collection.bulk_sync([this, child])
     return child
 
   num_children : () ->
@@ -813,6 +812,10 @@ class Efficiently.OutlineNodes extends Backbone.Collection
     @sync_all = _.throttle(@_sync_all, 3000)
   model : Efficiently.OutlineNode
   url : ''
+  bulk_sync : (models) =>
+    for m in models
+      @storage[m.id] = m
+    @sync_all()
   _sync_all : () =>
     tosave = {'outline' : {}}
     for own id, model of @storage
