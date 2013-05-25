@@ -677,7 +677,11 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return null
 
   show_all_children : (node) ->
-    node.tree_apply(@unhide, null)
+    @hide(node)
+    children = @children(node, false)
+    for child in children
+      child.tree_apply(@unhide, null)
+    @unhide(node)
     return null
 
   hide_all_children : (node) ->
