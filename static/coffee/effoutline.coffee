@@ -685,9 +685,11 @@ class Efficiently.DocView extends Efficiently.BasicNodeView
     return null
 
   hide_all_children : (node) ->
+    @hide(node)
     children = @children(node, false)
     for child in children
       child.tree_apply(@hide, null)
+    @unhide(node)
     return null
 
 class Efficiently.Document extends Efficiently.EfficientlyModel
@@ -866,7 +868,8 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     BBoilerplate.safebind(this, @model, "change:text", @render_text)
     BBoilerplate.safebind(this, @viewstate, "change:edit", @render_text)
     BBoilerplate.safebind(this, @viewstate, "change:select", @render_select)
-    BBoilerplate.safebind(this, @viewstate, "change:any_hidden", @render)
+    BBoilerplate.safebind(this, @viewstate, "change:any_hidden",
+      @render_chidden)
     BBoilerplate.safebind(this, @model.doc, "change:todostates", @render)
     BBoilerplate.safebind(this, @model.doc, "change:todocolors", @render)
     return this
@@ -918,6 +921,14 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
     else
       @$el.find('.outline-textdisplay').removeClass('hide')
       @$el.find('.outline-input').addClass('hide')
+
+  render_chidden : () ->
+    dot = $("<image src='/static/images/bullet.svg' class='fakedot'></image>")
+    plus = $("<image src='/static/images/add.svg' class='plusicon'> </image>")
+    if @viewstate.get('any_hidden')
+      @$el.find('.fakedotcontainer').html(plus)
+    else
+      @$el.find('.fakedotcontainer').html(dot)
 
   render : (options) ->
     window.rendertimes += 1
