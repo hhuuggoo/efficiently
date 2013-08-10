@@ -149,8 +149,8 @@ def create_document(user, title, db):
 
     
 def create_initial_data(user, passwd, email, title, db):
-    salt = bcrypt.gensalt(log_rounds=7)
-    passhash = bcrypt.hashpw(passwd, salt)
+    salt = bcrypt.gensalt()
+    passhash = bcrypt.hashpw(str(passwd), str(salt))
     docid = create_document(user, title, db)
     db.user.insert({'username':user,
                     'salt' : salt,
@@ -253,7 +253,7 @@ def loginpost():
     username = request.form['username']
     password = request.form['password']
     user_dict = app.db.user.find_one({'username' : username})
-    if bcrypt.hashpw(password, user_dict['salt']) == user_dict['passhash']:
+    if bcrypt.hashpw(str(password), str(user_dict['salt'])) == user_dict['passhash']:
         session['username'] = username
     else:
         flash("invalid username or password", "error")
@@ -711,7 +711,7 @@ def usersettings():
         if password != password2:
             flash("passwords do not match", "error")
             return redirect("/settings/" + session.get('docid'))
-        salt = bcrypt.gensalt(log_rounds=7)
+        salt = bcrypt.gensalt()
         passhash = bcrypt.hashpw(password, salt)
         updates['salt'] = salt
         updates['passhash'] = passhash
