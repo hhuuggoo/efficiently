@@ -20,6 +20,11 @@ class Efficiently.BasicNodeView extends BBoilerplate.BasicView
     @docview.register(@model.id, this, @viewstate)
     @render()
 
+  set_cursor : (pos) ->
+    textarea = @$el
+    textarea = textarea.find('.outline-input')[0]
+    textarea.setSelectionRange(pos, pos)
+
   remove : () ->
     @docview.deregister(this, @viewstate)
     return super()
@@ -465,19 +470,35 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
 
   enter : (e) =>
     parent = @docview.currnode.parent()
+    state = parent.todostate()
+    todostates = parent.doc.get('todostates')
+    startingstate = todostates[0]
+    if _.indexOf(todostates[...-1], state) >= 0
+      initialtext = Efficiently.set_text('', parent.doc, todo : startingstate)
+    else
+      initialtext = ''
     curridx = parent.child_index(@docview.currnode)
-    newnode = @docview.model.doc.newnode()
+    newnode = @docview.model.doc.newnode(text : initialtext)
     newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
+    @docview.currview().set_cursor(initialtext.length)
     return false
 
   modenter : (e) =>
-    newnode = @docview.model.doc.newnode()
+    parent = @docview.currnode
+    state = parent.todostate()
+    todostates = parent.doc.get('todostates')
+    startingstate = todostates[0]
+    if _.indexOf(todostates[...-1], state) >= 0
+      initialtext = Efficiently.set_text('', parent.doc, todo : startingstate)
+    else
+      initialtext = ''
+    newnode = @docview.model.doc.newnode(text : initialtext)
     newnode = @docview.currnode.add_child(newnode)
     e.preventDefault()
     @docview.select(newnode)
-    @docview.currnode = newnode
+    @docview.currview().set_cursor(initialtext.length)
     return false
 
 class Efficiently.DocView extends Efficiently.BasicNodeView
@@ -799,8 +820,15 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       child.tree_apply(func, newlevel)
     return null
 
+  todostate : (state) =>
+    if state
+      newtxt = Efficiently.set_text(@get('text'), @doc, todo : state)
+      @set('text', newtxt)
+    else
+      return Efficiently.parse_text(@get('text'), @doc).todo
+
   toggle_todo_state : () =>
-    todostate = Efficiently.parse_text(@get('text'), @doc).todo
+    todostate = @todostate()
     todostates = @doc.get('todostates')
     curridx = _.indexOf(todostates, todostate)
     if curridx == todostates.length - 1
@@ -809,9 +837,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
       newstate = todostates[0]
     else
       newstate = todostates[curridx + 1]
-    newtxt = Efficiently.set_text(@get('text'), @doc,
-      {'todo' : newstate}
-    )
+    @todostate(newstate)
     @set('text', newtxt)
     @save()
     return null
