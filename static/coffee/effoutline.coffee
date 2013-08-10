@@ -821,7 +821,7 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     return null
 
   todostate : (state) =>
-    if state
+    if not _.isUndefined(state)
       newtxt = Efficiently.set_text(@get('text'), @doc, todo : state)
       @set('text', newtxt)
     else
@@ -838,7 +838,6 @@ class Efficiently.OutlineNode extends Efficiently.EfficientlyModel
     else
       newstate = todostates[curridx + 1]
     @todostate(newstate)
-    @set('text', newtxt)
     @save()
     return null
 
