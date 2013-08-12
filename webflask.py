@@ -584,16 +584,18 @@ def makeshare(docid, email, mode, title, db):
     
 def process_share(username, temphash, use_flash, db):
     shareinfo = db.sharelinks.find_one({'temphash' : temphash})
+    if shareinfo['mode'] == 'rw':
+        field = 'rwuser'
+    else:
+        field = 'ruser'
+    if username in document[field]:
+        return shareinfo
     if not shareinfo:
         flash("invalid shared link", "error")
         return False
     if (time.time() - shareinfo['timestamp']) > 259200.0:
         flash("link expired", "error")
         return False
-    if shareinfo['mode'] == 'rw':
-        field = 'rwuser'
-    else:
-        field = 'ruser'
     app.db.document.update(
         {'_id' : shareinfo['docid']},
         {'$addToSet' : {field : username}},
