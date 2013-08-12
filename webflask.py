@@ -584,6 +584,7 @@ def makeshare(docid, email, mode, title, db):
     
 def process_share(username, temphash, use_flash, db):
     shareinfo = db.sharelinks.find_one({'temphash' : temphash})
+    document = app.db.document.find_one({'_id' : shareinfo['docid']})
     if shareinfo['mode'] == 'rw':
         field = 'rwuser'
     else:
