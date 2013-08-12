@@ -1,8 +1,70 @@
 {% extends "base.html" %}
 {% block main %}
+<script src="https://checkout.stripe.com/v2/checkout.js"></script>
+<script>
+  $(function(){
+  $('#paybutton').click(function(){
+  var token = function(res){
+  var $input = $('<input type=hidden name=stripeToken />').val(res.id);
+  $('.stripeform').append($input).submit();
+  };
+  StripeCheckout.open({
+  key:         '{{key}}',
+  token:       token
+  });
+  return false;
+  });
+  });
+</script>
 <div class="container-fluid">
-  <div class="row-fluid">  
-    <div class="span6">
+  <div class="row-fluid">
+    <div class="span4 offset2">
+      <h4> Account Information </h4>
+      {% if not plan %}
+      <p> You have a basic account which is limited to 5 free outlines.  Upgrading your account will
+        support efficiently, and give you unlimited outlines!</p>
+      <h5> Upgrade Your Account </h5>
+      <form class="stripeform form" action="/settings/upgrade" method="POST">
+        <label class="radio">
+          <input type="radio" name="optionsplan" id="monthly" value="monthly" checked="checked">
+          $5 a month
+        </label>
+        <label class="radio">
+          <input type="radio" name="optionsplan" id="yearly" value="yearly">
+          $20 a year
+        </label>
+        <button id="paybutton" type="button" class="btn-primary">Upgrade</button> 
+      </form>
+      {% else %}
+      You are subscribed to the {{ plan }}.  You can cancel your subscription at any time.
+      <h5> Downgrade Your Account </h5>
+      <form class="form" action="/settings/downgrade" method="POST">
+        <label class="checkbox">
+          Are you sure you wish to cancel your subscription?
+          <input type="checkbox" name="confirmcancel" id="confirmcancel"/>
+        </label>
+        <input id="downgradebutton" type="submit" class="btn-primary" value="Downgrade"/>
+      </form>
+      {% endif %}
+      <h4> User Settings </h4>
+      <form class="form" action="/usersettings" method="POST">
+        <label for="password">
+          Change Password
+        </label>
+        <input type="password" name="password">
+        <label for="password">
+          Confirm Password
+        </label>
+        <input type="password" name="password2">
+        <label for="email">
+          Email Address
+        </label>
+        <input type="text" name="email" value="{{email}}">
+        <br/>
+        <input class="btn-primary" type="submit"/>        
+      </form>
+    </div>
+    <div class="span4">
       <h4> Document Settings</h4>
       <label><strong>Data</strong></label>
       <a href="/export/{{ document_id }}">Export data from this document</a>
@@ -47,25 +109,6 @@
       {% else %}
       <p> You do not have permissions to change settings on this outline </p>
       {% endif %}
-    </div>
-    <div class="span6">
-      <h4> User Settings </h4>
-      <form class="form" action="/usersettings" method="POST">
-        <label for="password">
-          Change Password
-        </label>
-        <input type="password" name="password">
-        <label for="password">
-          Confirm Password
-        </label>
-        <input type="password" name="password2">
-        <label for="email">
-          Email Address
-        </label>
-        <input type="text" name="email" value="{{email}}">
-        <br/>
-        <input class="btn-primary" type="submit"/>        
-      </form>
     </div>
   </div>
 </div>

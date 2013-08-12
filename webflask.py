@@ -17,6 +17,7 @@ import time
 import json
 import os
 import urlparse
+import stripe
 
 import os.path
 import websocket
@@ -32,17 +33,18 @@ from flask import (request, g, session,
                    flash, jsonify, Response)
 
 from app import app
-
+keypath = os.path.join(os.environ['HOME'], "keys.json")
+with open(keypath) as f:
+    data = f.read()
+    keys = json.loads(data)
+stripe.api_key = keys["STRIPE_SECRET"]
+    
 def send_email(fromaddr, toaddrs, subject, txtdata):
-    keypath = os.path.join(os.environ['HOME'], "keys.json")
-    with open(keypath) as f:
-        data = f.read()
-        keys = json.loads(data)
-        from boto.ses import SESConnection
-        connection = SESConnection(
-            aws_access_key_id=keys["AWS_ACCESS_KEY"],
-            aws_secret_access_key=keys["AWS_SECRET_KEY"])
-        connection.send_email(fromaddr, subject, txtdata, toaddrs)
+    from boto.ses import SESConnection
+    connection = SESConnection(
+        aws_access_key_id=keys["AWS_ACCESS_KEY"],
+        aws_secret_access_key=keys["AWS_SECRET_KEY"])
+    connection.send_email(fromaddr, subject, txtdata, toaddrs)
     
 def prepare_app(app):
     conn = pymongo.Connection()
@@ -319,6 +321,8 @@ def docview(mode, docid):
     topid += 1
     username = session.get('username')
     #FIXME should show error page if doc is invalid/missing
+    user = app.db.user.find_one({'username' : session.get('username')})
+    plan = stripe_plan(user)
     document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
     if not document :
         flash("invalid document", "error")
@@ -329,8 +333,7 @@ def docview(mode, docid):
         rdocdatas = []
         rwdocdatas = []
     else:
-        docdatas = get_own_docdatas(username, app.db,
-                                    document['id'])
+        docdatas = get_own_docdatas(username, app.db, None)
         rdocdatas = get_r_docdatas(username, app.db,
                                    document['id'])
         rwdocdatas = get_rw_docdatas(username, app.db,
@@ -344,6 +347,8 @@ def docview(mode, docid):
                                safe=True)
         return render_template(
             "outline.html",
+            key=keys["STRIPE_PUBLIC"],
+            plan=plan,
             root_id=document['root_id'],
             document_id=document['id'],
             user=username,
@@ -367,52 +372,6 @@ def docview(mode, docid):
             return redirect("/login")
         return 
 
-@app.route("/docdebug/<mode>/<docid>/")
-def docdebug(mode, docid):
-    global topid
-    topid += 1
-    username = session.get('username')
-    #FIXME should show error page if doc is invalid/missing
-    document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
-    if not document :
-        flash("invalid document", "error")
-        return redirect("/login")
-    document = doc_mongo_to_app(document)
-    if not username:
-        docdatas = []
-        rdocdatas = []
-        rwdocdatas = []
-    else:
-        docdatas = get_own_docdatas(username, app.db,
-                                    document['id'])
-        rdocdatas = get_r_docdatas(username, app.db,
-                                   document['id'])
-        rwdocdatas = get_rw_docdatas(username, app.db,
-                                     document['id'])
-    if (mode == 'rw' and can_write(document, username)) \
-       or (mode =='r' and can_read(document, username)):
-        if username and mode == 'rw':
-            user = app.db.user.find_one({'username' : username})            
-            app.db.user.update({'_id' : user['_id']},
-                               {'$set' : {'defaultdoc' : document['id']}},
-                               safe=True)
-        return render_template(
-            "outlinedebug.html",
-            root_id=document['root_id'],
-            document_id=document['id'],
-            user=username,
-            title=document['title'],
-            owner=document['username'],
-            mode=mode,
-            client_id=topid,
-            docdatas=docdatas,
-            rdocdatas=rdocdatas,
-            rwdocdatas=rwdocdatas,
-            display_share_form=True,
-            showdocs=True
-            )
-    else:
-        return
 
 @app.route("/document/<docid>")
 def document(docid):
@@ -443,6 +402,14 @@ def document(docid):
 def create():
     if not session.get('username'):
         return redirect("/login")
+    user = app.db.user.find_one({'username' : session.get('username')})
+    plan = stripe_plan(user)
+    if not plan:
+        num_docs = len(get_own_docdatas(session.get('username'), 
+                                        app.db, None))
+        if num_docs >= 5:
+            flash("You have reached the limit for free plans.  To create more outlines, please delete an existing outline, or upgrade your plan")
+            return redirect(request.referrer)
     title = request.form['title']
     docid = create_document(session.get('username'), title, app.db)
     return redirect("/docview/rw/" + docid)
@@ -507,6 +474,51 @@ def docexport(docid):
     else:
         return redirect("/login")
 
+def stripe_customer(user, create=False):
+    stripe_cust_id = user.get('stripe_customer', None)
+    if stripe_cust_id:
+        customer = stripe.Customer.retrieve(stripe_cust_id)
+    elif create:
+        customer = stripe.Customer.create(description=user['username'])
+        app.db.user.update({'_id' : user['_id']},
+                           {'$set' : {'stripe_customer' : customer['id']}},
+                           safe=True)
+    else:
+        return None
+    return customer
+
+def stripe_plan(user):
+    customer = stripe_customer(user)
+    plan_id = None
+    if customer and customer.subscription:
+        plan_id = customer.subscription.plan.id
+    return plan_id
+
+@app.route("/settings/downgrade", methods=["POST"])
+def downgrade():
+    if request.values.get('confirmcancel', None):
+        user = app.db.user.find_one({'username' : session.get('username')})
+        customer = stripe_customer(user)
+        customer.cancel_subscription()
+        flash("You have cancelled your subscription =(", "info")
+    else:
+        flash("Are you sure you want to cancel your subscription? Please confirm the checkbox", "error")
+    return redirect(request.referrer)
+
+@app.route("/settings/upgrade", methods=["POST"])
+def upgrade():
+    user = app.db.user.find_one({'username' : session.get('username')})
+    customer = stripe_customer(user, create=True)
+    customer.card = request.values['stripeToken']
+    customer.save()
+    if request.values['optionsplan'] == "monthly":
+        plan_id = "efficientlybasic"
+    elif request.values['optionsplan'] == "yearly":
+        plan_id = "efficientlybasicannual"
+    customer.update_subscription(plan=plan_id)
+    flash("Thanks for subscribing!", "info")
+    return redirect(request.referrer)
+
 @app.route("/settings/<docid>", methods=["GET"])
 def settingsget(docid):
     session['docid'] = docid
@@ -514,9 +526,20 @@ def settingsget(docid):
         return redirect("/login")
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
+    user = app.db.user.find_one({'username' : session.get('username')})
+    plan_id = stripe_plan(user)
+    if plan_id == "efficientlybasic":
+        plan = 'monthly plan'
+    elif plan_id == "efficientlybasicannual":
+        plan = 'yearly plan'
+    else:
+        plan = None
+        
     if can_write(document, session.get('username')):
         return render_template(
             "settings.html",
+            key=keys["STRIPE_PUBLIC"],
+            plan=plan,
             can_write=True,
             rwusers=", ".join(document['rwuser'] + document['rwemail']),
             rusers=", ".join(document['ruser'] + document['remail']),
@@ -527,6 +550,8 @@ def settingsget(docid):
     else:
         return render_template(
             "settings.html",
+            key=keys["STRIPE_PUBLIC"],
+            plan=plan,
             can_write=False,
             )
 def send_share_email(shareinfo):

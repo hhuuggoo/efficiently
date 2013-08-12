@@ -35,6 +35,24 @@
 	    <div class="navbar-inner titlerow">
       	  {% include "narrowlogo.html" %}
       	  <ul class="pull-right nav nav-pills" style="">
+            {% if user and not plan %}
+            <li>
+              <form class="form-inline inlineupgrade" action="/settings/upgrade" method="POST">
+                <select name="optionsplan">
+                  <option value="monthly">Upgrade: $5 a month</option>
+                  <option value="yearly">Upgrade: $20 a year</option>
+                </select>
+                <input type="hidden" name="test" value="test"/>
+                <script src="https://checkout.stripe.com/v2/checkout.js"
+                        class="stripe-button"
+                        data-key="{{ key }}"
+                        data-panel-label="Efficiently"
+                        data-label="Upgrade"
+                        >
+                </script>                
+      		  </form>
+      	    </li>
+            {% endif %}
       	    {% if user and document_id%}
       	    <li>
       		  <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
