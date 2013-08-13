@@ -11,6 +11,10 @@ setup_websocket = (wsurl, token) ->
       auth : token
     )
     window.websocket.s.send(msg)
+    window.websocket.on("close", () ->
+      console.log('WS close')
+      $('#reconnectmodal').modal({'show' : true})
+    )
   )
   window.websocket.on("msg:#{topic}", (msg) ->
     msgobj = JSON.parse(msg)
@@ -23,10 +27,6 @@ setup_websocket = (wsurl, token) ->
       outlines = msgobj['outline']
       Efficiently.wscache.addnode(outlines)
       Efficiently.wscache.update_collection()
-  )
-  window.websocket.on("close", () ->
-    console.log('WS close')
-    $('#reconnectmodal').modal({'show' : true})
   )
 
 reconnect = (token) ->
