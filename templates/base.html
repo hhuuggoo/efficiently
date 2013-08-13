@@ -38,9 +38,9 @@
             {% if user and not plan %}
             <li>
               <form class="form-inline inlineupgrade" action="/settings/upgrade" method="POST">
-                <select name="optionsplan">
-                  <option value="monthly">Upgrade: $5 a month</option>
-                  <option value="yearly">Upgrade: $20 a year</option>
+                <select class="input-small" name="optionsplan">
+                  <option value="monthly">$5/month</option>
+                  <option value="yearly">$20/year</option>
                 </select>
                 <input type="hidden" name="test" value="test"/>
                 <script src="https://checkout.stripe.com/v2/checkout.js"
@@ -49,7 +49,8 @@
                         data-panel-label="Upgrade"
                         data-label="Upgrade"
                         >
-                </script>                
+                </script>
+                <a href="#" id="whyupgrade">Why Upgrade?</a>
       		  </form>
       	    </li>
             {% endif %}
@@ -143,17 +144,6 @@
         
         {% endblock %}
       </div>
-      <footer>
-	    <div class="container">
-	      <div class="row-fluid">
-	        <div class="span4">
-	          &copy;2012 efficiently.com
-	          <br>
-	          <a href="mailto:humongo.shi@gmail.com">Contact Us</a>
-	        </div>
-	      </div>
-	    </div>
-      </footer>
       <div class="modal hide" id="sharemodal" style="position:absolute">
 	    <div class="modal-header">
 	      <button type="button" class="close" data-dismiss="modal">×</button>
@@ -187,6 +177,37 @@
             <input class="btn-primary" type="submit"/>
             
           </form>
+	    </div>
+      </div>
+      <div class="modal hide" id="whyupgrademodal" style="position:absolute">
+	    <div class="modal-header">
+	      <button type="button" class="close" data-dismiss="modal">×</button>
+	      <h3>Why Upgrade?</h3>
+	    </div>
+	    <div class="modal-body">
+          <ul>
+            <li>
+              You like Efficiently and want to support it!
+            </li>
+            <li>
+              You want unlimited outlines!
+            </li>
+          </ul>
+          <form class="form-inline inlineupgrade" action="/settings/upgrade" method="POST">
+            <select name="optionsplan">
+              <option value="monthly">Upgrade: $5 a month</option>
+              <option value="yearly">Upgrade: $20 a year</option>
+            </select>
+            <input type="hidden" name="test" value="test"/>
+            <script src="https://checkout.stripe.com/v2/checkout.js"
+                    class="stripe-button"
+                    data-key="{{ key }}"
+                    data-panel-label="Upgrade"
+                    data-label="Upgrade"
+                    >
+            </script>
+      	  </form>
+
 	    </div>
       </div>
       <div class="modal hide" id="createmodal" style="position:absolute">

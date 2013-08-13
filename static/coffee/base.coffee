@@ -16,5 +16,9 @@ $(()->
     $('#sharemodal').modal({'show' : true})
     $('#sharemodal').find('input:text:visible:first').focus()
   )
+  $('#whyupgrade').click(() ->
+    $('#whyupgrademodal').modal({'show' : true})
+    $('#whyupgrademodal').find('input:text:visible:first').focus()
+  )
 
 )
