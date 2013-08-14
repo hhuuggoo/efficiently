@@ -437,6 +437,7 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     if @docview.model.children().length == 1 and
         @docview.model.children()[0] == @docview.currnode
       return false
+    @docview.hide_all_children(@docview.currnode)
     nextnode = @nearest_visible_node()
     parent = @docview.currnode.parent()
     parent.remove_child(@docview.currnode)
