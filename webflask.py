@@ -248,6 +248,7 @@ def splash():
                            user=None,
                            document_id=None,
                            mode=None,
+                           debug=app.debug
                            )
 
 @app.route("/login", methods=["POST"])
@@ -360,7 +361,8 @@ def docview(mode, docid):
             rdocdatas=rdocdatas,
             rwdocdatas=rwdocdatas,
             display_share_form=True,
-            showdocs=True
+            showdocs=True,
+            debug=app.debug
             )
     else:
         if username:
@@ -457,7 +459,9 @@ def docimportget(docid):
     if can_write(document, session.get('username')):
         return render_template("import.html",
                                docid=docid,
-                               user=session.get('username'))
+                               user=session.get('username'),
+                               debug=app.debug
+                               )
     else:
         return redirect("/login")
 
@@ -545,7 +549,8 @@ def settingsget(docid):
             rusers=", ".join(document['ruser'] + document['remail']),
             title=document['title'],
             document_id=document['id'],
-            user=session.get('username')
+            user=session.get('username'),
+            debug=app.debug
             )
     else:
         return render_template(
@@ -553,6 +558,7 @@ def settingsget(docid):
             key=keys["STRIPE_PUBLIC"],
             plan=plan,
             can_write=False,
+            debug=app.debug
             )
 def send_share_email(shareinfo):
     msg = \
@@ -612,7 +618,7 @@ def process_shares(username, temphashes, db):
 
 @app.route("/loginorregister")
 def loginorregister():
-    return render_template("loginorregister.html")
+    return render_template("loginorregister.html", debug=app.debug)
 
 @app.route("/share/<temphash>")
 def share(temphash):
@@ -627,7 +633,7 @@ def share(temphash):
             return redirect("/login")
     else:
         session.setdefault('sharelinks', []).append(temphash)
-        return render_template("loginorregister.html")
+        return render_template("loginorregister.html", debug=app.debug)
 
 @app.route("/addtoshare/<docid>", methods=["POST"])
 def addtoshare(docid):

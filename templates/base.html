@@ -9,10 +9,13 @@
     {% endif %}
     <link rel="stylesheet" type="text/css" 
 	      href="/static/themes/base/jquery.ui.all.css">
-    <link rel="stylesheet/less" 
-	      href="/static/vendor/bootstrap/less/bootstrap.less" type="text/css" >
+    {% if debug %}
+    <link rel="stylesheet/less" type="text/css" href="/static/css/yata.less">
+    {% else %}
+    <link rel="stylesheet/less" type="text/css" href="/static/css/yata.css">
+    {% endif %}
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lobster Two|Open+Sans|Open+Sans+Condensed:300|Courgette|Boogaloo">
-    <link rel="stylesheet/less" type="text/css" href="/static/css/yata.less"/>    
+
     <!-- end basecss -->
 
     <!-- start basejs -->
@@ -185,7 +188,6 @@
             <br/>
             <br/>        
             <input class="btn-primary" type="submit" value="Submit"/>
-            
           </form>
 	    </div>
       </div>
