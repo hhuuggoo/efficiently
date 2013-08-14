@@ -4749,7 +4749,6 @@ footer a:hover {
 }
 .heading {
   font-family: Open Sans Condensed;
-  text-align: center;
 }
 textarea,
 div,
@@ -4867,4 +4866,23 @@ textarea:focus {
 }
 .inlineupgrade > a {
   color: white;
+}
+.instructionscreenshot {
+  width: 200px;
+  margin-right: 20px;
+  border: 1px solid #aaa;
+}
+.moveimage {
+  width: 250px;
+  border: 1px solid #aaa;
+}
+.searchimage {
+  width: 400px;
+  margin-top: 20px;
+  border: 1px solid #aaa;
+}
+.taskbarimage {
+  width: 250px;
+  margin-right: 20px;
+  border: 1px solid #aaa;
 }
