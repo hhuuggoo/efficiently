@@ -256,7 +256,9 @@ def loginpost():
     username = request.form['username']
     password = request.form['password']
     user_dict = app.db.user.find_one({'username' : username})
-    if bcrypt.hashpw(str(password), str(user_dict['salt'])) == user_dict['passhash']:
+    if not user_dict:
+        flash("invalid username or password", "error")
+    elif bcrypt.hashpw(str(password), str(user_dict['salt'])) == user_dict['passhash']:
         session['username'] = username
     else:
         flash("invalid username or password", "error")
@@ -887,7 +889,7 @@ if __name__ == "__main__":
             http_server.serve_forever()
     elif sys.argv[1] == 'prod':
         prepare_app(app)
-        app.secret_key="asdfa;lkja;sdlkfja;sdf"
+        app.secret_key=str(uuid.uuid4())
         app.debug=False
         from gevent.pywsgi import WSGIServer
         http_server = WSGIServer(('', 9000), app,
