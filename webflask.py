@@ -859,6 +859,15 @@ def node_to_text(outlines, outline, prefix="*", level=0):
     total_txt = [output]
     total_txt.extend(children_txt)
     return "\r\n".join(total_txt)
+@app.route("/terms", methods=['GET'])
+def terms():
+    return render_template("terms.html",
+                           user=None,
+                           document_id=None,
+                           mode=None,
+                           debug=app.debug
+                           )
+
 
 @app.route("/heartbeat", methods=['POST'])
 def heartbeat():
