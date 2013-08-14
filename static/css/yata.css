@@ -4662,9 +4662,11 @@ a.badge:hover {
 .affix {
   position: fixed;
 }
+.slogan {
+  color: white;
+}
 .splashmiddle {
   padding-top: 30px;
-  color: white;
   background-color: #485451;
   background-image: -moz-linear-gradient(top, #1671d4, #64b5ff);
   background-image: -ms-linear-gradient(top, #1671d4, #64b5ff);
