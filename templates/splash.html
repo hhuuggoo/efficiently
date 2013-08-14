@@ -3,16 +3,24 @@
 <div class="splashmiddle">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span6" style="text-align:center">
-	<h1 class="bigstart">Stop Wasting Time</h1>
-	<br/>
-	<h1 class="bigend">Everything you need to manage your life in one place
-	</h1>      
+      <div class="slogan span6" style="text-align:center">
+	    <h1 class="bigstart">Stop Wasting Time</h1>
+	    <h1 class="bigend">Everything you need to manage your life in one place
+	    </h1>
       </div>
-      <div class="span6">
-	<div class="center">
-	  <img class="center" style="width:100%" src="/static/images/efficiently.png"/>
-	</div>
+      <div class="span4">
+        <form class="form well"action="/register" method="POST">
+          <h3>Register for Free!</h3>
+	      <!-- Label and text input -->
+	      <label>username</label>
+	      <input type="text" id="username" name="username" />
+	      <label for="password">password</label>
+	      <input type="password" id="password" name="password"/>
+	      <label for="email">email</label>
+	      <input type="text" id="email" name="email"/>
+	      <br>
+	      <input class="btn btn-primary" type="submit" value="Submit"/>
+	    </form>    
       </div>
     </div>
   </div>    
