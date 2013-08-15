@@ -493,12 +493,20 @@ def stripe_customer(user, create=False):
         return None
     return customer
 
-def stripe_plan(user):
+def _stripe_plan(user):
     customer = stripe_customer(user)
     plan_id = None
     if customer and customer.subscription:
         plan_id = customer.subscription.plan.id
     return plan_id
+
+def stripe_plan(user):
+    if user.get('plan_override'):
+        return user.get('plan_override')
+    if user.get('cached_plan'):
+        return user.get('cached_plan')
+    return _stripe_plan(user)
+
 
 @app.route("/settings/downgrade", methods=["POST"])
 def downgrade():
