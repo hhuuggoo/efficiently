@@ -324,8 +324,11 @@ def docview(mode, docid):
     topid += 1
     username = session.get('username')
     #FIXME should show error page if doc is invalid/missing
-    user = app.db.user.find_one({'username' : session.get('username')})
-    plan = stripe_plan(user)
+    if username:
+        user = app.db.user.find_one({'username' : session.get('username')})
+        plan = stripe_plan(user)
+    else:
+        plan = None
     document = app.db.document.find_one({'_id' : docid, 'status' : 'ACTIVE'})
     if not document :
         flash("invalid document", "error")
