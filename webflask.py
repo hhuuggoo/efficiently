@@ -507,13 +507,26 @@ def stripe_plan(user):
         return user.get('cached_plan')
     return _stripe_plan(user)
 
-
+def set_plan(user, plan, customer=None):
+    if customer is None:
+        customer = stripe_customer(user)
+    if plan is None:
+        customer.cancel_subscription()
+        db.user.update({'_id' : user['_id']},
+                       {'$set' : {'cached_plan' : None,
+                                  'stripe_customer' : None}},
+                       safe=True)
+    else:
+        customer.update_subscription(plan=plan)
+        db.user.update({'_id' : user['_id']},
+                       {'$set' : {'cached_plan' : plan}},
+                       safe=True)
+        
 @app.route("/settings/downgrade", methods=["POST"])
 def downgrade():
     if request.values.get('confirmcancel', None):
         user = app.db.user.find_one({'username' : session.get('username')})
-        customer = stripe_customer(user)
-        customer.cancel_subscription()
+        set_plan(user, None)
         flash("You have cancelled your subscription =(", "info")
     else:
         flash("Are you sure you want to cancel your subscription? Please confirm the checkbox", "error")
@@ -529,7 +542,7 @@ def upgrade():
         plan_id = "efficientlybasic"
     elif request.values['optionsplan'] == "yearly":
         plan_id = "efficientlybasicannual"
-    customer.update_subscription(plan=plan_id)
+    set_plan(user, plan_id, customer=customer)
     flash("Thanks for subscribing!", "info")
     return redirect(request.referrer)
 

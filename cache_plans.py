@@ -3,6 +3,7 @@ prepare_app(app)
 db = app.db
 for user in db.user.find():
     real_plan = _stripe_plan(user)
+    print 'updating', user, real_plan
     db.user.update({'_id' : user['_id']},
                    {'$set' : {'cached_plan' : real_plan}},
                    safe=True)
