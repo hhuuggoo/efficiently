@@ -512,15 +512,15 @@ def set_plan(user, plan, customer=None):
         customer = stripe_customer(user)
     if plan is None:
         customer.cancel_subscription()
-        db.user.update({'_id' : user['_id']},
-                       {'$set' : {'cached_plan' : None,
-                                  'stripe_customer' : None}},
-                       safe=True)
+        app.db.user.update({'_id' : user['_id']},
+                           {'$set' : {'cached_plan' : None,
+                                      'stripe_customer' : None}},
+                           safe=True)
     else:
         customer.update_subscription(plan=plan)
-        db.user.update({'_id' : user['_id']},
-                       {'$set' : {'cached_plan' : plan}},
-                       safe=True)
+        app.db.user.update({'_id' : user['_id']},
+                           {'$set' : {'cached_plan' : plan}},
+                           safe=True)
         
 @app.route("/settings/downgrade", methods=["POST"])
 def downgrade():
