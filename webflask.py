@@ -140,7 +140,8 @@ def create_document(user, title, db):
          'todocolors': {'TODO' : 'red',
                         'INPROGRESS': 'red',
                         'DONE' : 'green'},
-         'status': 'ACTIVE'
+         'status': 'ACTIVE',
+         'timestamp' : time.time(),
          },
         safe=True)
     objid = db.outline.insert({
@@ -158,7 +159,8 @@ def create_initial_data(user, passwd, email, title, db):
                     'salt' : salt,
                     'passhash':passhash,
                     'email':email,
-                    'defaultdoc' : docid
+                    'defaultdoc' : docid,
+                    'timestamp' : time.time(),
                     }, safe=True)
                         
 #handler if we are indexing elems by list name            
