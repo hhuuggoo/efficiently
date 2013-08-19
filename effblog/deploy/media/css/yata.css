@@ -4930,3 +4930,6 @@ textarea:focus {
   top: 80px;
   left: 250px;
 }
+figcaption {
+  display: none;
+}

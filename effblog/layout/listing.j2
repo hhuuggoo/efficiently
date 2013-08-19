@@ -3,6 +3,7 @@
 {% block main %}
     {% for res in resource.node.walk_resources_sorted_by_time() %}
     {{ render_excerpt(res, 100) }}
+    <a href="{{ res.url }}"> Read More </a>
     {% endfor %}
 {% endblock main %}
 {% block sidebar %}
