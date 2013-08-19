@@ -1,0 +1,13 @@
+{% extends "base.j2" %}
+{% from "macros.j2" import render_excerpt with context  %}
+{% block main %}
+    {% for res in resource.node.walk_resources_sorted_by_time() %}
+    {{ render_excerpt(res, 100) }}
+    {% endfor %}
+{% endblock main %}
+{% block sidebar %}
+<h3 class="heading">Tags</h3>
+{% for tag in site.tagger.tags.to_dict() %}
+<a href="/blog/tags/{{tag}}.html">{{ tag }}</a>
+{% endfor %}
+{% endblock sidebar %}

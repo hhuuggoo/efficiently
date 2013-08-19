@@ -1,0 +1,17 @@
+{% extends "base.j2" %}
+{% block page_title %}
+<h1 class="title">{{ tag }}</h1>
+{% endblock page_title%}    
+{% block main %}
+<h3 class="heading"> Posts </h3>
+<section class="archives">
+  {% for resource in walker() -%}
+  <a href="{{ content_url(resource.url) }}">{{ resource.meta.title }}</a>
+  -
+  <time class="heading" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">
+    {{ resource.meta.created.strftime('%a, %d %b %Y') }}
+  </time>
+
+  {%- endfor %}
+</section>
+{% endblock %}

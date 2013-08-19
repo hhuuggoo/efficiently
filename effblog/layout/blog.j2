@@ -1,0 +1,19 @@
+{% extends "base.j2" %}
+
+{% block main -%}
+<article class="post">
+<time class="heading" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">
+    {{ resource.meta.created.strftime('%a, %d %b %Y') }}
+</time>
+<br>
+<br>    
+{% if resource.meta.tags %}
+{% endif %}
+{% filter markdown|typogrify -%}
+{% mark post -%}
+{% block post -%}{%- endblock %}
+{%- endmark %}
+{%- endfilter %}
+</article>
+
+{%- endblock %}
