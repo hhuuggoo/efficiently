@@ -82,6 +82,7 @@
                     <div class="sidebar span3">
                       {% block sidebar %}
                       <a href="/blog"> <h3 class="heading"> Blog </h3> </a>
+                      <a href="/blog"> <h3 class="heading"> Blog </h3> </a>
                       <h3 class="heading">Tags</h3>
                       {% for tag in site.tagger.tags.to_dict() %}
                       <a href="/blog/tags/{{tag}}.html">{{ tag }}</a>
@@ -107,6 +108,7 @@
 
   {% block scripts %}
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+  <script src="/static/js/base.js"></script>
   <script src="{{ media_url('js/bootstrap.js') }}"></script>
   <script src="{{ media_url('js/bootstrap-modal.js') }}"></script>
   {% endblock scripts %}

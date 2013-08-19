@@ -7,7 +7,7 @@
         <link href="/"/>
     
         
-    <updated>2013-08-19T00:02:40Z</updated>
+    <updated>2013-08-19T00:09:59Z</updated>
 
     <id>/blog/excerpts.xml/</id>
 
@@ -30,11 +30,11 @@ In the past I&amp;#8217;ve always written my own forms but writing the input val
 
 &lt;p&gt;The first thing I wanted to do, was add an upgrade form in the main user interface to make it easy for people to upgrade their&amp;nbsp;accounts.&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/blogmedia/images/effpaymentnavbar.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/media/images/effpaymentnavbar.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;Clicking on the Upgrade button pops up a modal dialog where the user can input their credit card information.  Stripe handles all input validation and displays nice error messages if there are problems with any of the&amp;nbsp;inputs.&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/blogmedia/images/effmodalpayment.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/media/images/effmodalpayment.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;After entering valid credit card information, The user is&amp;nbsp;upgraded!&lt;/p&gt;
 &lt;h3 class=&#34;heading&#34;&gt; How does it&amp;nbsp;work? &lt;/h3&gt;
