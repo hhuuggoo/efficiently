@@ -6,9 +6,3 @@
     <a href="{{ res.url }}"> Read More </a>
     {% endfor %}
 {% endblock main %}
-{% block sidebar %}
-<h3 class="heading">Tags</h3>
-{% for tag in site.tagger.tags.to_dict() %}
-<a href="/blog/tags/{{tag}}.html">{{ tag }}</a>
-{% endfor %}
-{% endblock sidebar %}

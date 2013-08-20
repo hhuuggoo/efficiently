@@ -98,10 +98,25 @@
   </time></section>
                     </div>
                     <div class="sidebar span3">
-                                            <a href="/blog"> <h3 class="heading"> Blog </h3> </a>
+                      		      <h3 class="heading"> Efficiently </h3>
+		      <ul style="list-style-type:none">
+			<li>
+			  <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
+			</li>
+			<li>
+			  <a href="https://eff.iciently.com/login"> About </a>
+			</li>
+			<li>
+			  <a href="/blog"> The Blog</a>
+			</li>
+		      </ul>
                       <h3 class="heading">Tags</h3>
-                                            <a href="/blog/tags/development.html">development</a>
-                                                                </div>
+		      <ul style="list-style-type:none">
+                      		      <li>
+			<a href="/blog/tags/development.html">development</a>
+		      </li>
+                      		      </ul>
+                                          </div>
                   </div>
                 </div>
               </div>                
@@ -115,6 +130,7 @@
     <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
   
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+  <script src="/static/js/base.js"></script>
   <script src="/media/js/bootstrap.js"></script>
   <script src="/media/js/bootstrap-modal.js"></script>
   
@@ -125,5 +141,42 @@
   <![endif]-->
 
       
-  </body>
+    <div class="modal hide" id="loginmodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Login</h3>
+    </div>
+    <div class="modal-body">
+      <form class="" action="/login" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+    </div>
+  </div>
+  <div class="modal hide" id="registermodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Register</h3>
+    </div>
+    <div class="modal-body">
+      <form action="/register" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<label for="email">email</label>
+	<input type="text" id="email" name="email"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+      <p>by registering, you accept our <a href="/terms">Terms of Service</a></p>
+    </div>
+  </div>
+</body>
 </html>

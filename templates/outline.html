@@ -87,10 +87,12 @@
   <div class="row-fluid">
     <div class="span8">
       <div id="connected"></div>
-      <h4>{{ title }}: by {{ owner }}</h4>
+      <h3 class="heading">{{ title }}: by {{ owner }}</h3>
       {% if mode == 'r' %}
       Warning, this document is opened in read only mode, 
       you will not be able to save any changes
+      <br>
+      <br>
       {% endif %}
       <div class="abox" id="{{document_id}}-display}}">
       </div>
@@ -99,7 +101,7 @@
       <hr>
     </div>
     <div class="span4">
-      <h4>Basic Usage</h4>
+      <h3 class="heading">Basic Usage</h3>
       <ul class="square">
 	    <li>
           enter : add a new item
@@ -120,7 +122,7 @@
           alt + < : toggle the TODO state
         </li>          
       </ul>
-      <h4>Advanced Usage</h4>
+      <h3 class="heading">Advanced Usage</h3>
       <ul>
         <li>
           alt + / : hide all items

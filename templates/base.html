@@ -90,8 +90,8 @@ olark.identify('8606-711-10-9778');/*]]>*/</script><noscript><a href="https://ww
       	    </li>
             {% endif %}
       	    {% if user and document_id%}
-      	    <li>
-      		  <a href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
+      	    <li class="navlink">
+      		  <a  href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
       	    </li>
             {% endif %}
       	    {% if showdocs and user %}
