@@ -4725,6 +4725,8 @@ a.badge:hover {
 .navbar .nav > li > a {
   text-decoration: none;
   color: white;
+  font-family: Open Sans Condensed;
+  font-size: 125%;
 }
 mainblog,
 body {
