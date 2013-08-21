@@ -4727,6 +4727,12 @@ a.badge:hover {
   color: white;
   font-family: Open Sans Condensed;
   font-size: 125%;
+  font-weight: bold;
+  padding: 10px;
+}
+#whyupgrade {
+  font-family: Open Sans Condensed;
+  font-size: 125%;
 }
 mainblog,
 body {
@@ -4804,28 +4810,7 @@ html,
 body {
   height: 100%;
 }
-textarea {
-  line-height: 18px;
-  border: 0;
-  padding: 0;
-  outline: none;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  font: inherit;
-  border-radius: 0;
-  width: 100%;
-  color: #111;
-  margin: 0;
-  display: inline;
-  margin-bottom: 0;
-  height: 0;
-  min-height: 18px;
-  vertical-align: text-top;
-  overflow: hidden;
-  resize: none;
-  clear: none;
-  background: inherit;
-}
+textarea,
 textarea:focus {
   line-height: 18px;
   border: 0;
@@ -4835,6 +4820,7 @@ textarea:focus {
   -webkit-border-radius: 0;
   font: inherit;
   border-radius: 0;
+  width: 100%;
   color: #111;
   margin: 0;
   display: inline;
@@ -4846,7 +4832,6 @@ textarea:focus {
   resize: none;
   clear: none;
   background: inherit;
-  width: 100%;
 }
 .outline-textdisplay {
   white-space: pre-wrap;
@@ -4896,7 +4881,7 @@ textarea:focus {
   overflow-y: auto;
 }
 .inlineupgrade {
-  margin-top: 7px !important;
+  padding: 7px 10px 10px 0px;
 }
 .inlineupgrade > a {
   color: white;
@@ -4926,11 +4911,12 @@ textarea:focus {
 .screenshot {
   position: relative;
   font-size: bigger;
+  width: 400px;
 }
 .demo {
   position: absolute;
   top: 80px;
-  left: 250px;
+  left: 150px;
 }
 figcaption {
   display: none;

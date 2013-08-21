@@ -67,7 +67,7 @@ olark.identify('8606-711-10-9778');/*]]>*/</script><noscript><a href="https://ww
     {% endif %}
     <body>
       <div class="navbar">
-	    <div class="navbar-inner titlerow">
+	<div class="navbar-inner titlerow" style="overflow:hidden">
       	  {% include "narrowlogo.html" %}
       	  <ul class="pull-right nav nav-pills" style="">
             {% if user and not plan %}
@@ -91,7 +91,7 @@ olark.identify('8606-711-10-9778');/*]]>*/</script><noscript><a href="https://ww
             {% endif %}
       	    {% if user and document_id%}
       	    <li class="navlink">
-      		  <a  href="/settings/{{ document_id }}" target="_blank">Settings for <strong> {{user}} </strong> </a>
+      		  <a  href="/settings/{{ document_id }}" target="_blank">Settings</strong> </a>
       	    </li>
             {% endif %}
       	    {% if showdocs and user %}
@@ -152,6 +152,7 @@ olark.identify('8606-711-10-9778');/*]]>*/</script><noscript><a href="https://ww
       	    <li><a id="loginlink">Login</a></li>
       	    <li><a id="registerlink">Register</a></li>
       	    {% endif %}
+	    <li><a href="/blog">Blog</a></li>
       	  </ul>
 	    </div>
       </div>

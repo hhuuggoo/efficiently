@@ -4725,6 +4725,14 @@ a.badge:hover {
 .navbar .nav > li > a {
   text-decoration: none;
   color: white;
+  font-family: Open Sans Condensed;
+  font-size: 125%;
+  font-weight: bold;
+  padding: 10px;
+}
+#whyupgrade {
+  font-family: Open Sans Condensed;
+  font-size: 125%;
 }
 mainblog,
 body {
@@ -4894,7 +4902,7 @@ textarea:focus {
   overflow-y: auto;
 }
 .inlineupgrade {
-  margin-top: 7px !important;
+  padding: 7px 10px 10px 0px;
 }
 .inlineupgrade > a {
   color: white;
@@ -4924,11 +4932,12 @@ textarea:focus {
 .screenshot {
   position: relative;
   font-size: bigger;
+  width: 400px;
 }
 .demo {
   position: absolute;
   top: 80px;
-  left: 250px;
+  left: 150px;
 }
 figcaption {
   display: none;

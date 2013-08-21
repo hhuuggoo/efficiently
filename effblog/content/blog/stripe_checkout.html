@@ -95,6 +95,8 @@ def stripe_customer(user, create=False):
 
 {% endsyntax %}
 
+{%- endmark %}
+
 After setting up the stripe customer, I need to subscribe them to the plan.
 Stripe allows you to create plans using their account dashboard.
 Before you begin, you should do this, so you know what IDs you should
@@ -142,4 +144,26 @@ def stripe_plan(user):
 
 This allows me to gift subscriptions on my side just by setting a field inside mongo db.
 
-{%- endmark %}
+<h3 class="heading"> Using your own buttons  </h3>
+
+The last issue I ran into was using my own buttons with stripe.  I have a form for upgrading plans on the settings page, and since I want all UI elements 
+on that page to be consistent, I wanted to use my own buttons rather than stripe's button.
+{% syntax js %}
+$(function(){
+    $('#paybutton').click(function(){
+	var token = function(res){
+	    var $input = $('<input type=hidden name=stripeToken />').val(res.id);
+	    $('.stripeform').append($input).submit();
+	};
+	StripeCheckout.open({
+	    key: key,
+	    token: token
+	});
+	return false;
+    });
+});
+{% endsyntax %}
+
+Step1 - stripe payments.  Step2 - get users.  Step3 - profit!!!
+
+
