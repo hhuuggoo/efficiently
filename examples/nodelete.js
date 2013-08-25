@@ -1,4 +1,4 @@
-KeyEventer.prototype.get_keyfunction = function(e) {
+Efficintly.KeyEventer.prototype.get_keyfunction = function(e) {
     var modified, nsmodified;
     modified = this.modified(e);
     nsmodified = this.nsmodified(e);
