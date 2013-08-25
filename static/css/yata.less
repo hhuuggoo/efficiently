@@ -1,6 +1,7 @@
 @import "../vendor/bootstrap/less/bootstrap.less";
 @import "blog.less";
 @import "navbar.less";
+@import "settings.less";
 .slogan{
     color : white;
 }
@@ -211,18 +212,16 @@ textarea:focus
     border : 1px solid #000;
 }
 
-.sharetext{
+
+.sharetext,
+.sharetext:focus
+{
     height : 40px;
     width : 90%;
     border : 1px solid #aaa;
     overflow-y : auto;
 }
-.sharetext:focus{
-    height : 40px;
-    width : 90%;
-    border : 1px solid #aaa;
-    overflow-y : auto;
-}
+
 .inlineupgrade{
     padding : 7px 10px 10px 0px;
 }

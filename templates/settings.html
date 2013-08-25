@@ -61,7 +61,13 @@
         </label>
         <input type="text" name="email" value="{{email}}">
         <br/>
-        <input class="btn-primary" type="submit"/>        
+        <label for="scripts">
+          Customize efficiently with additional  html (script tags allowed!)
+	    </label>
+	    <textarea class="scriptadd" name="scripts">{% autoescape false %}{{ scripts }}{% endautoescape %}</textarea>
+        <br>
+        <br>
+        <input class="btn-primary" type="submit"/>
       </form>
     </div>
     <div class="span4">
@@ -102,8 +108,8 @@
 	      Users who can view, but cannot edit this outline
 	    </label>
 	    <textarea class="sharetext" name="ruser">{{ rusers }}</textarea>
-        <br/>
-        <br/>        
+        <br>
+        <br>        
         <input class="btn-primary" type="submit"/>
       </form>
       {% else %}

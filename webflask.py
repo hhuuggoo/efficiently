@@ -369,7 +369,8 @@ def docview(mode, docid):
             rwdocdatas=rwdocdatas,
             display_share_form=True,
             showdocs=True,
-            debug=app.debug
+            debug=app.debug,
+            scripts=user.get('scripts') if user.get('scripts') else ""
             )
     else:
         if username:
@@ -559,6 +560,7 @@ def settingsget(docid):
     document = app.db.document.find_one({'_id' : docid})
     document = doc_mongo_to_app(document)
     user = app.db.user.find_one({'username' : session.get('username')})
+    scripts = user.get('scripts')
     plan_id = stripe_plan(user)
     if plan_id == "efficientlybasic":
         plan = 'monthly plan'
@@ -578,7 +580,8 @@ def settingsget(docid):
             title=document['title'],
             document_id=document['id'],
             user=session.get('username'),
-            debug=app.debug
+            debug=app.debug,
+            scripts=scripts if scripts else ""
             )
     else:
         return render_template(
@@ -586,7 +589,8 @@ def settingsget(docid):
             key=keys["STRIPE_PUBLIC"],
             plan=plan,
             can_write=False,
-            debug=app.debug
+            debug=app.debug,
+            scripts=scripts
             )
 def send_share_email(shareinfo):
     msg = \
@@ -782,6 +786,10 @@ def usersettings():
         email = request.form.get('email')
         updates['email'] = email
         flash("email changed", "info")        
+    if request.form.get('scripts'):        
+        scripts = request.form.get('scripts')
+        flash("scripts added", "info")
+        updates['scripts'] = scripts
     app.db.user.update({'_id' : user['_id']},
                        {'$set' : updates},
                        safe=True)
