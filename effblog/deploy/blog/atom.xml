@@ -7,10 +7,27 @@
         <link href="/"/>
     
         
-    <updated>2013-08-20T05:21:42Z</updated>
+    <updated>2013-08-25T17:20:32Z</updated>
 
     <id>/blog/atom.xml/</id>
 
+            <entry>
+            <title type="html">Open Sourcing Efficiently</title>
+            <author><name>Lakshmi Vyasarajan</name></author>
+            <link href="/blog/opensource.html"/>
+            <updated>2013-08-24T10:00:00Z</updated>
+            <published>2013-08-24T10:00:00Z</published>
+            <id>/blog/opensource.html</id>
+                        <category   scheme="/blog/tags"
+                        term="development"
+                        label="Development" />
+                        <category   scheme="/blog/tags"
+                        term="business"
+                        label="Business" />
+            
+            <content type="html">
+                                            </content>
+        </entry>
             <entry>
             <title type="html">Integrating Stripe Checkout with Mongodb and Flask</title>
             <author><name>Lakshmi Vyasarajan</name></author>

@@ -4691,6 +4691,16 @@ a.badge:hover {
   margin: 0px;
   padding: 0px;
 }
+.navbar-form-label {
+  color: white;
+}
+.scriptadd,
+.scriptadd:focus {
+  height: 80px;
+  width: 90%;
+  border: 1px solid #aaa;
+  overflow-y: auto;
+}
 .slogan {
   color: white;
 }
@@ -4810,28 +4820,7 @@ html,
 body {
   height: 100%;
 }
-textarea {
-  line-height: 18px;
-  border: 0;
-  padding: 0;
-  outline: none;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  font: inherit;
-  border-radius: 0;
-  width: 100%;
-  color: #111;
-  margin: 0;
-  display: inline;
-  margin-bottom: 0;
-  height: 0;
-  min-height: 18px;
-  vertical-align: text-top;
-  overflow: hidden;
-  resize: none;
-  clear: none;
-  background: inherit;
-}
+textarea,
 textarea:focus {
   line-height: 18px;
   border: 0;
@@ -4841,6 +4830,7 @@ textarea:focus {
   -webkit-border-radius: 0;
   font: inherit;
   border-radius: 0;
+  width: 100%;
   color: #111;
   margin: 0;
   display: inline;
@@ -4852,7 +4842,6 @@ textarea:focus {
   resize: none;
   clear: none;
   background: inherit;
-  width: 100%;
 }
 .outline-textdisplay {
   white-space: pre-wrap;
@@ -4889,12 +4878,7 @@ textarea:focus {
   width: 90%;
   border: 1px solid #000;
 }
-.sharetext {
-  height: 40px;
-  width: 90%;
-  border: 1px solid #aaa;
-  overflow-y: auto;
-}
+.sharetext,
 .sharetext:focus {
   height: 40px;
   width: 90%;

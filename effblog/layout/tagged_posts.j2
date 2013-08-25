@@ -5,13 +5,17 @@
 {% block main %}
 <h3 class="heading"> Posts </h3>
 <section class="archives">
-  {% for resource in walker() -%}
-  <a href="{{ content_url(resource.url) }}">{{ resource.meta.title }}</a>
-  -
-  <time class="heading" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">
-    {{ resource.meta.created.strftime('%a, %d %b %Y') }}
-  </time>
+  <ul style="list-style-type:none">
 
-  {%- endfor %}
+    {% for resource in walker() -%}
+    <li>
+      <a href="{{ content_url(resource.url) }}">{{ resource.meta.title }}</a>
+      -
+      <time class="heading" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">
+        {{ resource.meta.created.strftime('%a, %d %b %Y') }}
+      </time>
+    </li>
+    {%- endfor %}
+  </ul>
 </section>
 {% endblock %}

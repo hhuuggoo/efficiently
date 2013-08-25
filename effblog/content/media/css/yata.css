@@ -4691,6 +4691,16 @@ a.badge:hover {
   margin: 0px;
   padding: 0px;
 }
+.navbar-form-label {
+  color: white;
+}
+.scriptadd,
+.scriptadd:focus {
+  height: 80px;
+  width: 90%;
+  border: 1px solid #aaa;
+  overflow-y: auto;
+}
 .slogan {
   color: white;
 }
@@ -4868,12 +4878,7 @@ textarea:focus {
   width: 90%;
   border: 1px solid #000;
 }
-.sharetext {
-  height: 40px;
-  width: 90%;
-  border: 1px solid #aaa;
-  overflow-y: auto;
-}
+.sharetext,
 .sharetext:focus {
   height: 40px;
   width: 90%;

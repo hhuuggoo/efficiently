@@ -1,0 +1,229 @@
+<!doctype html>
+<head>
+  
+    <meta charset="">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="">
+
+  <!-- encoding must be specified within the first 512 bytes
+        www.whatwg.org/specs/web-apps/current-work/multipage/semantics.html#charset -->
+
+  <!-- meta element for compatibility mode needs to be before
+        all elements except title & meta
+        msdn.microsoft.com/en-us/library/cc288325(VS.85).aspx -->
+  <!-- Chrome Frame is only invoked if meta element for
+        compatibility mode is within the first 1K bytes
+        code.google.com/p/chromium/issues/detail?id=23003 -->
+
+  <title>Open Sourcing Efficiently</title>
+  <meta name="description" content="Open Sourcing Efficiently">
+  <meta name="author" content="Lakshmi Vyasarajan">
+
+  <!--  Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="">
+
+    <!-- Place favicon.ico & apple-touch-icon.png
+        in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/media/favicon.ico">
+  <link rel="apple-touch-icon" href="/media/apple-touch-icon.png">
+  
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lobster Two|Open+Sans|Open+Sans+Condensed:300|Courgette|Boogaloo">  
+  <link rel="stylesheet" href="/media/css/yata.css">
+  <link rel="stylesheet" href="/media/css/syntax.css">
+  
+    <!-- All JavaScript at the bottom, except for Modernizr which
+        enables HTML5 elements & feature detects -->
+    <script src="/media/js/libs/modernizr-1.7.min.js"></script>
+    </head>
+<body id="opensource">
+  <div class="navbar">
+    <div class="navbar-inner titlerow">
+      <a href="/" style="text-decoration:none">
+  <svg class="logo" height="65" width="300">
+    <g transform="scale(0.5, 0.5)">
+      <svg height="130" width="600">
+        <rect height="130" width="600" rx="10" ry="10" class="bgrect"/>
+        <g transform='translate(0,90)'>
+	      <text font-family="Lobster Two" font-weight="normal" font-size="110" y="5" x="20">
+	        Efficiently
+	      </text>
+        </g>
+        <g transform='translate(400,10)'>
+	      <g transform="translate(20, 20)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+	      <g transform="translate(50, 52)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+	      <g transform="translate(50, 85)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+        </g>
+      </svg>
+    </g>
+  </svg>
+</a>      <ul class="pull-right nav nav-pills" style="">
+      	<li><a id="loginlink">Login</a></li>
+      	<li><a id="registerlink">Register</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="blogcontainer container-fluid">
+        <div class="row-fluid">
+      <div class="span10 offset1">
+        <div class="page-header foo">
+                              <h1 class="title">Open Sourcing Efficiently</h1>
+              
+                  </div>
+      </div>
+    </div>
+            <div id="main" role="main">
+          <section class="content">
+            <div class="row-fluid">
+              <div class="span10 offset1">
+                <div class="mainblog container-fluid">
+                  <div class="row-fluid">
+                    <div class="mainbar span9">
+                      <article class="post">
+<time class="heading" datetime="2013-08-24">
+    Sat, 24 Aug 2013
+</time>
+<br>
+<br>    
+<p>Efficiently is a site for creating <a href="https://eff.iciently.com/login">shareable online outlines</a>.  I use it every day
+because breaking my work into <a href="https://eff.iciently.com/login">tasks</a> and <a href="https://eff.iciently.com/login">subtasks</a>
+makes me much more productive.  Today I made the decision to open source efficiently - The code is ok.. some is ugly, some is pretty good, you can get to the <a href="" title="https://github.com/hhuuggoo/efficiently">github link&nbsp;here</a></p>
+<p>I&#8217;m still trying to monetize it, so it&#8217;s being released under a non-commercial use license.  There are a few reasons I want to open source&nbsp;it.  </p>
+<ol>
+<li>The code is of mixed quality, but I think it&#8217;s an example of how you can build a pretty complex backbone&nbsp;app.</li>
+<li>If I ever go away, potential customers can always run their own efficiently&nbsp;servers</li>
+<li>There is now a customize efficiently&nbsp;feature!</li>
+</ol>
+<h3 class="heading"> Customize&nbsp;Efficiently  </h3>
+
+<p>In the settings page, I&#8217;ve added a place where you can inject 
+your own html snippet.  The idea being that you could add your own
+script tags, which either execute javascript inline, or load your 
+own js file from s3.  That&#8217;s where the open source comes in.
+Now that you know how Efficiently is implemented, it&#8217;s pretty easy
+to modify it change the behavior.  Let&#8217;s look at  a one example
+<h3 class="heading"> Unbinding the delete&nbsp;key  </h3></p>
+<p>Currently, delete will remove a node in the outline. I discovered this was a bit
+dangerous, and I might remove that functionality soon actually, but in the short term, I can disable it by monkey 
+patching&nbsp;Efficiently.</p>
+<p>Here is the necessary javascript code to do&nbsp;so:</p>
+<div class="codebox"><figure class="code"><div class="highlight"><pre><span class="nx">Efficiently</span><span class="p">.</span><span class="nx">KeyEventer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">get_keyfunction</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><br />    <span class="kd">var</span> <span class="nx">modified</span><span class="p">,</span> <span class="nx">nsmodified</span><span class="p">;</span><br />    <span class="nx">modified</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">modified</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span><br />    <span class="nx">nsmodified</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">nsmodified</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">DOWN</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">cursor_down</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">UP</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">cursor_up</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">modenter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">modenter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">BACKSPACE</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">deletenode</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">BACKSPACE</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">deletekey</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="c1">// if (e.keyCode === this.keycodes.<span class="caps">DELETE</span>) {</span><br />    <span class="c1">//     return this.deletenode;</span><br />    <span class="c1">// }</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">RIGHT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveright</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">LEFT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveleft</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">UP</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveup</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">DOWN</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">movedown</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">GT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_outline</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">SLASH</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_outline_global</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">LT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_todo</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">O_KEY</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterfilter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">R_BRACKET</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterisearch</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">L_BRACKET</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterisearch</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span><br /><span class="p">};</span><br /></pre></div><br /><figcaption>JavaScript</figcaption></figure></div>
+
+<p>It&#8217;s a bit long, but that&#8217;s becuase I&#8217;m essentially cutting and pasting the function out of github, and removing
+the keybindings I don&#8217;t want.  Maybe in the future there will be a more pluggable way to do&nbsp;this.</p>
+<h3 class="heading"> Local&nbsp;Development  </h3>
+
+<p>To set this up, the first thing I did was went to the settings page, and uploaded this html&nbsp;snippet:</p>
+<p><img alt="" src="/media/images/effcustom.png" /></p>
+<p>This snippet loads the javascript from a local webserver, which I ran by executing <code>python -m SimpleHTTPServer</code> in the directory containing my javascript snippet.  Now that this is setup, If I connect to Efficiently, it loads my javascript snippet, and I can edit it locally until I&#8217;m happy with it.  The only other obstacle is that Efficiently is using https, which means you either need an https server, or you have to enable insecure content on the page while you&#8217;re debugging your&nbsp;script.</p>
+<h3 class="heading"> Production Monkey&nbsp;Patching  </h3>
+
+<p>Now that I&#8217;m happy with my snippet, I can upload it inline, this way I don&#8217;t have to worry about having another server to serve the snippet.  Here is what the html snippet looks&nbsp;like</p>
+<div class="codebox"><figure class="code"><div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span><br /><span class="nx">Efficiently</span><span class="p">.</span><span class="nx">KeyEventer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">get_keyfunction</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><br />    <span class="kd">var</span> <span class="nx">modified</span><span class="p">,</span> <span class="nx">nsmodified</span><span class="p">;</span><br />    <span class="nx">modified</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">modified</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span><br />    <span class="nx">nsmodified</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">nsmodified</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">DOWN</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">cursor_down</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">UP</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">cursor_up</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">modenter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">ENTER</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">modenter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">BACKSPACE</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">deletenode</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">BACKSPACE</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">deletekey</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="c1">// if (e.keyCode === this.keycodes.<span class="caps">DELETE</span>) {</span><br />    <span class="c1">//     return this.deletenode;</span><br />    <span class="c1">// }</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">RIGHT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveright</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">LEFT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveleft</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">UP</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveup</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">modified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">DOWN</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">movedown</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">GT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_outline</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">SLASH</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_outline_global</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx"><span class="caps">LT</span></span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toggle_todo</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">O_KEY</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterfilter</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">R_BRACKET</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterisearch</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">if</span> <span class="p">(</span><span class="nx">nsmodified</span> <span class="o">&amp;&amp;</span> <span class="nx">e</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">keycodes</span><span class="p">.</span><span class="nx">L_BRACKET</span><span class="p">)</span> <span class="p">{</span><br />        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">enterisearch</span><span class="p">;</span><br />    <span class="p">}</span><br />    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span><br /><span class="p">};</span><br /><span class="nt">&lt;/script&gt;</span><br /></pre></div><br /><figcaption><span class="caps">HTML</span></figcaption></figure></div></article>                    </div>
+                    <div class="sidebar span3">
+                      		      <h3 class="heading"> Efficiently </h3>
+		      <ul style="list-style-type:none">
+			<li>
+			  <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
+			</li>
+			<li>
+			  <a href="https://eff.iciently.com/login"> About </a>
+			</li>
+			<li>
+			  <a href="/blog"> The Blog</a>
+			</li>
+		      </ul>
+                      <h3 class="heading">Tags</h3>
+		      <ul style="list-style-type:none">
+                      		      <li>
+			<a href="/blog/tags/development.html">development</a>
+		      </li>
+                      		      <li>
+			<a href="/blog/tags/business.html">business</a>
+		      </li>
+                      		      </ul>
+                                          </div>
+                  </div>
+                </div>
+              </div>                
+            </div>
+          </section>
+        </div>
+                      </div> <!--! end of #container -->
+    </div>
+  </div>
+    <!-- Javascript at the bottom for fast page loading -->
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+  <script src="/static/js/base.js"></script>
+  <script src="/media/js/bootstrap.js"></script>
+  <script src="/media/js/bootstrap-modal.js"></script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-43172810-1', 'iciently.com');
+    ga('send', 'pageview');
+
+  </script>
+
+  
+
+  <!--[if lt IE 7 ]>
+    <script src="js/libs/dd_belatedpng.js"></script>
+    <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>
+  <![endif]-->
+
+      
+    <div class="modal hide" id="loginmodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Login</h3>
+    </div>
+    <div class="modal-body">
+      <form class="" action="/login" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+    </div>
+  </div>
+  <div class="modal hide" id="registermodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Register</h3>
+    </div>
+    <div class="modal-body">
+      <form action="/register" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<label for="email">email</label>
+	<input type="text" id="email" name="email"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+      <p>by registering, you accept our <a href="/terms">Terms of Service</a></p>
+    </div>
+  </div>
+</body>
+</html>

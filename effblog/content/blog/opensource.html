@@ -1,0 +1,185 @@
+---
+title: Open Sourcing Efficiently
+description:  Open Sourcing Efficiently
+created: !!timestamp '2013-08-24 10:00:00'
+tags:
+    - development
+    - business
+---
+{% mark excerpt -%}
+Efficiently is a site for creating [shareable online outlines](https://eff.iciently.com/login).  I use it every day
+because breaking my work into [tasks](https://eff.iciently.com/login) and [subtasks](https://eff.iciently.com/login)
+makes me much more productive.  Today I made the decision to open source efficiently - The code is ok.. some is ugly, some is pretty good, you can get to the [github link here]("https://github.com/hhuuggoo/efficiently")
+
+I'm still trying to monetize it, so it's being released under a non-commercial use license.  There are a few reasons I want to open source it.  
+
+1.  The code is of mixed quality, but I think it's an example of how you can build a pretty complex backbone app.
+2.  If I ever go away, potential customers can always run their own efficiently servers
+3.  There is now a customize efficiently feature!
+
+<h3 class="heading"> Customize Efficiently  </h3>
+
+In the settings page, I've added a place where you can inject 
+your own html snippet.  The idea being that you could add your own
+script tags, which either execute javascript inline, or load your 
+own js file from s3.  That's where the open source comes in.
+Now that you know how Efficiently is implemented, it's pretty easy
+to modify it change the behavior.  Let's look at  a one example
+
+{%- endmark %}
+
+<h3 class="heading"> Unbinding the delete key  </h3>
+
+Currently, delete will remove a node in the outline. I discovered this was a bit
+dangerous, and I might remove that functionality soon actually, but in the short term, I can disable it by monkey 
+patching Efficiently.
+
+Here is the necessary javascript code to do so:
+
+{% syntax javascript %}
+Efficiently.KeyEventer.prototype.get_keyfunction = function(e) {
+    var modified, nsmodified;
+    modified = this.modified(e);
+    nsmodified = this.nsmodified(e);
+    if (!modified && e.keyCode === this.keycodes.DOWN) {
+        return this.cursor_down;
+    }
+    if (!modified && e.keyCode === this.keycodes.UP) {
+        return this.cursor_up;
+    }
+    if (!modified && e.keyCode === this.keycodes.ENTER) {
+        return this.enter;
+    }
+    if (modified && e.keyCode === this.keycodes.ENTER) {
+        return this.modenter;
+    }
+    if (modified && e.keyCode === this.keycodes.ENTER) {
+        return this.modenter;
+    }
+    if (modified && e.keyCode === this.keycodes.BACKSPACE) {
+        return this.deletenode;
+    }
+    if (!modified && e.keyCode === this.keycodes.BACKSPACE) {
+        return this.deletekey;
+    }
+    // if (e.keyCode === this.keycodes.DELETE) {
+    //     return this.deletenode;
+    // }
+    if (modified && e.keyCode === this.keycodes.RIGHT) {
+        return this.moveright;
+    }
+    if (modified && e.keyCode === this.keycodes.LEFT) {
+        return this.moveleft;
+    }
+    if (modified && e.keyCode === this.keycodes.UP) {
+        return this.moveup;
+    }
+    if (modified && e.keyCode === this.keycodes.DOWN) {
+        return this.movedown;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.GT) {
+        return this.toggle_outline;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.SLASH) {
+        return this.toggle_outline_global;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.LT) {
+        return this.toggle_todo;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.O_KEY) {
+        return this.enterfilter;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.R_BRACKET) {
+        return this.enterisearch;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.L_BRACKET) {
+        return this.enterisearch;
+    }
+    return null;
+};
+
+{%- endsyntax %}
+
+It's a bit long, but that's becuase I'm essentially cutting and pasting the function out of github, and removing
+the keybindings I don't want.  Maybe in the future there will be a more pluggable way to do this.
+
+<h3 class="heading"> Local Development  </h3>
+
+To set this up, the first thing I did was went to the settings page, and uploaded this html snippet:
+
+![]({{ media_url('images/effcustom.png') }})
+
+This snippet loads the javascript from a local webserver, which I ran by executing `python -m SimpleHTTPServer` in the directory containing my javascript snippet.  Now that this is setup, If I connect to Efficiently, it loads my javascript snippet, and I can edit it locally until I'm happy with it.  The only other obstacle is that Efficiently is using https, which means you either need an https server, or you have to enable insecure content on the page while you're debugging your script.
+
+<h3 class="heading"> Production Monkey Patching  </h3>
+
+Now that I'm happy with my snippet, I can upload it inline, this way I don't have to worry about having another server to serve the snippet.  Here is what the html snippet looks like
+
+{% syntax html %}
+<script type="text/javascript">
+Efficiently.KeyEventer.prototype.get_keyfunction = function(e) {
+    var modified, nsmodified;
+    modified = this.modified(e);
+    nsmodified = this.nsmodified(e);
+    if (!modified && e.keyCode === this.keycodes.DOWN) {
+        return this.cursor_down;
+    }
+    if (!modified && e.keyCode === this.keycodes.UP) {
+        return this.cursor_up;
+    }
+    if (!modified && e.keyCode === this.keycodes.ENTER) {
+        return this.enter;
+    }
+    if (modified && e.keyCode === this.keycodes.ENTER) {
+        return this.modenter;
+    }
+    if (modified && e.keyCode === this.keycodes.ENTER) {
+        return this.modenter;
+    }
+    if (modified && e.keyCode === this.keycodes.BACKSPACE) {
+        return this.deletenode;
+    }
+    if (!modified && e.keyCode === this.keycodes.BACKSPACE) {
+        return this.deletekey;
+    }
+    // if (e.keyCode === this.keycodes.DELETE) {
+    //     return this.deletenode;
+    // }
+    if (modified && e.keyCode === this.keycodes.RIGHT) {
+        return this.moveright;
+    }
+    if (modified && e.keyCode === this.keycodes.LEFT) {
+        return this.moveleft;
+    }
+    if (modified && e.keyCode === this.keycodes.UP) {
+        return this.moveup;
+    }
+    if (modified && e.keyCode === this.keycodes.DOWN) {
+        return this.movedown;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.GT) {
+        return this.toggle_outline;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.SLASH) {
+        return this.toggle_outline_global;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.LT) {
+        return this.toggle_todo;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.O_KEY) {
+        return this.enterfilter;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.R_BRACKET) {
+        return this.enterisearch;
+    }
+    if (nsmodified && e.keyCode === this.keycodes.L_BRACKET) {
+        return this.enterisearch;
+    }
+    return null;
+};
+</script>
+{%- endsyntax %}
+
+
+
+
