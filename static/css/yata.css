@@ -4691,6 +4691,9 @@ a.badge:hover {
   margin: 0px;
   padding: 0px;
 }
+.navbar-form-label {
+  color: white;
+}
 .slogan {
   color: white;
 }
