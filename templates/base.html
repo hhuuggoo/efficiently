@@ -149,7 +149,20 @@ olark.identify('8606-711-10-9778');/*]]>*/</script><noscript><a href="https://ww
       		  <a href="/logout">Logout</a>
       	    </li>
       	    {% else %}
-      	    <li><a id="loginlink">Login</a></li>
+            <li>
+	          <form class="form-inline" action="/login" method="POST">
+	            <!-- Label and text input -->
+	            <label class="navbar-form-label" 
+                       for="username">username</label>
+	            <input class="input-small"
+                       type="text" id="username" name="username" />
+	            <label class="navbar-form-label" 
+                       for="password">password</label>
+	            <input class="input-small"
+                       type="password" id="password" name="password"/>
+	            <input class="btn btn-primary" type="submit" value="Login"/>
+	          </form>
+            </li>
       	    <li><a id="registerlink">Register</a></li>
       	    {% endif %}
 	    <li><a href="/blog">Blog</a></li>
