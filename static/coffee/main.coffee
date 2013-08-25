@@ -105,7 +105,7 @@ $(() ->
       Efficiently.outlinenodes, document
     )
     setup_websocket(wsurl, token)
-    check_connection()
+    _.delay(check_connection, 3000)
     $('#reconnectbutton').click( () ->
       reconnect(token)
     )

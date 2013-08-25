@@ -130,6 +130,7 @@ def pub_from_redis(redisconn, wsmanager):
 #web socket subscriber
 @app.route('/sub')
 def sub():
+    print 'SUB'
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         run_socket(
