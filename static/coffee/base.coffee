@@ -1,9 +1,5 @@
 
 $(()->
-  $('#loginlink').click(() ->
-    $('#loginmodal').modal({'show' : true})
-    $('#loginmodal').find('input:text:visible:first').focus()
-  )
   $('#registerlink').click(() ->
     $('#registermodal').modal({'show' : true})
     $('#registermodal').find('input:text:visible:first').focus()
