@@ -90,7 +90,21 @@
                   <div class="row-fluid">
                     <div class="mainbar span9">
                       <article class="post">
-<time class="heading" datetime="2013-08-13">
+<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<!-- Place this tag where you want the +1 button to render. -->
+<div class="g-plusone" data-size="medium" data-annotation="inline" data-width="200"></div>
+
+<!-- Place this tag after the last +1 button tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div class="fb-like" data-href="http://developers.facebook.com/docs/reference/plugins/like" data-width="100" data-layout="button_count" data-show-faces="true" data-send="false"></div>
+<br><time class="heading" datetime="2013-08-13">
     Tue, 13 Aug 2013
 </time>
 <br>
@@ -158,29 +172,43 @@ which takes advantage of cached_plan, as well as my own&nbsp;override.</p>
 <p>The last issue I ran into was using my own buttons with stripe.  I have a form for upgrading plans on the settings page, and since I want all <span class="caps">UI</span> elements 
 on that page to be consistent, I wanted to use my own buttons rather than stripe&#8217;s button.
 <div class="codebox"><figure class="code"><div class="highlight"><pre><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><br />    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#paybutton&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><br />  <span class="kd">var</span> <span class="nx">token</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">){</span><br />       <span class="kd">var</span> <span class="nx">$input</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;input type=hidden name=stripeToken /&gt;&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span><br />     <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.stripeform&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">$input</span><span class="p">).</span><span class="nx">submit</span><span class="p">();</span><br />  <span class="p">};</span><br /> <span class="nx">StripeCheckout</span><span class="p">.</span><span class="nx">open</span><span class="p">({</span><br />       <span class="nx">key</span><span class="o">:</span> <span class="nx">key</span><span class="p">,</span><br />       <span class="nx">token</span><span class="o">:</span> <span class="nx">token</span><br />   <span class="p">});</span><br />    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span><br />    <span class="p">});</span><br /><span class="p">});</span><br /></pre></div><br /><figcaption>JavaScript</figcaption></figure></div></p>
-<p>Step1 - stripe payments.  Step2 - get users.  Step3 -&nbsp;profit!!!</p></article>                    </div>
+<p>Step1 - stripe payments.  Step2 - get users.  Step3 -&nbsp;profit!!!</p><a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<!-- Place this tag where you want the +1 button to render. -->
+<div class="g-plusone" data-size="medium" data-annotation="inline" data-width="200"></div>
+
+<!-- Place this tag after the last +1 button tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div class="fb-like" data-href="http://developers.facebook.com/docs/reference/plugins/like" data-width="100" data-layout="button_count" data-show-faces="true" data-send="false"></div>
+<br></article>                    </div>
                     <div class="sidebar span3">
-                      		      <h3 class="heading"> Efficiently </h3>
-		      <ul style="list-style-type:none">
-			<li>
-			  <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
-			</li>
-			<li>
-			  <a href="https://eff.iciently.com/login"> About </a>
-			</li>
-			<li>
-			  <a href="/blog"> The Blog</a>
-			</li>
-		      </ul>
+                      		              <h3 class="heading"> Efficiently </h3>
+		              <ul style="list-style-type:none">
+			            <li>
+			              <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
+			            </li>
+			            <li>
+			              <a href="https://eff.iciently.com/login"> About </a>
+			            </li>
+			            <li>
+			              <a href="/blog"> The Blog</a>
+			            </li>
+		              </ul>
                       <h3 class="heading">Tags</h3>
-		      <ul style="list-style-type:none">
-                      		      <li>
-			<a href="/blog/tags/development.html">development</a>
-		      </li>
-                      		      <li>
-			<a href="/blog/tags/business.html">business</a>
-		      </li>
-                      		      </ul>
+		              <ul style="list-style-type:none">
+                        		                <li>
+			              <a href="/blog/tags/development.html">development</a>
+		                </li>
+                        		                <li>
+			              <a href="/blog/tags/business.html">business</a>
+		                </li>
+                        		              </ul>
                                           </div>
                   </div>
                 </div>
@@ -209,6 +237,14 @@ on that page to be consistent, I wanted to use my own buttons rather than stripe
 
   </script>
 
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
   
 
   <!--[if lt IE 7 ]>
