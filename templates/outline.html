@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block other_scripts%}
-{% if scripts %}
-{% autoescape false %}{{ scripts }}{% endautoescape %}
-{% endif %}
 <link rel="stylesheet" type="text/css" 
       href="/static/css/outline.css"/>
 <script type="text/template" id="main-template">
@@ -38,6 +35,9 @@
 <script type="text/javascript" src="/static/js/websocket.js"></script>
 <script type="text/javascript" src="/static/js/main.js"></script>
 <!-- end outlinejs -->
+{% if scripts %}
+{% autoescape false %}{{ scripts }}{% endautoescape %}
+{% endif %}
 {% endblock %}
 {% block main %}
 <hr class="mainsep"/>
