@@ -2,6 +2,7 @@
 
 {% block main -%}
 <article class="post">
+{% include "social.j2" %}
 <time class="heading" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">
     {{ resource.meta.created.strftime('%a, %d %b %Y') }}
 </time>
@@ -14,6 +15,7 @@
 {% block post -%}{%- endblock %}
 {%- endmark %}
 {%- endfilter %}
+{% include "social.j2" %}
 </article>
 
 {%- endblock %}

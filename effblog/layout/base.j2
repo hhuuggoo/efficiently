@@ -81,26 +81,26 @@
                     </div>
                     <div class="sidebar span3">
                       {% block sidebar %}
-		      <h3 class="heading"> Efficiently </h3>
-		      <ul style="list-style-type:none">
-			<li>
-			  <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
-			</li>
-			<li>
-			  <a href="https://eff.iciently.com/login"> About </a>
-			</li>
-			<li>
-			  <a href="/blog"> The Blog</a>
-			</li>
-		      </ul>
+		              <h3 class="heading"> Efficiently </h3>
+		              <ul style="list-style-type:none">
+			            <li>
+			              <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
+			            </li>
+			            <li>
+			              <a href="https://eff.iciently.com/login"> About </a>
+			            </li>
+			            <li>
+			              <a href="/blog"> The Blog</a>
+			            </li>
+		              </ul>
                       <h3 class="heading">Tags</h3>
-		      <ul style="list-style-type:none">
-                      {% for tag in site.tagger.tags.to_dict() %}
-		      <li>
-			<a href="/blog/tags/{{tag}}.html">{{ tag }}</a>
-		      </li>
-                      {% endfor %}
-		      </ul>
+		              <ul style="list-style-type:none">
+                        {% for tag in site.tagger.tags.to_dict() %}
+		                <li>
+			              <a href="/blog/tags/{{tag}}.html">{{ tag }}</a>
+		                </li>
+                        {% endfor %}
+		              </ul>
                       {% endblock sidebar %}
                     </div>
                   </div>
@@ -136,6 +136,14 @@
 
   </script>
 
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
   {% endblock scripts %}
 
 
