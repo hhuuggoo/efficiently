@@ -1043,7 +1043,6 @@ Efficiently.tree_filter = (expression, docview) ->
     return false
   egraph = Efficiently.expression_graph(expression)
   regexes = [new RegExp(/(^|\s)@(\w+)/g), new RegExp(/(^|\s)#(\w+)/g)]
-  regexes = regexes.concat(_.values(docview.model.doc.state_regexp_map))
   f = (node, tags_found) ->
     console.log(node.get('text'), tags_found)
     _.extend(tags_found, Efficiently.get_tags(node.get('text'), regexes))
