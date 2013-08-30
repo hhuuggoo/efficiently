@@ -1,8 +1,14 @@
 !!python/unicode '#index.html#': [listing.j2, narrowlogo.html, base.j2, analytics.j2,
   macros.j2]
 !!python/unicode 'about.html': [narrowlogo.html, base.j2, analytics.j2]
+!!python/unicode 'blog/#opensource.html#': [blog.j2, narrowlogo.html, social.j2, analytics.j2,
+  base.j2]
+!!python/unicode 'blog/#stripe_checkout.html#': [blog.j2, narrowlogo.html, social.j2,
+  analytics.j2, base.j2]
 !!python/unicode 'blog/angry-post.html': [blog.j2, macros.j2, base.j2, analytics.j2]
 !!python/unicode 'blog/atom.xml': [atom.j2, macros.j2]
+!!python/unicode 'blog/efficiently-design.html': [blog.j2, narrowlogo.html, social.j2,
+  analytics.j2, base.j2]
 !!python/unicode 'blog/excerpts.xml': [atom.j2, macros.j2]
 !!python/unicode 'blog/happy-post.html': [blog.j2, narrowlogo.html, base.j2, analytics.j2]
 !!python/unicode 'blog/index.html': [listing.j2, narrowlogo.html, base.j2, analytics.j2,

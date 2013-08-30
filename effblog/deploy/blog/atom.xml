@@ -7,10 +7,24 @@
         <link href="/"/>
     
         
-    <updated>2013-08-25T17:20:32Z</updated>
+    <updated>2013-08-30T19:26:31Z</updated>
 
     <id>/blog/atom.xml/</id>
 
+            <entry>
+            <title type="html">Bootstrapping Design</title>
+            <author><name>Lakshmi Vyasarajan</name></author>
+            <link href="/blog/efficiently-design.html"/>
+            <updated>2013-09-01T10:00:00Z</updated>
+            <published>2013-09-01T10:00:00Z</published>
+            <id>/blog/efficiently-design.html</id>
+                        <category   scheme="/blog/tags"
+                        term="development"
+                        label="Development" />
+            
+            <content type="html">
+                                            </content>
+        </entry>
             <entry>
             <title type="html">Open Sourcing Efficiently</title>
             <author><name>Lakshmi Vyasarajan</name></author>

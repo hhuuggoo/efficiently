@@ -7,10 +7,112 @@
         <link href="/"/>
     
         
-    <updated>2013-08-20T05:21:42Z</updated>
+    <updated>2013-08-30T19:26:33Z</updated>
 
     <id>/blog/excerpts.xml/</id>
 
+            <entry>
+            <title type="html">Bootstrapping Design</title>
+            <author><name>Lakshmi Vyasarajan</name></author>
+            <link href="/blog/efficiently-design.html"/>
+            <updated>2013-09-01T10:00:00Z</updated>
+            <published>2013-09-01T10:00:00Z</published>
+            <id>/blog/efficiently-design.html</id>
+                        <category   scheme="/blog/tags"
+                        term="development"
+                        label="Development" />
+            
+            <content type="html">
+                
+                &lt;p&gt;Efficiently is a site for creating &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;shareable online outlines&lt;/a&gt;.  I use it every day
+because breaking my work into &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;tasks&lt;/a&gt; and &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;subtasks&lt;/a&gt;
+makes me much more productive.  You can try the &lt;a href=&#34;https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/&#34;&gt;Efficiently demo&lt;/a&gt;.
+I&amp;#8217;ve never been good at design - I&amp;#8217;m still not, but I wanted to see just how non-terrible I could be.  When I first built 
+Efficiently, it was called Yata - Yet Another Task Application.  I like acronyms, and yata.in was a 
+domain that was available for cheap.  I built it, set it up, and it was fine&amp;#8230; but the design left a little to be desired.
+Here is the landing&amp;nbsp;page:&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/media/images/yatasplash.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And the actual&amp;nbsp;application&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;&#34; src=&#34;/media/images/yataoutline.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;So it&amp;#8217;s certainly not as terrible as it could be, but it wasn&amp;#8217;t great.  I saw a post on hackernews about &lt;a href=&#34;http://bootstrappingdesign.com/&#34;&gt;bootstrapping design&lt;/a&gt;, which was a way to learn some basics about design for hackers.  It&amp;#8217;s a great book, a quick read, and is responsible for the way the site looks&amp;nbsp;today.&lt;/p&gt;
+&lt;h3 class=&#34;heading&#34;&gt; Typography &lt;/h3&gt;
+
+&lt;p&gt;Typography is emphasized in the book, and it&amp;#8217;s super important.  The 
+first thing I did was browse google web fonts and select a few that I liked.
+&lt;a href=&#34;http://bootstrappingdesign.com/&#34;&gt;bootstrapping design&lt;/a&gt; stressed that you
+want to use a few fonts, but you don&amp;#8217;t want to go crazy.  I settled on 3
+fonts, Lobster Two for the logo, Open Sans for regular text, and 
+Open Sans Condensed for headings.  See for yourself
+&lt;center style=&#34;font-size:150%&#34;&gt;
+  &lt;div class=&#34;heading&#34;&gt;My heading font&lt;/div&gt;
+  &lt;br&gt;
+  &lt;div class=&#34;&#34;&gt;Regular Text&lt;/div&gt;
+  &lt;br&gt;
+  &lt;div style=&#34;font-family:Lobster Two;&#34;&gt;Logo Font&lt;/div&gt;
+&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;/&#34; style=&#34;text-decoration:none&#34;&gt;
+  &lt;svg class=&#34;logo&#34; height=&#34;65&#34; width=&#34;300&#34;&gt;
+    &lt;g transform=&#34;scale(0.5, 0.5)&#34;&gt;
+      &lt;svg height=&#34;130&#34; width=&#34;600&#34;&gt;
+        &lt;rect height=&#34;130&#34; width=&#34;600&#34; rx=&#34;10&#34; ry=&#34;10&#34; class=&#34;bgrect&#34;/&gt;
+        &lt;g transform=&#39;translate(0,90)&#39;&gt;
+          &lt;text font-family=&#34;Lobster Two&#34; font-weight=&#34;normal&#34; font-size=&#34;110&#34; y=&#34;5&#34; x=&#34;20&#34;&gt;
+            Efficiently
+          &lt;/text&gt;
+        &lt;/g&gt;
+        &lt;g transform=&#39;translate(400,10)&#39;&gt;
+          &lt;g transform=&#34;translate(20, 20)&#34;&gt;
+            &lt;circle cx=&#34;0&#34; cy=&#34;0&#34; r=&#34;12&#34;/&gt;
+            &lt;rect x=&#34;8&#34; y=&#34;-4&#34; width=&#34;300&#34; height=&#34;9&#34; r=&#34;12&#34;/&gt;
+          &lt;/g&gt;
+          &lt;g transform=&#34;translate(50, 52)&#34;&gt;
+            &lt;circle cx=&#34;0&#34; cy=&#34;0&#34; r=&#34;12&#34;/&gt;
+            &lt;rect x=&#34;8&#34; y=&#34;-4&#34; width=&#34;300&#34; height=&#34;9&#34; r=&#34;12&#34;/&gt;
+          &lt;/g&gt;
+          &lt;g transform=&#34;translate(50, 85)&#34;&gt;
+            &lt;circle cx=&#34;0&#34; cy=&#34;0&#34; r=&#34;12&#34;/&gt;
+            &lt;rect x=&#34;8&#34; y=&#34;-4&#34; width=&#34;300&#34; height=&#34;9&#34; r=&#34;12&#34;/&gt;
+          &lt;/g&gt;
+        &lt;/g&gt;
+      &lt;/svg&gt;
+    &lt;/g&gt;
+  &lt;/svg&gt;
+&lt;/a&gt;&lt;/p&gt;            </content>
+        </entry>
+            <entry>
+            <title type="html">Open Sourcing Efficiently</title>
+            <author><name>Lakshmi Vyasarajan</name></author>
+            <link href="/blog/opensource.html"/>
+            <updated>2013-08-24T10:00:00Z</updated>
+            <published>2013-08-24T10:00:00Z</published>
+            <id>/blog/opensource.html</id>
+                        <category   scheme="/blog/tags"
+                        term="development"
+                        label="Development" />
+                        <category   scheme="/blog/tags"
+                        term="business"
+                        label="Business" />
+            
+            <content type="html">
+                
+                &lt;p&gt;Efficiently is a site for creating &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;shareable online outlines&lt;/a&gt;.  I use it every day
+because breaking my work into &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;tasks&lt;/a&gt; and &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;subtasks&lt;/a&gt;
+makes me much more productive.  You can try the &lt;a href=&#34;https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/&#34;&gt;Efficiently demo&lt;/a&gt;.  Today I made the decision to open source efficiently - The code is ok.. some is ugly, some is pretty good, you can get to the &lt;a href=&#34;https://github.com/hhuuggoo/efficiently&#34;&gt;github page&amp;nbsp;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m still trying to monetize it, so it&amp;#8217;s being released under a non-commercial use license.  There are a few reasons I want to open source&amp;nbsp;it.  &lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The code is of mixed quality, but I think it&amp;#8217;s an example of how you can build a pretty complex backbone&amp;nbsp;app.&lt;/li&gt;
+&lt;li&gt;If I ever go away, potential customers can always run their own efficiently&amp;nbsp;servers&lt;/li&gt;
+&lt;li&gt;There is now a customize efficiently&amp;nbsp;feature!&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 class=&#34;heading&#34;&gt; Customize&amp;nbsp;Efficiently  &lt;/h3&gt;
+
+&lt;p&gt;In the settings page, I&amp;#8217;ve added a place where you can inject 
+your own html snippet.  The idea being that you could add your own
+script tags, which either execute javascript inline, or load your 
+own js file from s3.  That&amp;#8217;s where the open source comes in.
+Now that you know how Efficiently is implemented, it&amp;#8217;s pretty easy
+to modify it change the behavior.  Let&amp;#8217;s look at  a one&amp;nbsp;example&lt;/p&gt;            </content>
+        </entry>
             <entry>
             <title type="html">Integrating Stripe Checkout with Mongodb and Flask</title>
             <author><name>Lakshmi Vyasarajan</name></author>
@@ -24,7 +126,9 @@
             
             <content type="html">
                 
-                &lt;p&gt;I&amp;#8217;ve been working on Efficently in my spare time for a few years now, it started as a tool for my own personal use, however now that it&amp;#8217;s relatively mature, I wanted to spend some minimal effort to see if I could monetize it. I&amp;#8217;ve used stripe before, and always loved it&amp;#8217;s easy to use &lt;span class=&#34;caps&#34;&gt;API&lt;/span&gt;.
+                &lt;p&gt;Efficiently is a site for creating &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;shareable online outlines&lt;/a&gt;.  I use it every day
+because breaking my work into &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;tasks&lt;/a&gt; and &lt;a href=&#34;https://eff.iciently.com/login&#34;&gt;subtasks&lt;/a&gt;
+makes me much more productive.  I&amp;#8217;ve been working on Efficently in my spare time for a few years now, it started as a tool for my own personal use, however now that it&amp;#8217;s relatively mature, I wanted to spend some minimal effort to see if I could monetize it. I&amp;#8217;ve used stripe before, and always loved it&amp;#8217;s easy to use &lt;span class=&#34;caps&#34;&gt;API&lt;/span&gt;.
 In the past I&amp;#8217;ve always written my own forms but writing the input validation for credit card forms can be quite a pain.  I was thrilled when I saw that stripe now has their &lt;a href=&#34;https://stripe.com/docs/checkout&#34;&gt;own credit card forms&lt;/a&gt;  that you can use easily from your&amp;nbsp;application.&lt;/p&gt;
 &lt;h3 class=&#34;heading&#34;&gt; Adding a payment&amp;nbsp;widget &lt;/h3&gt;
 

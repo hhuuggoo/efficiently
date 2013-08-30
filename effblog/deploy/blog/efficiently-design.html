@@ -1,0 +1,314 @@
+<!doctype html>
+<head>
+  
+    <meta charset="">
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="">
+
+  <!-- encoding must be specified within the first 512 bytes
+        www.whatwg.org/specs/web-apps/current-work/multipage/semantics.html#charset -->
+
+  <!-- meta element for compatibility mode needs to be before
+        all elements except title & meta
+        msdn.microsoft.com/en-us/library/cc288325(VS.85).aspx -->
+  <!-- Chrome Frame is only invoked if meta element for
+        compatibility mode is within the first 1K bytes
+        code.google.com/p/chromium/issues/detail?id=23003 -->
+
+  <title>Bootstrapping Design</title>
+  <meta name="description" content="Bootstrapping Design">
+  <meta name="author" content="Lakshmi Vyasarajan">
+
+  <!--  Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="">
+
+    <!-- Place favicon.ico & apple-touch-icon.png
+        in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/media/favicon.ico">
+  <link rel="apple-touch-icon" href="/media/apple-touch-icon.png">
+  
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lobster Two|Open+Sans|Open+Sans+Condensed:300|Courgette|Boogaloo">  
+  <link rel="stylesheet" href="/media/css/yata.css">
+  <link rel="stylesheet" href="/media/css/syntax.css">
+  
+    <!-- All JavaScript at the bottom, except for Modernizr which
+        enables HTML5 elements & feature detects -->
+    <script src="/media/js/libs/modernizr-1.7.min.js"></script>
+    </head>
+<body id="efficiently-design">
+  <div class="navbar">
+    <div class="navbar-inner titlerow">
+      <a href="/" style="text-decoration:none">
+  <svg class="logo" height="65" width="300">
+    <g transform="scale(0.5, 0.5)">
+      <svg height="130" width="600">
+        <rect height="130" width="600" rx="10" ry="10" class="bgrect"/>
+        <g transform='translate(0,90)'>
+	      <text font-family="Lobster Two" font-weight="normal" font-size="110" y="5" x="20">
+	        Efficiently
+	      </text>
+        </g>
+        <g transform='translate(400,10)'>
+	      <g transform="translate(20, 20)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+	      <g transform="translate(50, 52)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+	      <g transform="translate(50, 85)">
+	        <circle cx="0" cy="0" r="12"/>
+	        <rect x="8" y="-4" width="300" height="9" r="12"/>
+	      </g>
+        </g>
+      </svg>
+    </g>
+  </svg>
+</a>      <ul class="pull-right nav nav-pills" style="">
+      	<li><a id="loginlink">Login</a></li>
+      	<li><a id="registerlink">Register</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="blogcontainer container-fluid">
+        <div class="row-fluid">
+      <div class="span10 offset1">
+        <div class="page-header foo">
+                              <h1 class="title">Bootstrapping Design</h1>
+              
+                  </div>
+      </div>
+    </div>
+            <div id="main" role="main">
+          <section class="content">
+            <div class="row-fluid">
+              <div class="span10 offset1">
+                <div class="mainblog container-fluid">
+                  <div class="row-fluid">
+                    <div class="mainbar span9">
+                      <article class="post">
+<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<!-- Place this tag where you want the +1 button to render. -->
+<div class="g-plusone" data-size="medium" data-annotation="inline" data-width="200"></div>
+
+<!-- Place this tag after the last +1 button tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div class="fb-like" data-href="http://developers.facebook.com/docs/reference/plugins/like" data-width="100" data-layout="button_count" data-show-faces="true" data-send="false"></div>
+<br><time class="heading" datetime="2013-09-01">
+    Sun, 01 Sep 2013
+</time>
+<br>
+<br>    
+<p>Efficiently is a site for creating <a href="https://eff.iciently.com/login">shareable online outlines</a>.  I use it every day
+because breaking my work into <a href="https://eff.iciently.com/login">tasks</a> and <a href="https://eff.iciently.com/login">subtasks</a>
+makes me much more productive.  You can try the <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/">Efficiently demo</a>.
+I&#8217;ve never been good at design - I&#8217;m still not, but I wanted to see just how non-terrible I could be.  When I first built 
+Efficiently, it was called Yata - Yet Another Task Application.  I like acronyms, and yata.in was a 
+domain that was available for cheap.  I built it, set it up, and it was fine&#8230; but the design left a little to be desired.
+Here is the landing&nbsp;page:</p>
+<p><img alt="" src="/media/images/yatasplash.png" /></p>
+<p>And the actual&nbsp;application</p>
+<p><img alt="" src="/media/images/yataoutline.png" /></p>
+<p>So it&#8217;s certainly not as terrible as it could be, but it wasn&#8217;t great.  I saw a post on hackernews about <a href="http://bootstrappingdesign.com/">bootstrapping design</a>, which was a way to learn some basics about design for hackers.  It&#8217;s a great book, a quick read, and is responsible for the way the site looks today.  It was pretty simple, so I wanted to share how anyone can use the simple design tips from <a href="http://bootstrappingdesign.com/">bootstrapping design</a> to improve their&nbsp;site.</p>
+<h3 class="heading"> Typography </h3>
+
+<p>Typography is emphasized in the book, and it&#8217;s super important.  The 
+first thing I did was browse google web fonts and select a few that I liked.
+<a href="http://bootstrappingdesign.com/">bootstrapping design</a> stressed that you
+want to use a few fonts, but you don&#8217;t want to go crazy.  I settled on 3
+fonts, Lobster Two for the logo, Open Sans for regular text, and 
+Open Sans Condensed for headings.  See for&nbsp;yourself</p>
+<p><center style="font-size:150%">
+  <div class="heading">My heading font</div>
+  <br>
+  <div class="">Regular Text</div>
+  <br>
+  <div style="font-family:Lobster Two;">Efficiently Logo</div>
+</center></p>
+<h3 class="heading"> Choosing a Color&nbsp;Theme </h3>
+
+<p><center>
+  <svg height="100" width="500">
+    <rect height="100" width="100" fill="#CDE8FF"/>
+    <rect height="100" width="100" x="100" fill="#64B5FF"/>
+    <rect height="100" width="100" x="200" fill="#1671D4"/>
+    <rect height="100" width="100" x="300" fill="#1E2322"/>
+    <rect height="100" width="100" x="400" fill="#0D0D0D"/> 
+  </svg>
+</center>
+I went to a website that had a bunch of color themes, I don&#8217;t remember which one, but it was pretty easy to select one that I liked.  After selecting it, I
+simply used all the color codes in my css.  Efficiently is a very
+text heavy site and it&#8217;s not super colorful, however having a cohesive and
+uniform approach to all accent colors is a good&nbsp;idea</p>
+<h3 class="heading"> Creating a&nbsp;Logo </h3>
+
+<p>One of the best things pointed out by bootstrapping design, is that you can
+get great logos by choosing great fonts!  I went with Lobster Two, and
+then created some a simple bullet list using <span class="caps">SVG</span> and I was done really
+quickly.  I wrote the <span class="caps">SVG</span> by hand, but I&#8217;m sure there are alot of tools
+out there for doing so.  Here is the Logo.
+<center>
+  <a href="/" style="text-decoration:none">
+    <svg class="logo" height="65" width="300">
+      <g transform="scale(0.5, 0.5)">
+        <svg height="130" width="600">
+          <rect height="130" width="600" rx="10" ry="10" class="bgrect"/>
+          <g transform='translate(0,90)'>
+            <text font-family="Lobster Two" font-weight="normal" font-size="110" y="5" x="20">
+              Efficiently
+            </text>
+          </g>
+          <g transform='translate(400,10)'>
+            <g transform="translate(20, 20)">
+              <circle cx="0" cy="0" r="12"/>
+              <rect x="8" y="-4" width="300" height="9" r="12"/>
+            </g>
+            <g transform="translate(50, 52)">
+              <circle cx="0" cy="0" r="12"/>
+              <rect x="8" y="-4" width="300" height="9" r="12"/>
+            </g>
+            <g transform="translate(50, 85)">
+              <circle cx="0" cy="0" r="12"/>
+              <rect x="8" y="-4" width="300" height="9" r="12"/>
+            </g>
+          </g>
+        </svg>
+      </g>
+    </svg>
+  </a>
+</center></p>
+<p>Here is the associated source&nbsp;code.</p>
+<div class="codebox"><figure class="code"><div class="highlight"><pre><span class="nt">&lt;center&gt;</span><br />  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/&quot;</span> <span class="na">style=</span><span class="s">&quot;text-decoration:none&quot;</span><span class="nt">&gt;</span><br />    <span class="nt">&lt;svg</span> <span class="na">class=</span><span class="s">&quot;logo&quot;</span> <span class="na">height=</span><span class="s">&quot;65&quot;</span> <span class="na">width=</span><span class="s">&quot;300&quot;</span><span class="nt">&gt;</span><br />      <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&quot;scale(0.5, 0.5)&quot;</span><span class="nt">&gt;</span><br />        <span class="nt">&lt;svg</span> <span class="na">height=</span><span class="s">&quot;130&quot;</span> <span class="na">width=</span><span class="s">&quot;600&quot;</span><span class="nt">&gt;</span><br />          <span class="nt">&lt;rect</span> <span class="na">height=</span><span class="s">&quot;130&quot;</span> <span class="na">width=</span><span class="s">&quot;600&quot;</span> <span class="na">rx=</span><span class="s">&quot;10&quot;</span> <span class="na">ry=</span><span class="s">&quot;10&quot;</span> <span class="na">class=</span><span class="s">&quot;bgrect&quot;</span><span class="nt">/&gt;</span><br />          <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&#39;translate(0,90)&#39;</span><span class="nt">&gt;</span><br />            <span class="nt">&lt;text</span> <span class="na">font-family=</span><span class="s">&quot;Lobster Two&quot;</span> <span class="na">font-weight=</span><span class="s">&quot;normal&quot;</span> <span class="na">font-size=</span><span class="s">&quot;110&quot;</span> <span class="na">y=</span><span class="s">&quot;5&quot;</span> <span class="na">x=</span><span class="s">&quot;20&quot;</span><span class="nt">&gt;</span><br />           Efficiently<br />         <span class="nt">&lt;/text&gt;</span><br />          <span class="nt">&lt;/g&gt;</span><br />          <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&#39;translate(400,10)&#39;</span><span class="nt">&gt;</span><br />         <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&quot;translate(20, 20)&quot;</span><span class="nt">&gt;</span><br />            <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;0&quot;</span> <span class="na">cy=</span><span class="s">&quot;0&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;rect</span> <span class="na">x=</span><span class="s">&quot;8&quot;</span> <span class="na">y=</span><span class="s">&quot;-4&quot;</span> <span class="na">width=</span><span class="s">&quot;300&quot;</span> <span class="na">height=</span><span class="s">&quot;9&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;/g&gt;</span><br />            <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&quot;translate(50, 52)&quot;</span><span class="nt">&gt;</span><br />            <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;0&quot;</span> <span class="na">cy=</span><span class="s">&quot;0&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;rect</span> <span class="na">x=</span><span class="s">&quot;8&quot;</span> <span class="na">y=</span><span class="s">&quot;-4&quot;</span> <span class="na">width=</span><span class="s">&quot;300&quot;</span> <span class="na">height=</span><span class="s">&quot;9&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;/g&gt;</span><br />            <span class="nt">&lt;g</span> <span class="na">transform=</span><span class="s">&quot;translate(50, 85)&quot;</span><span class="nt">&gt;</span><br />            <span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;0&quot;</span> <span class="na">cy=</span><span class="s">&quot;0&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;rect</span> <span class="na">x=</span><span class="s">&quot;8&quot;</span> <span class="na">y=</span><span class="s">&quot;-4&quot;</span> <span class="na">width=</span><span class="s">&quot;300&quot;</span> <span class="na">height=</span><span class="s">&quot;9&quot;</span> <span class="na">r=</span><span class="s">&quot;12&quot;</span><span class="nt">/&gt;</span><br />           <span class="nt">&lt;/g&gt;</span><br />          <span class="nt">&lt;/g&gt;</span><br />        <span class="nt">&lt;/svg&gt;</span><br />      <span class="nt">&lt;/g&gt;</span><br />    <span class="nt">&lt;/svg&gt;</span><br />  <span class="nt">&lt;/a&gt;</span><br /><span class="nt">&lt;/center&gt;</span><br /></pre></div><br /><figcaption><span class="caps">HTML</span></figcaption></figure></div>
+
+<p>There you have it, a few simple design tips from <a href="http://bootstrappingdesign.com/">bootstrapping design</a>, and my site is looking alot better.  It&#8217;s worth noting that using less and bootstrap made it alot easier to put this site together, however 
+I really think updating your typography, color scheme, and logo can make a
+website much&nbsp;better.</p><a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<!-- Place this tag where you want the +1 button to render. -->
+<div class="g-plusone" data-size="medium" data-annotation="inline" data-width="200"></div>
+
+<!-- Place this tag after the last +1 button tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div class="fb-like" data-href="http://developers.facebook.com/docs/reference/plugins/like" data-width="100" data-layout="button_count" data-show-faces="true" data-send="false"></div>
+<br></article>                    </div>
+                    <div class="sidebar span3">
+                      		              <h3 class="heading"> Efficiently </h3>
+		              <ul style="list-style-type:none">
+			            <li>
+			              <a href="https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/"> Try The Demo </a>
+			            </li>
+			            <li>
+			              <a href="https://eff.iciently.com/login"> About </a>
+			            </li>
+			            <li>
+			              <a href="/blog"> The Blog</a>
+			            </li>
+		              </ul>
+                      <h3 class="heading">Tags</h3>
+		              <ul style="list-style-type:none">
+                        		                <li>
+			              <a href="/blog/tags/development.html">development</a>
+		                </li>
+                        		                <li>
+			              <a href="/blog/tags/business.html">business</a>
+		                </li>
+                        		              </ul>
+                                          </div>
+                  </div>
+                </div>
+              </div>                
+            </div>
+          </section>
+        </div>
+                      </div> <!--! end of #container -->
+    </div>
+  </div>
+    <!-- Javascript at the bottom for fast page loading -->
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+  <script src="/static/js/base.js"></script>
+  <script src="/media/js/bootstrap.js"></script>
+  <script src="/media/js/bootstrap-modal.js"></script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-43172810-1', 'iciently.com');
+    ga('send', 'pageview');
+
+  </script>
+
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+  
+
+  <!--[if lt IE 7 ]>
+    <script src="js/libs/dd_belatedpng.js"></script>
+    <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>
+  <![endif]-->
+
+      
+    <div class="modal hide" id="loginmodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Login</h3>
+    </div>
+    <div class="modal-body">
+      <form class="" action="/login" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+    </div>
+  </div>
+  <div class="modal hide" id="registermodal" style="position:absolute">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">X</button>
+      <h3>Register</h3>
+    </div>
+    <div class="modal-body">
+      <form action="/register" method="POST">
+	<!-- Label and text input -->
+	<label for="username">username</label>
+	<input type="text" id="username" name="username" />
+	<label for="password">password</label>
+	<input type="password" id="password" name="password"/>
+	<label for="email">email</label>
+	<input type="text" id="email" name="email"/>
+	<br>
+	<input class="btn btn-primary" type="submit" value="Submit"/>
+      </form>
+      <p>by registering, you accept our <a href="/terms">Terms of Service</a></p>
+    </div>
+  </div>
+</body>
+</html>

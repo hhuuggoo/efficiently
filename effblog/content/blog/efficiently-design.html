@@ -1,0 +1,143 @@
+---
+title: Bootstrapping Design
+description:  Bootstrapping Design
+created: !!timestamp '2013-09-01 10:00:00'
+tags:
+    - development
+---
+{% mark excerpt -%}
+Efficiently is a site for creating [shareable online outlines](https://eff.iciently.com/login).  I use it every day
+because breaking my work into [tasks](https://eff.iciently.com/login) and [subtasks](https://eff.iciently.com/login)
+makes me much more productive.  You can try the [Efficiently demo](https://eff.iciently.com/docview/r/4ed70c031a7ba32edb000002/).
+I've never been good at design - I'm still not, but I wanted to see just how non-terrible I could be.  When I first built 
+Efficiently, it was called Yata - Yet Another Task Application.  I like acronyms, and yata.in was a 
+domain that was available for cheap.  I built it, set it up, and it was fine... but the design left a little to be desired.
+Here is the landing page:
+
+![]({{ media_url('images/yatasplash.png') }})
+
+And the actual application
+
+![]({{ media_url('images/yataoutline.png') }})
+
+So it's certainly not as terrible as it could be, but it wasn't great.  I saw a post on hackernews about [bootstrapping design](http://bootstrappingdesign.com/), which was a way to learn some basics about design for hackers.  It's a great book, a quick read, and is responsible for the way the site looks today.  It was pretty simple, so I wanted to share how anyone can use the simple design tips from [bootstrapping design](http://bootstrappingdesign.com/) to improve their site.
+
+<h3 class="heading"> Typography </h3>
+
+Typography is emphasized in the book, and it's super important.  The 
+first thing I did was browse google web fonts and select a few that I liked.
+[bootstrapping design](http://bootstrappingdesign.com/) stressed that you
+want to use a few fonts, but you don't want to go crazy.  I settled on 3
+fonts, Lobster Two for the logo, Open Sans for regular text, and 
+Open Sans Condensed for headings.  See for yourself
+
+<center style="font-size:150%">
+  <div class="heading">My heading font</div>
+  <br>
+  <div class="">Regular Text</div>
+  <br>
+  <div style="font-family:Lobster Two;">Efficiently Logo</div>
+</center>
+
+<h3 class="heading"> Choosing a Color Theme </h3>
+
+<center>
+  <svg height="100" width="500">
+    <rect height="100" width="100" fill="#CDE8FF"/>
+    <rect height="100" width="100" x="100" fill="#64B5FF"/>
+    <rect height="100" width="100" x="200" fill="#1671D4"/>
+    <rect height="100" width="100" x="300" fill="#1E2322"/>
+    <rect height="100" width="100" x="400" fill="#0D0D0D"/>	
+  </svg>
+</center>
+
+{%- endmark %}
+
+I went to a website that had a bunch of color themes, I don't remember which one, but it was pretty easy to select one that I liked.  After selecting it, I
+simply used all the color codes in my css.  Efficiently is a very
+text heavy site and it's not super colorful, however having a cohesive and
+uniform approach to all accent colors is a good idea
+
+
+<h3 class="heading"> Creating a Logo </h3>
+
+One of the best things pointed out by bootstrapping design, is that you can
+get great logos by choosing great fonts!  I went with Lobster Two, and
+then created some a simple bullet list using SVG and I was done really
+quickly.  I wrote the SVG by hand, but I'm sure there are alot of tools
+out there for doing so.  Here is the Logo.
+<center>
+  <a href="/" style="text-decoration:none">
+    <svg class="logo" height="65" width="300">
+      <g transform="scale(0.5, 0.5)">
+        <svg height="130" width="600">
+          <rect height="130" width="600" rx="10" ry="10" class="bgrect"/>
+          <g transform='translate(0,90)'>
+	        <text font-family="Lobster Two" font-weight="normal" font-size="110" y="5" x="20">
+	          Efficiently
+	        </text>
+          </g>
+          <g transform='translate(400,10)'>
+	        <g transform="translate(20, 20)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+	        <g transform="translate(50, 52)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+	        <g transform="translate(50, 85)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+          </g>
+        </svg>
+      </g>
+    </svg>
+  </a>
+</center>
+
+Here is the associated source code.
+
+{% syntax html %}
+<center>
+  <a href="/" style="text-decoration:none">
+    <svg class="logo" height="65" width="300">
+      <g transform="scale(0.5, 0.5)">
+        <svg height="130" width="600">
+          <rect height="130" width="600" rx="10" ry="10" class="bgrect"/>
+          <g transform='translate(0,90)'>
+	        <text font-family="Lobster Two" font-weight="normal" font-size="110" y="5" x="20">
+	          Efficiently
+	        </text>
+          </g>
+          <g transform='translate(400,10)'>
+	        <g transform="translate(20, 20)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+	        <g transform="translate(50, 52)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+	        <g transform="translate(50, 85)">
+	          <circle cx="0" cy="0" r="12"/>
+	          <rect x="8" y="-4" width="300" height="9" r="12"/>
+	        </g>
+          </g>
+        </svg>
+      </g>
+    </svg>
+  </a>
+</center>
+{% endsyntax %}
+
+There you have it, a few simple design tips from [bootstrapping design](http://bootstrappingdesign.com/), and my site is looking alot better.  It's worth noting that using less and bootstrap made it alot easier to put this site together, however 
+I really think updating your typography, color scheme, and logo can make a
+website much better.
+
+
+
+
+
+
