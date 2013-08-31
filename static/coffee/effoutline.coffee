@@ -208,6 +208,13 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     else
       return true
 
+  pushstate : () =>
+    currnode = @docview.currnode
+    currnode.tree_apply(
+      (n) -> n.todostate(currnode.todostate()),
+      null
+    )
+
   get_isearchkeyfunction : (e) =>
     modified = @modified(e)
     nsmodified = @nsmodified(e)
