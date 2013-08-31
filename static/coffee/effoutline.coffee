@@ -331,6 +331,8 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
       return @deletenode
     if not modified and e.keyCode == @keycodes.BACKSPACE
       return @deletekey
+    if nsmodified and e.keyCode == @keycodes.P_KEY
+      return @pushstate
     if e.keyCode == @keycodes.DELETE
       return @deletenode
     if modified and e.keyCode == @keycodes.RIGHT
@@ -475,15 +477,17 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     todostates = parent.doc.get('todostates')
     startingstate = todostates[0]
     if _.indexOf(todostates[...-1], state) >= 0
-      initialtext = Efficiently.set_text('', parent.doc, todo : startingstate)
+      state = startingstate
     else
-      initialtext = ''
+      state = null
     curridx = parent.child_index(@docview.currnode)
-    newnode = @docview.model.doc.newnode(text : initialtext)
+    newnode = @docview.model.doc.newnode()
+    if state
+      newnode.todostate(startingstate)
     newnode = @docview.currnode.add_sibling(newnode, curridx + 1)
     e.preventDefault()
     @docview.select(newnode)
-    @docview.currview().set_cursor(initialtext.length)
+    @docview.currview().set_cursor(newnode.get('text').length)
     return false
 
   modenter : (e) =>
@@ -492,14 +496,16 @@ class Efficiently.KeyEventer extends BBoilerplate.BasicView
     todostates = parent.doc.get('todostates')
     startingstate = todostates[0]
     if _.indexOf(todostates[...-1], state) >= 0
-      initialtext = Efficiently.set_text('', parent.doc, todo : startingstate)
+      state = startingstate
     else
-      initialtext = ''
-    newnode = @docview.model.doc.newnode(text : initialtext)
+      state = null
+    newnode = @docview.model.doc.newnode()
+    if state
+      newnode.todostate(startingstate)
     newnode = @docview.currnode.add_child(newnode)
     e.preventDefault()
     @docview.select(newnode)
-    @docview.currview().set_cursor(initialtext.length)
+    @docview.currview().set_cursor(newnode.get('text').length)
     return false
 
 class Efficiently.DocView extends Efficiently.BasicNodeView
@@ -944,6 +950,7 @@ class Efficiently.BasicNodeContentView extends BBoilerplate.BasicView
       @$el.find('.outline-input').focus()
       @$el.find('.outline-textdisplay').addClass('hide')
       @$el.find('.outline-input').removeClass('hide')
+      @$el.find('textarea').autoResize()
     else
       @$el.find('.outline-textdisplay').removeClass('hide')
       @$el.find('.outline-input').addClass('hide')
